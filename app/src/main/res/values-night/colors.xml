@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Brand: Tiki Blue Night -->
+    <color name="brand_primary">#38A3FF</color>
+    <color name="brand_primary_dark">#0B74E5</color>
+    <color name="brand_primary_light">#0A223A</color>
+    <color name="brand_secondary">#00A8FF</color>
+
+    <color name="brand_gradient_start">#0B74E5</color>
+    <color name="brand_gradient_center">#0095FF</color>
+    <color name="brand_gradient_end">#00C2FF</color>
+
+    <!-- Background / Surface -->
+    <color name="background">#0F172A</color>
+    <color name="surface">#111827</color>
+    <color name="surface_soft">#1E293B</color>
+    <color name="surface_blue_soft">#0A223A</color>
+
+    <!-- Text -->
+    <color name="text_primary">#F9FAFB</color>
+    <color name="text_secondary">#CBD5E1</color>
+    <color name="text_hint">#94A3B8</color>
+    <color name="text_white">#FFFFFFFF</color>
+
+    <!-- Border / Divider -->
+    <color name="border">#334155</color>
+    <color name="brand_border">#1E5C99</color>
+    <color name="divider">#263445</color>
+
+    <!-- State -->
+    <color name="danger">#F87171</color>
+    <color name="danger_light">#3A1010</color>
+
+    <color name="success">#4ADE80</color>
+    <color name="success_light">#052E1A</color>
+
+    <color name="warning">#FBBF24</color>
+    <color name="warning_light">#3A2A08</color>
+
+    <!-- Badge -->
+    <color name="badge_sale_bg">#0A223A</color>
+    <color name="badge_sale_text">#38A3FF</color>
+    <color name="badge_free_ship_bg">#052E1A</color>
+    <color name="badge_free_ship_text">#4ADE80</color>
+
+    <!-- Bottom navigation -->
+    <color name="nav_active">#38A3FF</color>
+    <color name="nav_inactive">#94A3B8</color>
+
+    <!-- Default -->
+    <color name="white">#FFFFFFFF</color>
+    <color name="black">#FF000000</color>
+
+</resources>

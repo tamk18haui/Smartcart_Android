@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- ========================= -->
+    <!-- Brand: Blue -->
+    <!-- ========================= -->
+    <color name="brand_primary">#0B74E5</color>
+    <color name="brand_primary_dark">#005BBB</color>
+    <color name="brand_primary_light">#EAF4FF</color>
+    <color name="brand_secondary">#00A8FF</color>
+
+    <color name="brand_gradient_start">#0B74E5</color>
+    <color name="brand_gradient_center">#0095FF</color>
+    <color name="brand_gradient_end">#00C2FF</color>
+
+    <!-- ========================= -->
+    <!-- Background / Surface -->
+    <!-- ========================= -->
+    <color name="background">#F5FAFF</color>
+    <color name="surface">#FFFFFF</color>
+    <color name="surface_soft">#F8FBFF</color>
+    <color name="surface_blue_soft">#EEF7FF</color>
+
+    <!-- ========================= -->
+    <!-- Text -->
+    <!-- ========================= -->
+    <color name="text_primary">#1F2937</color>
+    <color name="text_secondary">#64748B</color>
+    <color name="text_hint">#9CA3AF</color>
+    <color name="text_white">#FFFFFFFF</color>
+
+    <!-- ========================= -->
+    <!-- Border / Divider -->
+    <!-- ========================= -->
+    <color name="border">#DCEEFF</color>
+    <color name="brand_border">#B9DCFF</color>
+    <color name="divider">#E8F3FF</color>
+
+    <!-- ========================= -->
+    <!-- State -->
+    <!-- ========================= -->
+    <color name="danger">#DC2626</color>
+    <color name="danger_light">#FEE2E2</color>
+
+    <color name="success">#16A34A</color>
+    <color name="success_light">#E8FFF3</color>
+
+    <color name="warning">#F59E0B</color>
+    <color name="warning_light">#FFF7D6</color>
+
+    <!-- ========================= -->
+    <!-- Badge -->
+    <!-- ========================= -->
+    <color name="badge_sale_bg">#EAF4FF</color>
+    <color name="badge_sale_text">#0B74E5</color>
+    <color name="badge_free_ship_bg">#E8FFF3</color>
+    <color name="badge_free_ship_text">#16A34A</color>
+
+    <!-- ========================= -->
+    <!-- Bottom navigation -->
+    <!-- ========================= -->
+    <color name="nav_active">#0B74E5</color>
+    <color name="nav_inactive">#8A8A8A</color>
+
+    <!-- ========================= -->
+    <!-- Default -->
+    <!-- ========================= -->
+    <color name="white">#FFFFFFFF</color>
+    <color name="black">#FF000000</color>
+
+</resources>

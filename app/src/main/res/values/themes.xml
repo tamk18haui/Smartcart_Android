@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <style name="Base.Theme.SmartCartAndroid" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Brand colors -->
+        <item name="colorPrimary">@color/brand_primary</item>
+        <item name="colorPrimaryDark">@color/brand_primary_dark</item>
+        <item name="colorSecondary">@color/brand_secondary</item>
+        <item name="android:colorAccent">@color/brand_primary</item>
+
+        <!-- Window -->
+        <item name="android:windowBackground">@color/background</item>
+        <item name="android:statusBarColor">@color/brand_primary</item>
+        <item name="android:navigationBarColor">@color/surface</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
+
+        <!-- Font -->
+        <item name="android:fontFamily">sans</item>
+
+        <!-- Material default widgets -->
+        <item name="materialButtonStyle">@style/Widget.SmartCart.Button.Primary</item>
+        <item name="textInputStyle">@style/Widget.SmartCart.TextInputLayout</item>
+        <item name="bottomSheetDialogTheme">@style/ThemeOverlay.SmartCart.BottomSheetDialog</item>
+    </style>
+
+    <style name="Theme.SmartCartAndroid" parent="Base.Theme.SmartCartAndroid" />
+
+    <!-- ========================= -->
+    <!-- Button -->
+    <!-- ========================= -->
+
+    <style name="Widget.SmartCart.Button.Primary" parent="Widget.Material3.Button">
+        <item name="backgroundTint">@color/brand_primary</item>
+        <item name="cornerRadius">16dp</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:minHeight">52dp</item>
+        <item name="iconTint">@color/white</item>
+    </style>
+
+    <style name="Widget.SmartCart.Button.Outline" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="strokeColor">@color/brand_primary</item>
+        <item name="android:textColor">@color/brand_primary</item>
+        <item name="cornerRadius">16dp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:minHeight">48dp</item>
+        <item name="iconTint">@color/brand_primary</item>
+    </style>
+
+    <style name="Widget.SmartCart.Button.Text" parent="Widget.Material3.Button.TextButton">
+        <item name="android:textColor">@color/brand_primary</item>
+        <item name="android:textAllCaps">false</item>
+    </style>
+
+    <!-- ========================= -->
+    <!-- TextInput -->
+    <!-- ========================= -->
+
+    <style name="Widget.SmartCart.TextInputLayout" parent="Widget.Material3.TextInputLayout.OutlinedBox">
+        <item name="boxStrokeColor">@color/brand_primary</item>
+        <item name="hintTextColor">@color/text_hint</item>
+        <item name="boxCornerRadiusTopStart">14dp</item>
+        <item name="boxCornerRadiusTopEnd">14dp</item>
+        <item name="boxCornerRadiusBottomStart">14dp</item>
+        <item name="boxCornerRadiusBottomEnd">14dp</item>
+    </style>
+
+    <!-- ========================= -->
+    <!-- BottomSheet -->
+    <!-- ========================= -->
+
+    <style name="ThemeOverlay.SmartCart.BottomSheetDialog" parent="ThemeOverlay.Material3.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/Widget.SmartCart.BottomSheet</item>
+    </style>
+
+    <style name="Widget.SmartCart.BottomSheet" parent="Widget.Material3.BottomSheet.Modal">
+        <item name="shapeAppearanceOverlay">@style/ShapeAppearance.SmartCart.BottomSheet</item>
+        <item name="backgroundTint">@color/surface</item>
+    </style>
+
+    <!-- ========================= -->
+    <!-- Base Text Style -->
+    <!-- ========================= -->
+
+    <!-- Đã thêm parent="" để tránh lỗi implicit inheritance (kế thừa ngầm định) -->
+    <style name="Text.SmartCart" parent="">
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:fontFamily">sans</item>
+    </style>
+
+    <style name="Text.SmartCart.Title" parent="Text.SmartCart">
+        <item name="android:textSize">24sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="Text.SmartCart.SectionTitle" parent="Text.SmartCart">
+        <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="Text.SmartCart.Body" parent="Text.SmartCart">
+        <item name="android:textSize">15sp</item>
+    </style>
+
+    <style name="Text.SmartCart.Caption" parent="Text.SmartCart">
+        <item name="android:textColor">@color/text_secondary</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+
+    <style name="Text.SmartCart.Brand" parent="Text.SmartCart">
+        <item name="android:textColor">@color/brand_primary</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <!-- ========================= -->
+    <!-- Base ShapeAppearance -->
+    <!-- ========================= -->
+
+    <!-- Đã thêm parent="" để tránh lỗi implicit inheritance (kế thừa ngầm định) -->
+    <style name="ShapeAppearance.SmartCart" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">16dp</item>
+    </style>
+
+    <style name="ShapeAppearance.SmartCart.BottomSheet" parent="ShapeAppearance.SmartCart">
+        <item name="cornerSizeTopLeft">24dp</item>
+        <item name="cornerSizeTopRight">24dp</item>
+        <item name="cornerSizeBottomLeft">0dp</item>
+        <item name="cornerSizeBottomRight">0dp</item>
+    </style>
+
+</resources>

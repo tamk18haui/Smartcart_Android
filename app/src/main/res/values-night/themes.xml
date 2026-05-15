@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <style name="Base.Theme.SmartCartAndroid" parent="Theme.Material3.DayNight.NoActionBar">
+
+        <item name="colorPrimary">@color/brand_primary</item>
+        <item name="colorPrimaryDark">@color/brand_primary_dark</item>
+        <item name="colorSecondary">@color/brand_secondary</item>
+        <item name="android:colorAccent">@color/brand_primary</item>
+
+        <item name="android:windowBackground">@color/background</item>
+        <item name="android:statusBarColor">@color/background</item>
+        <item name="android:navigationBarColor">@color/background</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">false</item>
+
+        <item name="android:fontFamily">sans</item>
+
+        <item name="materialButtonStyle">@style/Widget.SmartCart.Button.Primary</item>
+        <item name="textInputStyle">@style/Widget.SmartCart.TextInputLayout</item>
+        <item name="bottomSheetDialogTheme">@style/ThemeOverlay.SmartCart.BottomSheetDialog</item>
+
+    </style>
+
+    <style name="Theme.SmartCartAndroid" parent="Base.Theme.SmartCartAndroid" />
+
+</resources>
