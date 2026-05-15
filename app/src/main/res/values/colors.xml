@@ -2,65 +2,70 @@
 <resources>
 
     <!-- ========================= -->
-    <!-- Brand: Blue -->
+    <!-- Price / Danger -->
     <!-- ========================= -->
-    <color name="brand_primary">#0B74E5</color>
-    <color name="brand_primary_dark">#005BBB</color>
-    <color name="brand_primary_light">#EAF4FF</color>
-    <color name="brand_secondary">#00A8FF</color>
-
-    <color name="brand_gradient_start">#0B74E5</color>
-    <color name="brand_gradient_center">#0095FF</color>
-    <color name="brand_gradient_end">#00C2FF</color>
+    <color name="price_red">#EF4444</color>
 
     <!-- ========================= -->
-    <!-- Background / Surface -->
+    <!-- Brand: Cyber Sapphire Blue (Xanh Lam Cao Cấp) -->
     <!-- ========================= -->
-    <color name="background">#F5FAFF</color>
+    <color name="brand_primary">#1A56DB</color> <!-- Xanh Sapphire đậm, cực kỳ sắc nét và chuyên nghiệp -->
+    <color name="brand_primary_dark">#1E429F</color>
+    <color name="brand_primary_light">#EDF2FF</color>
+    <color name="brand_secondary">#3B82F6</color> <!-- Xanh Electric làm điểm nhấn sáng -->
+
+    <color name="brand_gradient_start">#60A5FA</color>
+    <color name="brand_gradient_center">#1A56DB</color>
+    <color name="brand_gradient_end">#111827</color> <!-- Vuốt gradient về dark slate nhìn siêu sâu -->
+
+    <!-- ========================= -->
+    <!-- Background / Surface (Ice Blue Tone) -->
+    <!-- ========================= -->
+    <color name="background">#F4F8FC</color> <!-- Nền trắng tro ánh băng, tạo độ trong suốt cho UI -->
     <color name="surface">#FFFFFF</color>
-    <color name="surface_soft">#F8FBFF</color>
-    <color name="surface_blue_soft">#EEF7FF</color>
+    <color name="surface_soft">#FAFCFF</color>
+    <color name="surface_blue_soft">#E1EFFE</color> <!-- Xanh bộ đội nhạt cực mịn -->
 
     <!-- ========================= -->
-    <!-- Text -->
+    <!-- Text (Deep Navy Black) -->
     <!-- ========================= -->
-    <color name="text_primary">#1F2937</color>
-    <color name="text_secondary">#64748B</color>
+    <color name="text_primary">#111928</color> <!-- Đen ánh xanh rất sâu, nhìn sang hơn đen thường -->
+    <color name="text_secondary">#4B5563</color>
     <color name="text_hint">#9CA3AF</color>
     <color name="text_white">#FFFFFFFF</color>
 
     <!-- ========================= -->
     <!-- Border / Divider -->
     <!-- ========================= -->
-    <color name="border">#DCEEFF</color>
-    <color name="brand_border">#B9DCFF</color>
-    <color name="divider">#E8F3FF</color>
+    <color name="border">#E5EDF6</color>
+    <color name="brand_border">#BFDBFE</color>
+    <color name="divider">#F0F5FA</color>
 
     <!-- ========================= -->
     <!-- State -->
     <!-- ========================= -->
-    <color name="danger">#DC2626</color>
+    <color name="danger">#EF4444</color>
     <color name="danger_light">#FEE2E2</color>
 
-    <color name="success">#16A34A</color>
-    <color name="success_light">#E8FFF3</color>
+    <color name="success">#0E9F6E</color> <!-- Xanh mint đậm, rất hợp rơ với tone xanh dương -->
+    <color name="success_light">#E3FBEF</color>
 
-    <color name="warning">#F59E0B</color>
-    <color name="warning_light">#FFF7D6</color>
+    <color name="warning">#F5A623</color>
+    <color name="warning_light">#FFF8E6</color>
 
     <!-- ========================= -->
     <!-- Badge -->
     <!-- ========================= -->
-    <color name="badge_sale_bg">#EAF4FF</color>
-    <color name="badge_sale_text">#0B74E5</color>
-    <color name="badge_free_ship_bg">#E8FFF3</color>
-    <color name="badge_free_ship_text">#16A34A</color>
+    <color name="badge_sale_bg">#EDF2FF</color>
+    <color name="badge_sale_text">#1A56DB</color>
+    <color name="badge_free_ship_bg">#E3FBEF</color>
+    <color name="badge_free_ship_text">#0E9F6E</color>
 
     <!-- ========================= -->
     <!-- Bottom navigation -->
     <!-- ========================= -->
-    <color name="nav_active">#0B74E5</color>
-    <color name="nav_inactive">#8A8A8A</color>
+    <color name="nav_active">#1A56DB</color>
+    <color name="nav_inactive">#9CA3AF</color>
 
     <!-- ========================= -->
     <!-- Default -->

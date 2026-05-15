@@ -183,12 +183,12 @@
                     </LinearLayout>
 
                     <!-- REMEMBER & FORGOT PASSWORD -->
-                    <CheckBox
+                    <com.google.android.material.checkbox.MaterialCheckBox
                         android:id="@+id/cbRemember"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="16dp"
-                        android:buttonTint="@color/brand_primary"
+                        app:buttonTint="@color/brand_primary"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/layoutPassword" />
 

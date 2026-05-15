@@ -23,7 +23,7 @@ public class BaseActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
     }
 
-    protected void showToast(String message) {
+    public void showToast(String message) {
         if (message == null || message.trim().isEmpty()) return;
 
         if (currentToast != null) {

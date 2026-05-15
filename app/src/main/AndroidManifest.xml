@@ -22,13 +22,40 @@
             android:name=".auth.register.RegisterActivity"
             android:exported="false" />
 
-        <!-- Nếu đã có BuyerMainActivity thì giữ dòng này -->
-<!--        <activity-->
-<!--            android:name=".buyer.main.BuyerMainActivity"-->
-<!--            android:exported="false" />-->
+        <activity
+            android:name=".buyer.main.BuyerMainActivity"
+            android:exported="false" />
+        <activity
+            android:name=".buyer.product.ProductDetailActivity"
+            android:exported="false" />
+        <activity
+            android:name=".buyer.account.AccountActivity"
+            android:exported="false" />
+        <activity
+            android:name=".buyer.address.AddressActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".buyer.address.AddressFormActivity"
+            android:exported="false" />
+        <activity
+            android:name=".buyer.notification.NotificationActivity"
+            android:exported="false" />
+        <activity
+            android:name=".buyer.cart.CartActivity"
+            android:exported="false" />
+        <activity
+            android:name=".buyer.order.OrderHistoryActivity"
+            android:exported="false" />
 
         <activity
             android:name=".auth.login.LoginActivity"
+            android:exported="false" />
+        <activity
+            android:name=".buyer.checkout.CheckoutActivity"
+            android:exported="false" />
+        <activity
+            android:name=".MainActivity"
             android:exported="true">
 
             <intent-filter>
