@@ -31,6 +31,9 @@ import com.gr6.smartcart_android.buyer.checkout.CheckoutSelectedShop;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.google.gson.Gson;
+import com.gr6.smartcart_android.buyer.checkout.CheckoutActivity;
+import com.gr6.smartcart_android.buyer.checkout.CheckoutSelectedShop;
 
 public class CartActivity extends BaseActivity {
 
@@ -294,56 +297,53 @@ public class CartActivity extends BaseActivity {
     }
 
     private void checkoutSelectedItems() {
-        List<CheckoutSelectedShop> selectedShops = new ArrayList<>();
-
-        for (CartDetailResponse.ShopCart shop : shops) {
-            List<CheckoutSelectedShop.CheckoutSelectedItem> selectedItems = new ArrayList<>();
-
-            for (CartDetailResponse.CartItem item : shop.getItems()) {
-                if (!item.isSelected()) continue;
-
-                if (item.getVariantId() == null || item.getVariantId() <= 0) {
-                    showToast("Thiếu variantId trong giỏ hàng");
-                    return;
-                }
-
-                if (item.getQuantity() == null || item.getQuantity() <= 0) {
-                    showToast("Số lượng sản phẩm không hợp lệ");
-                    return;
-                }
-
-                selectedItems.add(new CheckoutSelectedShop.CheckoutSelectedItem(
-                        item.getVariantId(),
-                        item.getProductId(),
-                        item.getProductName(),
-                        item.getVariantText(),
-                        item.getImageUrl(),
-                        item.getPrice(),
-                        item.getQuantity()
-                ));
-            }
-
-            if (!selectedItems.isEmpty()) {
-                selectedShops.add(new CheckoutSelectedShop(
-                        shop.getShopId(),
-                        shop.getShopName(),
-                        null,
-                        selectedItems
-                ));
-            }
+        if (adapter == null) {
+            showToast("Giỏ hàng chưa sẵn sàng");
+            return;
         }
 
-        if (selectedShops.isEmpty()) {
+        List<CheckoutSelectedShop> selectedShops = adapter.getSelectedCheckoutShops();
+
+        if (selectedShops == null || selectedShops.isEmpty()) {
             showToast("Vui lòng chọn sản phẩm cần thanh toán");
             return;
         }
 
+        StringBuilder debug = new StringBuilder();
+        debug.append("Số shop gửi sang checkout: ")
+                .append(selectedShops.size())
+                .append("\n");
+
+        for (CheckoutSelectedShop shop : selectedShops) {
+            debug.append("Shop ")
+                    .append(shop.getShopId())
+                    .append(" - ")
+                    .append(shop.getShopName())
+                    .append(": ")
+                    .append(shop.getItems().size())
+                    .append(" sản phẩm\n");
+
+            for (CheckoutSelectedShop.CheckoutSelectedItem item : shop.getItems()) {
+                debug.append("   variantId=")
+                        .append(item.getVariantId())
+                        .append(", qty=")
+                        .append(item.getQuantity())
+                        .append("\n");
+            }
+        }
+
+        android.util.Log.d("CART_CHECKOUT_DEBUG", debug.toString());
+
+        String selectedShopsJson = new Gson().toJson(selectedShops);
+        android.util.Log.d("CART_CHECKOUT_JSON", selectedShopsJson);
+
+        showLongToast("Số shop gửi sang checkout: " + selectedShops.size());
+
         Intent intent = new Intent(this, CheckoutActivity.class);
         intent.putExtra("checkout_source", CheckoutActivity.SOURCE_FROM_CART);
-        intent.putExtra("selected_shops_json", new Gson().toJson(selectedShops));
+        intent.putExtra("selected_shops_json", selectedShopsJson);
         startActivity(intent);
     }
-
     private void openProductDetail(CartDetailResponse.CartItem item) {
         if (item == null || item.getProductId() == null) return;
 

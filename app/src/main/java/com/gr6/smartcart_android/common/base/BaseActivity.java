@@ -10,6 +10,7 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.gr6.smartcart_android.R;
 
@@ -80,6 +81,28 @@ public class BaseActivity extends AppCompatActivity {
         loadingDialog.show();
     }
 
+    protected void setupSwipeRefresh(
+            SwipeRefreshLayout swipeRefreshLayout,
+            Runnable reloadAction
+    ) {
+        if (swipeRefreshLayout == null) return;
+
+        swipeRefreshLayout.setColorSchemeResources(R.color.brand_primary);
+
+        swipeRefreshLayout.setOnRefreshListener(() -> {
+            if (reloadAction != null) {
+                reloadAction.run();
+            } else {
+                swipeRefreshLayout.setRefreshing(false);
+            }
+        });
+    }
+
+    protected void stopSwipeRefresh(SwipeRefreshLayout swipeRefreshLayout) {
+        if (swipeRefreshLayout != null) {
+            swipeRefreshLayout.setRefreshing(false);
+        }
+    }
     protected void hideLoading() {
         if (loadingDialog == null) return;
 

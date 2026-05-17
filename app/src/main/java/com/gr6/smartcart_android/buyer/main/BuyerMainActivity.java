@@ -107,25 +107,25 @@ public class BuyerMainActivity extends BaseActivity {
     private void initEvents() {
         swipeRefresh.setColorSchemeResources(R.color.brand_primary);
         swipeRefresh.setOnRefreshListener(() -> viewModel.refreshHome());
-        if (nestedHome != null) {
-            nestedHome.setOnScrollChangeListener(
-                    (NestedScrollView.OnScrollChangeListener) (v, scrollX, scrollY, oldScrollX, oldScrollY) -> {
-                        if (!v.canScrollVertically(1)) {
-                            viewModel.loadMoreProducts();
-                        }
-                    }
-            );
-        }
+
         imgCart.setOnClickListener(v -> {
-            Intent intent = new Intent(this, CartActivity.class);
+            Intent intent = new Intent(this, com.gr6.smartcart_android.buyer.cart.CartActivity.class);
             startActivity(intent);
         });
 
-        imgNotification.setOnClickListener(v ->
-                showToast("Thông báo sẽ làm ở bước sau")
-        );
+        imgNotification.setOnClickListener(v -> {
+            Intent intent = new Intent(this, com.gr6.smartcart_android.buyer.notification.NotificationActivity.class);
+            startActivity(intent);
+        });
 
-        categoryAdapter.setOnCategoryClickListener(this::filterByCategory);
+        categoryAdapter.setOnCategoryClickListener(category -> {
+            if (category == null || category.getCategoryId() == null) {
+                viewModel.clearCategoryFilter();
+                return;
+            }
+
+            viewModel.filterByCategory(category.getCategoryId());
+        });
 
         productAdapter.setOnProductClickListener(product -> {
             if (product.getProductId() == null) {
@@ -133,8 +133,11 @@ public class BuyerMainActivity extends BaseActivity {
                 return;
             }
 
-            Intent intent = new Intent(this, ProductDetailActivity.class);
-            intent.putExtra(ProductDetailActivity.EXTRA_PRODUCT_ID, product.getProductId());
+            Intent intent = new Intent(this, com.gr6.smartcart_android.buyer.product.ProductDetailActivity.class);
+            intent.putExtra(
+                    com.gr6.smartcart_android.buyer.product.ProductDetailActivity.EXTRA_PRODUCT_ID,
+                    product.getProductId()
+            );
             startActivity(intent);
         });
 
@@ -155,15 +158,39 @@ public class BuyerMainActivity extends BaseActivity {
                     int before,
                     int count
             ) {
-                filterByKeyword(s == null ? "" : s.toString());
+                viewModel.searchProducts(s == null ? "" : s.toString());
             }
 
             @Override
             public void afterTextChanged(Editable s) {
             }
         });
-    }
 
+        setupLoadMoreScroll();
+    }
+    private void setupLoadMoreScroll() {
+        int nestedHomeId = getResources().getIdentifier(
+                "nestedHome",
+                "id",
+                getPackageName()
+        );
+
+        if (nestedHomeId == 0) {
+            return;
+        }
+
+        View nestedHome = findViewById(nestedHomeId);
+
+        if (nestedHome == null) {
+            return;
+        }
+
+        nestedHome.setOnScrollChangeListener((v, scrollX, scrollY, oldScrollX, oldScrollY) -> {
+            if (!v.canScrollVertically(1)) {
+                viewModel.loadMoreProducts();
+            }
+        });
+    }
     private void observeHome() {
         viewModel.getHomeState().observe(this, state -> {
             if (state == null) return;

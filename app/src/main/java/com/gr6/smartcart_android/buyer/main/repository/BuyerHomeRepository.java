@@ -7,7 +7,6 @@ import androidx.annotation.NonNull;
 import com.gr6.smartcart_android.buyer.main.api.BuyerHomeApiService;
 import com.gr6.smartcart_android.buyer.main.request.SearchProductRequest;
 import com.gr6.smartcart_android.buyer.main.response.HomeCategoryResponse;
-import com.gr6.smartcart_android.buyer.main.response.HomeProductResponse;
 import com.gr6.smartcart_android.buyer.main.response.ProductPageResponse;
 import com.gr6.smartcart_android.common.base.BaseResponse;
 import com.gr6.smartcart_android.common.network.ApiClient;
@@ -46,65 +45,29 @@ public class BuyerHomeRepository {
         });
     }
 
-    public void getHomeProducts(HomeCallback<List<HomeProductResponse>> callback) {
-        apiService.getHomeProducts().enqueue(new Callback<BaseResponse<List<HomeProductResponse>>>() {
+    public void searchProducts(
+            SearchProductRequest request,
+            int page,
+            int size,
+            HomeCallback<ProductPageResponse> callback
+    ) {
+        apiService.searchProducts(request, page, size).enqueue(new Callback<BaseResponse<ProductPageResponse>>() {
             @Override
             public void onResponse(
-                    @NonNull Call<BaseResponse<List<HomeProductResponse>>> call,
-                    @NonNull Response<BaseResponse<List<HomeProductResponse>>> response
+                    @NonNull Call<BaseResponse<ProductPageResponse>> call,
+                    @NonNull Response<BaseResponse<ProductPageResponse>> response
             ) {
                 handleResponse(response, callback, "Không lấy được sản phẩm");
             }
 
             @Override
             public void onFailure(
-                    @NonNull Call<BaseResponse<List<HomeProductResponse>>> call,
+                    @NonNull Call<BaseResponse<ProductPageResponse>> call,
                     @NonNull Throwable t
             ) {
                 callback.onError("Không kết nối được server: " + t.getMessage());
             }
         });
-    }
-    public void getHomeProductsPage(
-            int page,
-            int size,
-            HomeCallback<ProductPageResponse> callback
-    ) {
-        apiService.searchProducts(SearchProductRequest.empty(), page, size)
-                .enqueue(new Callback<BaseResponse<ProductPageResponse>>() {
-                    @Override
-                    public void onResponse(
-                            @NonNull Call<BaseResponse<ProductPageResponse>> call,
-                            @NonNull Response<BaseResponse<ProductPageResponse>> response
-                    ) {
-                        if (!response.isSuccessful()) {
-                            callback.onError("Lấy sản phẩm thất bại. Mã lỗi: " + response.code());
-                            return;
-                        }
-
-                        BaseResponse<ProductPageResponse> body = response.body();
-
-                        if (body == null) {
-                            callback.onError("Server không trả dữ liệu sản phẩm");
-                            return;
-                        }
-
-                        if (!body.isSuccess()) {
-                            callback.onError(body.getSafeMessage());
-                            return;
-                        }
-
-                        callback.onSuccess(body.getData());
-                    }
-
-                    @Override
-                    public void onFailure(
-                            @NonNull Call<BaseResponse<ProductPageResponse>> call,
-                            @NonNull Throwable t
-                    ) {
-                        callback.onError("Không kết nối được server: " + t.getMessage());
-                    }
-                });
     }
 
     private <T> void handleResponse(

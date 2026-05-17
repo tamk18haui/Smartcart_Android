@@ -3,6 +3,7 @@ package com.gr6.smartcart_android.buyer.checkout;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.text.TextUtils;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -84,18 +85,20 @@ public class CheckoutShopAdapter extends RecyclerView.Adapter<CheckoutShopAdapte
 
         holder.txtShopName.setText(shop.getShopName());
 
-        holder.layoutProducts.removeAllViews();
-
         int quantityCount = 0;
+        holder.layoutProducts.removeAllViews();
 
         for (CheckoutPreviewResponse.ItemPreview item : shop.getItems()) {
             quantityCount += item.getQuantity();
             holder.layoutProducts.addView(createProductRow(item));
         }
 
-        holder.txtShopTotalLabel.setText("Tổng số tiền (" + quantityCount + " sản phẩm):");
+        holder.txtShopSubInfo.setText(quantityCount + " sản phẩm trong đơn này");
+        holder.txtShopTotalLabel.setText("Tổng shop (" + quantityCount + " sản phẩm):");
+
         holder.txtShopItemTotal.setText(formatVnd(shop.getShopItemTotal()));
         holder.txtShippingFee.setText(formatVnd(shop.getShopShippingFee()));
+        holder.txtShopTotal.setText(formatVnd(shop.getSubtotal()));
 
         if (shop.getShopDiscount() > 0) {
             holder.txtShopDiscount.setText("-" + formatVnd(shop.getShopDiscount()));
@@ -105,19 +108,32 @@ public class CheckoutShopAdapter extends RecyclerView.Adapter<CheckoutShopAdapte
             holder.txtShopDiscount.setTextColor(ContextCompat.getColor(context, R.color.text_secondary));
         }
 
-        holder.txtShopTotal.setText(formatVnd(shop.getSubtotal()));
-
         if (currentVoucher == null || currentVoucher.trim().isEmpty()) {
-            holder.txtShopVoucher.setText("Chọn mã giảm giá  ›");
+            holder.txtShopVoucher.setText("Chọn mã giảm giá");
             holder.txtShopVoucher.setTextColor(ContextCompat.getColor(context, R.color.text_secondary));
+            holder.txtShopVoucherSaving.setText("");
+            holder.txtShopVoucherSaving.setVisibility(View.GONE);
         } else {
-            holder.txtShopVoucher.setText(currentVoucher + "  ✕");
+            holder.txtShopVoucher.setText("Đang áp dụng: " + currentVoucher);
             holder.txtShopVoucher.setTextColor(ContextCompat.getColor(context, R.color.price_red));
+
+            if (shop.getShopDiscount() > 0) {
+                holder.txtShopVoucherSaving.setVisibility(View.VISIBLE);
+                holder.txtShopVoucherSaving.setText("Bạn tiết kiệm " + formatVnd(shop.getShopDiscount()));
+            } else {
+                holder.txtShopVoucherSaving.setVisibility(View.VISIBLE);
+                holder.txtShopVoucherSaving.setText("Mã sẽ được kiểm tra khi đặt hàng");
+            }
         }
 
         holder.layoutShopVoucher.setOnClickListener(v -> {
             if (voucherClickListener != null) {
-                voucherClickListener.onClick(shopId, shop.getShopName(), currentVoucher);
+                voucherClickListener.onClick(
+                        shopId,
+                        shop.getShopName(),
+                        currentVoucher,
+                        shop.getShopItemTotal()
+                );
             }
         });
     }
@@ -130,13 +146,13 @@ public class CheckoutShopAdapter extends RecyclerView.Adapter<CheckoutShopAdapte
     private View createProductRow(CheckoutPreviewResponse.ItemPreview item) {
         LinearLayout row = new LinearLayout(context);
         row.setOrientation(LinearLayout.HORIZONTAL);
-        row.setGravity(android.view.Gravity.CENTER_VERTICAL);
+        row.setGravity(Gravity.CENTER_VERTICAL);
         row.setPadding(0, dp(12), 0, 0);
 
         ImageView image = new ImageView(context);
         image.setScaleType(ImageView.ScaleType.CENTER_CROP);
-        image.setBackgroundResource(R.drawable.bg_cart_image);
-        image.setPadding(dp(5), dp(5), dp(5), dp(5));
+        image.setBackgroundResource(R.drawable.bg_image_placeholder);
+        image.setPadding(dp(4), dp(4), dp(4), dp(4));
 
         if (item.getVariantImageUrl() != null && !item.getVariantImageUrl().trim().isEmpty()) {
             ImageLoader.load(context, item.getVariantImageUrl(), image);
@@ -144,7 +160,7 @@ public class CheckoutShopAdapter extends RecyclerView.Adapter<CheckoutShopAdapte
             image.setImageResource(R.drawable.ic_cart);
         }
 
-        row.addView(image, new LinearLayout.LayoutParams(dp(76), dp(76)));
+        row.addView(image, new LinearLayout.LayoutParams(dp(74), dp(74)));
 
         LinearLayout info = new LinearLayout(context);
         info.setOrientation(LinearLayout.VERTICAL);
@@ -163,6 +179,8 @@ public class CheckoutShopAdapter extends RecyclerView.Adapter<CheckoutShopAdapte
         info.addView(name);
 
         TextView variant = createText(item.getOptionValues(), 12, R.color.text_secondary, Typeface.NORMAL);
+        variant.setMaxLines(1);
+        variant.setEllipsize(TextUtils.TruncateAt.END);
 
         LinearLayout.LayoutParams variantParams = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
@@ -171,19 +189,28 @@ public class CheckoutShopAdapter extends RecyclerView.Adapter<CheckoutShopAdapte
         variantParams.topMargin = dp(4);
         info.addView(variant, variantParams);
 
-        TextView price = createText(
-                formatVnd(item.getPrice()) + "  x" + item.getQuantity(),
-                14,
-                R.color.price_red,
-                Typeface.BOLD
-        );
+        LinearLayout priceRow = new LinearLayout(context);
+        priceRow.setGravity(Gravity.CENTER_VERTICAL);
+        priceRow.setOrientation(LinearLayout.HORIZONTAL);
+
+        TextView price = createText(formatVnd(item.getPrice()), 14, R.color.price_red, Typeface.BOLD);
+
+        TextView qty = createText("x" + item.getQuantity(), 13, R.color.text_secondary, Typeface.BOLD);
+        qty.setGravity(Gravity.END);
+
+        priceRow.addView(price, new LinearLayout.LayoutParams(
+                0,
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                1
+        ));
+        priceRow.addView(qty);
 
         LinearLayout.LayoutParams priceParams = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
         );
-        priceParams.topMargin = dp(6);
-        info.addView(price, priceParams);
+        priceParams.topMargin = dp(7);
+        info.addView(priceRow, priceParams);
 
         return row;
     }
@@ -210,7 +237,10 @@ public class CheckoutShopAdapter extends RecyclerView.Adapter<CheckoutShopAdapte
     static class ShopViewHolder extends RecyclerView.ViewHolder {
 
         TextView txtShopName;
+        TextView txtShopSubInfo;
+        TextView txtShopVoucherTitle;
         TextView txtShopVoucher;
+        TextView txtShopVoucherSaving;
         TextView txtShopItemTotal;
         TextView txtShippingFee;
         TextView txtShopDiscount;
@@ -223,7 +253,10 @@ public class CheckoutShopAdapter extends RecyclerView.Adapter<CheckoutShopAdapte
             super(itemView);
 
             txtShopName = itemView.findViewById(R.id.txtShopName);
+            txtShopSubInfo = itemView.findViewById(R.id.txtShopSubInfo);
+            txtShopVoucherTitle = itemView.findViewById(R.id.txtShopVoucherTitle);
             txtShopVoucher = itemView.findViewById(R.id.txtShopVoucher);
+            txtShopVoucherSaving = itemView.findViewById(R.id.txtShopVoucherSaving);
             txtShopItemTotal = itemView.findViewById(R.id.txtShopItemTotal);
             txtShippingFee = itemView.findViewById(R.id.txtShippingFee);
             txtShopDiscount = itemView.findViewById(R.id.txtShopDiscount);
@@ -235,6 +268,11 @@ public class CheckoutShopAdapter extends RecyclerView.Adapter<CheckoutShopAdapte
     }
 
     public interface OnShopVoucherClickListener {
-        void onClick(Long shopId, String shopName, String currentVoucherCode);
+        void onClick(
+                Long shopId,
+                String shopName,
+                String currentVoucherCode,
+                Long shopItemTotal
+        );
     }
 }

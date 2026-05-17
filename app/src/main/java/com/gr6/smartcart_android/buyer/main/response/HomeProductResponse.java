@@ -12,6 +12,18 @@ public class HomeProductResponse {
     @SerializedName("id")
     private Long id;
 
+    @SerializedName("categoryId")
+    private Long categoryId;
+
+    @SerializedName("categoryName")
+    private String categoryName;
+
+    @SerializedName("shopId")
+    private Long shopId;
+
+    @SerializedName("shopName")
+    private String shopName;
+
     @SerializedName("productName")
     private String productName;
 
@@ -39,6 +51,9 @@ public class HomeProductResponse {
     @SerializedName("minPrice")
     private BigDecimal minPrice;
 
+    @SerializedName("maxPrice")
+    private BigDecimal maxPrice;
+
     @SerializedName("salePrice")
     private BigDecimal salePrice;
 
@@ -48,8 +63,8 @@ public class HomeProductResponse {
     @SerializedName("soldQuantity")
     private Integer soldQuantity;
 
-    @SerializedName("sold")
-    private Integer sold;
+    @SerializedName("totalSold")
+    private Integer totalSold;
 
     @SerializedName("averageRating")
     private Double averageRating;
@@ -57,60 +72,24 @@ public class HomeProductResponse {
     @SerializedName("rating")
     private Double rating;
 
-    @SerializedName("shopId")
-    private Long shopId;
+    @SerializedName("reviewCount")
+    private Integer reviewCount;
 
-    @SerializedName("shopName")
-    private String shopName;
-
-    @SerializedName("categoryId")
-    private Long categoryId;
+    @SerializedName("location")
+    private String location;
 
     public Long getProductId() {
         if (productId != null) return productId;
         return id;
     }
 
-    public String getProductName() {
-        if (productName != null && !productName.trim().isEmpty()) return productName;
-        if (name != null && !name.trim().isEmpty()) return name;
-        return "Sản phẩm";
+    public Long getCategoryId() {
+        return categoryId;
     }
 
-    public String getProductDescription() {
-        if (productDescription != null && !productDescription.trim().isEmpty()) {
-            return productDescription;
-        }
-        return description;
-    }
-
-    public String getImageUrl() {
-        if (thumbnailUrl != null && !thumbnailUrl.trim().isEmpty()) return thumbnailUrl;
-        if (imageUrl != null && !imageUrl.trim().isEmpty()) return imageUrl;
-        return productImageUrl;
-    }
-
-    public BigDecimal getDisplayPrice() {
-        if (salePrice != null) return salePrice;
-        if (minPrice != null) return minPrice;
-        if (price != null) return price;
-        return BigDecimal.ZERO;
-    }
-
-    public BigDecimal getOriginalPrice() {
-        return originalPrice;
-    }
-
-    public Integer getSoldQuantity() {
-        if (soldQuantity != null) return soldQuantity;
-        if (sold != null) return sold;
-        return 0;
-    }
-
-    public Double getAverageRating() {
-        if (averageRating != null) return averageRating;
-        if (rating != null) return rating;
-        return 0.0;
+    public String getCategoryName() {
+        if (categoryName == null || categoryName.trim().isEmpty()) return "Danh mục";
+        return categoryName;
     }
 
     public Long getShopId() {
@@ -122,7 +101,85 @@ public class HomeProductResponse {
         return shopName;
     }
 
-    public Long getCategoryId() {
-        return categoryId;
+    public String getProductName() {
+        if (productName != null && !productName.trim().isEmpty()) return productName;
+        if (name != null && !name.trim().isEmpty()) return name;
+        return "Sản phẩm SmartCart";
+    }
+
+    public String getDescription() {
+        if (productDescription != null && !productDescription.trim().isEmpty()) {
+            return productDescription;
+        }
+
+        if (description != null && !description.trim().isEmpty()) {
+            return description;
+        }
+
+        return "";
+    }
+
+    public String getImageUrl() {
+        if (thumbnailUrl != null && !thumbnailUrl.trim().isEmpty()) return thumbnailUrl.trim();
+        if (imageUrl != null && !imageUrl.trim().isEmpty()) return firstImage(imageUrl);
+        if (productImageUrl != null && !productImageUrl.trim().isEmpty()) return firstImage(productImageUrl);
+        return "";
+    }
+
+    public BigDecimal getDisplayPrice() {
+        if (salePrice != null && salePrice.compareTo(BigDecimal.ZERO) > 0) return salePrice;
+        if (minPrice != null && minPrice.compareTo(BigDecimal.ZERO) > 0) return minPrice;
+        if (price != null && price.compareTo(BigDecimal.ZERO) > 0) return price;
+        if (originalPrice != null && originalPrice.compareTo(BigDecimal.ZERO) > 0) return originalPrice;
+        return BigDecimal.ZERO;
+    }
+
+    public BigDecimal getMinPrice() {
+        if (minPrice != null) return minPrice;
+        return getDisplayPrice();
+    }
+
+    public BigDecimal getMaxPrice() {
+        if (maxPrice != null) return maxPrice;
+        return getDisplayPrice();
+    }
+
+    public BigDecimal getOriginalPrice() {
+        return originalPrice;
+    }
+
+    public Integer getSoldQuantity() {
+        if (soldQuantity != null) return Math.max(soldQuantity, 0);
+        if (totalSold != null) return Math.max(totalSold, 0);
+        return 0;
+    }
+
+    public Double getAverageRating() {
+        if (averageRating != null) return averageRating;
+        if (rating != null) return rating;
+        return 0.0;
+    }
+
+    public Integer getReviewCount() {
+        return reviewCount == null ? 0 : reviewCount;
+    }
+
+    public String getLocation() {
+        if (location == null || location.trim().isEmpty()) return "";
+        return location.trim();
+    }
+
+    private String firstImage(String raw) {
+        if (raw == null || raw.trim().isEmpty()) return "";
+
+        String[] parts = raw.split(",");
+
+        for (String part : parts) {
+            if (part != null && !part.trim().isEmpty()) {
+                return part.trim();
+            }
+        }
+
+        return "";
     }
 }

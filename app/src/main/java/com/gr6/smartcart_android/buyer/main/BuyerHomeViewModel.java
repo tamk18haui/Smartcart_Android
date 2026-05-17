@@ -8,6 +8,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.gr6.smartcart_android.buyer.main.repository.BuyerHomeRepository;
+import com.gr6.smartcart_android.buyer.main.request.SearchProductRequest;
 import com.gr6.smartcart_android.buyer.main.response.HomeCategoryResponse;
 import com.gr6.smartcart_android.buyer.main.response.HomeProductResponse;
 import com.gr6.smartcart_android.buyer.main.response.ProductPageResponse;
@@ -30,6 +31,9 @@ public class BuyerHomeViewModel extends AndroidViewModel {
     private boolean loadingMore = false;
     private boolean firstLoading = false;
 
+    private String currentKeyword = "";
+    private Long currentCategoryId = null;
+
     public BuyerHomeViewModel(@NonNull Application application) {
         super(application);
         repository = new BuyerHomeRepository(application);
@@ -40,14 +44,7 @@ public class BuyerHomeViewModel extends AndroidViewModel {
     }
 
     public void loadHome() {
-        currentPage = 0;
-        lastPage = false;
-        loadingMore = false;
         firstLoading = true;
-
-        cachedCategories.clear();
-        cachedProducts.clear();
-
         homeState.setValue(BuyerHomeState.loading());
 
         repository.getCategories(new BuyerHomeRepository.HomeCallback<List<HomeCategoryResponse>>() {
@@ -71,33 +68,59 @@ public class BuyerHomeViewModel extends AndroidViewModel {
     }
 
     public void refreshHome() {
+        currentKeyword = "";
+        currentCategoryId = null;
         loadHome();
     }
 
+    public void searchProducts(String keyword) {
+        currentKeyword = keyword == null ? "" : keyword.trim();
+        loadProductsPage(0, true);
+    }
+
+    public void filterByCategory(Long categoryId) {
+        currentCategoryId = categoryId;
+        loadProductsPage(0, true);
+    }
+
+    public void clearCategoryFilter() {
+        currentCategoryId = null;
+        loadProductsPage(0, true);
+    }
+
     public void loadMoreProducts() {
-        if (firstLoading || loadingMore || lastPage) return;
+        if (loadingMore || lastPage || firstLoading) return;
 
         loadProductsPage(currentPage + 1, false);
     }
 
-    private void loadProductsPage(int page, boolean firstPage) {
-        if (firstPage) {
+    private void loadProductsPage(int page, boolean reset) {
+        if (reset) {
             firstLoading = true;
+            cachedProducts.clear();
+            currentPage = 0;
+            lastPage = false;
+            homeState.setValue(BuyerHomeState.loading());
         } else {
             loadingMore = true;
         }
 
-        repository.getHomeProductsPage(
+        SearchProductRequest request = SearchProductRequest.ofKeywordAndCategory(
+                currentKeyword,
+                currentCategoryId
+        );
+
+        repository.searchProducts(
+                request,
                 page,
                 PAGE_SIZE,
                 new BuyerHomeRepository.HomeCallback<ProductPageResponse>() {
                     @Override
-                    public void onSuccess(ProductPageResponse pageData) {
+                    public void onSuccess(ProductPageResponse data) {
                         firstLoading = false;
                         loadingMore = false;
 
-                        if (pageData == null) {
-                            lastPage = true;
+                        if (data == null) {
                             homeState.postValue(BuyerHomeState.success(
                                     new ArrayList<>(cachedCategories),
                                     new ArrayList<>(cachedProducts)
@@ -105,13 +128,14 @@ public class BuyerHomeViewModel extends AndroidViewModel {
                             return;
                         }
 
-                        if (firstPage) {
+                        currentPage = data.getPageIndexZeroBased();
+                        lastPage = data.isLast();
+
+                        if (reset) {
                             cachedProducts.clear();
                         }
 
-                        cachedProducts.addAll(pageData.getContent());
-                        currentPage = pageData.getNumber();
-                        lastPage = pageData.isLast();
+                        cachedProducts.addAll(data.getProducts());
 
                         homeState.postValue(BuyerHomeState.success(
                                 new ArrayList<>(cachedCategories),

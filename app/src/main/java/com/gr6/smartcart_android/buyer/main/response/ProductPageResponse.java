@@ -10,11 +10,20 @@ public class ProductPageResponse {
     @SerializedName("content")
     private List<HomeProductResponse> content;
 
+    @SerializedName("data")
+    private List<HomeProductResponse> data;
+
     @SerializedName("number")
     private Integer number;
 
+    @SerializedName("currentPage")
+    private Integer currentPage;
+
     @SerializedName("size")
     private Integer size;
+
+    @SerializedName("pageSize")
+    private Integer pageSize;
 
     @SerializedName("totalPages")
     private Integer totalPages;
@@ -25,17 +34,26 @@ public class ProductPageResponse {
     @SerializedName("last")
     private Boolean last;
 
-    public List<HomeProductResponse> getContent() {
-        if (content == null) return new ArrayList<>();
-        return content;
+    public List<HomeProductResponse> getProducts() {
+        if (content != null) return content;
+        if (data != null) return data;
+        return new ArrayList<>();
     }
 
-    public int getNumber() {
-        return number == null ? 0 : number;
+    public int getPageIndexZeroBased() {
+        if (number != null) return number;
+
+        if (currentPage != null && currentPage > 0) {
+            return currentPage - 1;
+        }
+
+        return 0;
     }
 
     public int getSize() {
-        return size == null ? 0 : size;
+        if (size != null) return size;
+        if (pageSize != null) return pageSize;
+        return getProducts().size();
     }
 
     public int getTotalPages() {
@@ -47,6 +65,10 @@ public class ProductPageResponse {
     }
 
     public boolean isLast() {
-        return Boolean.TRUE.equals(last);
+        if (last != null) return last;
+
+        if (totalPages <= 0) return true;
+
+        return getPageIndexZeroBased() >= totalPages - 1;
     }
 }

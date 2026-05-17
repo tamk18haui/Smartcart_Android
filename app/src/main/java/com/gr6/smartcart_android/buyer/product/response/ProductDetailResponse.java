@@ -446,106 +446,112 @@ public class ProductDetailResponse {
 
     public static class ShopVoucherDTO {
 
-        @SerializedName("voucherId")
         private Long voucherId;
-
-        @SerializedName("id")
-        private Long id;
-
-        @SerializedName("code")
+        private Long shopId;
         private String code;
-
-        @SerializedName("voucherCode")
-        private String voucherCode;
-
-        @SerializedName("name")
-        private String name;
-
-        @SerializedName("voucherName")
-        private String voucherName;
-
-        @SerializedName("discountType")
         private String discountType;
-
-        @SerializedName("type")
-        private String type;
-
-        @SerializedName("discountValue")
-        private BigDecimal discountValue;
-
-        @SerializedName("value")
-        private BigDecimal value;
-
-        @SerializedName("minOrderAmount")
-        private BigDecimal minOrderAmount;
-
-        @SerializedName("minimumOrderValue")
-        private BigDecimal minimumOrderValue;
-
-        @SerializedName("maxDiscountAmount")
-        private BigDecimal maxDiscountAmount;
-
-        @SerializedName("status")
+        private Long discountValue;
+        private Long minOrderValue;
+        private Long maxDiscountAmount;
+        private Integer usageLimit;
+        private Integer usedCount;
+        private String startDate;
+        private String endDate;
         private String status;
 
+        private Boolean usable;
+        private Boolean usedByCurrentUser;
+        private String unavailableReason;
+        private String displayTitle;
+        private String displaySubtitle;
+
         public Long getVoucherId() {
-            if (voucherId != null) return voucherId;
-            return id;
+            return voucherId;
+        }
+
+        public Long getShopId() {
+            return shopId;
         }
 
         public String getCode() {
-            if (code != null && !code.trim().isEmpty()) return code;
-            if (voucherCode != null && !voucherCode.trim().isEmpty()) return voucherCode;
-            return "VOUCHER";
-        }
-
-        public String getName() {
-            if (name != null && !name.trim().isEmpty()) return name;
-            if (voucherName != null && !voucherName.trim().isEmpty()) return voucherName;
-            return "Mã giảm giá của shop";
+            return code == null ? "" : code.trim();
         }
 
         public String getDiscountType() {
-            if (discountType != null && !discountType.trim().isEmpty()) return discountType;
-            return type;
+            return discountType == null ? "" : discountType;
         }
 
-        public BigDecimal getDiscountValue() {
-            if (discountValue != null) return discountValue;
-            if (value != null) return value;
-            return BigDecimal.ZERO;
+        public Long getDiscountValue() {
+            return discountValue == null ? 0L : discountValue;
         }
 
-        public BigDecimal getMinOrderAmount() {
-            if (minOrderAmount != null) return minOrderAmount;
-            if (minimumOrderValue != null) return minimumOrderValue;
-            return BigDecimal.ZERO;
+        public Long getMinOrderValue() {
+            return minOrderValue == null ? 0L : minOrderValue;
         }
 
-        public BigDecimal getMaxDiscountAmount() {
+        public Long getMaxDiscountAmount() {
             return maxDiscountAmount;
         }
 
+        public Integer getUsageLimit() {
+            return usageLimit == null ? 0 : usageLimit;
+        }
+
+        public Integer getUsedCount() {
+            return usedCount == null ? 0 : usedCount;
+        }
+
+        public String getStartDate() {
+            return startDate;
+        }
+
+        public String getEndDate() {
+            return endDate;
+        }
+
         public String getStatus() {
-            return status;
+            return status == null ? "" : status;
+        }
+
+        public boolean isUsable() {
+            return usable == null || usable;
+        }
+
+        public boolean isUsedByCurrentUser() {
+            return usedByCurrentUser != null && usedByCurrentUser;
+        }
+
+        public String getUnavailableReason() {
+            return unavailableReason == null ? "" : unavailableReason;
         }
 
         public String getDisplayTitle() {
-            return getCode();
+            if (displayTitle != null && !displayTitle.trim().isEmpty()) {
+                return displayTitle;
+            }
+
+            if ("PERCENT".equalsIgnoreCase(discountType)) {
+                return "Giảm " + getDiscountValue() + "%";
+            }
+
+            return "Giảm " + formatVnd(getDiscountValue());
         }
 
         public String getDisplaySubtitle() {
-            String safeType = getDiscountType() == null ? "" : getDiscountType().trim().toUpperCase();
-
-            if ("PERCENT".equals(safeType) || "PERCENTAGE".equals(safeType)) {
-                return "Giảm " + getDiscountValue().stripTrailingZeros().toPlainString() + "%";
+            if (displaySubtitle != null && !displaySubtitle.trim().isEmpty()) {
+                return displaySubtitle;
             }
 
-            if ("FIXED".equals(safeType) || "AMOUNT".equals(safeType) || "MONEY".equals(safeType)) {
-                return "Giảm " + getDiscountValue().stripTrailingZeros().toPlainString() + "đ";
+            if (getMinOrderValue() > 0) {
+                return "Đơn tối thiểu " + formatVnd(getMinOrderValue());
             }
 
-            return getName();
+            return "Không yêu cầu đơn tối thiểu";
+        }
+
+        private String formatVnd(Long value) {
+            long amount = value == null ? 0L : value;
+            return String.format("%,d", amount).replace(",", ".") + "đ";
         }
     }
 }

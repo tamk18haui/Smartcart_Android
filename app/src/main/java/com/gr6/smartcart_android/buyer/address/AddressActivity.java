@@ -10,6 +10,7 @@ import android.widget.TextView;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.gr6.smartcart_android.R;
 import com.gr6.smartcart_android.buyer.address.response.AddressResponse;
@@ -28,6 +29,7 @@ public class AddressActivity extends BaseActivity {
     public static final String RESULT_RECEIVER_PHONE = "receiver_phone";
     public static final String RESULT_FULL_ADDRESS = "full_address";
 
+    private SwipeRefreshLayout swipeAddress;
     private TextView txtTitle;
     private TextView txtAddressCount;
     private TextView txtEmpty;
@@ -73,6 +75,7 @@ public class AddressActivity extends BaseActivity {
         txtEmpty = findViewById(R.id.txtEmpty);
         btnAddAddress = findViewById(R.id.btnAddAddress);
         btnAddAddressEmpty = findViewById(R.id.btnAddAddressEmpty);
+        swipeAddress = findViewById(R.id.swipeAddress);
 
         layoutEmpty = findViewById(R.id.layoutEmpty);
         rcvAddresses = findViewById(R.id.rcvAddresses);
@@ -127,6 +130,7 @@ public class AddressActivity extends BaseActivity {
         btnAddAddress.setOnClickListener(v -> openForm(null));
 
         btnAddAddressEmpty.setOnClickListener(v -> openForm(null));
+        setupSwipeRefresh(swipeAddress, () -> viewModel.loadAddresses());
     }
 
     private void observeData() {
@@ -134,12 +138,11 @@ public class AddressActivity extends BaseActivity {
             if (state == null) return;
 
             if (state.isLoading()) {
-                showLoading();
+                swipeAddress.setRefreshing(true);
                 return;
             }
 
-            hideLoading();
-
+            stopSwipeRefresh(swipeAddress);
             if (state.isSuccess()) {
                 addresses.clear();
 

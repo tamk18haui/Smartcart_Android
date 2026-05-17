@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.gr6.smartcart_android.R;
 import com.gr6.smartcart_android.buyer.cart.response.CartDetailResponse;
+import com.gr6.smartcart_android.buyer.checkout.CheckoutSelectedShop;
 import com.gr6.smartcart_android.common.utils.ImageLoader;
 
 import java.text.NumberFormat;
@@ -37,6 +38,43 @@ public class CartShopAdapter extends RecyclerView.Adapter<CartShopAdapter.ShopVi
 
     public void setListener(CartListener listener) {
         this.listener = listener;
+    }
+
+    public List<CheckoutSelectedShop> getSelectedCheckoutShops() {
+        List<CheckoutSelectedShop> result = new ArrayList<>();
+
+        for (CartDetailResponse.ShopCart shop : shops) {
+            if (shop == null || shop.getItems() == null) continue;
+
+            List<CheckoutSelectedShop.CheckoutSelectedItem> selectedItems = new ArrayList<>();
+
+            for (CartDetailResponse.CartItem item : shop.getItems()) {
+                if (item == null || item.getVariantId() == null) continue;
+
+                if (item.isSelected()) {
+                    selectedItems.add(new CheckoutSelectedShop.CheckoutSelectedItem(
+                            item.getVariantId(),
+                            item.getProductId(),
+                            item.getProductName(),
+                            item.getVariantText(),
+                            item.getImageUrl(),
+                            item.getPrice(),
+                            item.getQuantity()
+                    ));
+                }
+            }
+
+            if (!selectedItems.isEmpty()) {
+                result.add(new CheckoutSelectedShop(
+                        shop.getShopId(),
+                        shop.getShopName(),
+                        null,
+                        selectedItems
+                ));
+            }
+        }
+
+        return result;
     }
 
     @NonNull
@@ -107,10 +145,7 @@ public class CartShopAdapter extends RecyclerView.Adapter<CartShopAdapter.ShopVi
             }
         }
 
-        private void bindProduct(
-                View productView,
-                CartDetailResponse.CartItem item
-        ) {
+        private void bindProduct(View productView, CartDetailResponse.CartItem item) {
             CheckBox cbProduct = productView.findViewById(R.id.cbProduct);
             ImageView imgProduct = productView.findViewById(R.id.imgProduct);
             TextView txtProductName = productView.findViewById(R.id.txtProductName);
@@ -178,6 +213,10 @@ public class CartShopAdapter extends RecyclerView.Adapter<CartShopAdapter.ShopVi
 
     private double calcShopSelectedTotal(CartDetailResponse.ShopCart shop) {
         double total = 0;
+
+        if (shop == null || shop.getItems() == null) {
+            return total;
+        }
 
         for (CartDetailResponse.CartItem item : shop.getItems()) {
             if (item.isSelected()) {

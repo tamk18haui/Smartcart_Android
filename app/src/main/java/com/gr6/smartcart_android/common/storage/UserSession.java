@@ -72,6 +72,16 @@ public class UserSession {
                 .apply();
     }
 
+    public void savePhoneNumber(String phoneNumber) {
+        sharedPreferences.edit()
+                .putString(Constants.KEY_PHONE_NUMBER, phoneNumber)
+                .apply();
+    }
+
+    public String getPhoneNumber() {
+        return sharedPreferences.getString(Constants.KEY_PHONE_NUMBER, "");
+    }
+
     public String getRole() {
         return sharedPreferences.getString(Constants.KEY_ROLE, "");
     }

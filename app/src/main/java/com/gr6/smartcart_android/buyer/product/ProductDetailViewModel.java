@@ -71,6 +71,21 @@ public class ProductDetailViewModel extends AndroidViewModel {
     }
 
     public void loadShopVouchers(Long shopId) {
-        repository.getShopVouchers(shopId, vouchers -> voucherState.postValue(vouchers));
+        if (shopId == null || shopId <= 0) {
+            return;
+        }
+
+        repository.getShopVouchers(shopId, new ProductRepository.VoucherCallback() {
+            @Override
+            public void onSuccess(List<ProductDetailResponse.ShopVoucherDTO> vouchers) {
+                voucherState.postValue(vouchers);
+            }
+
+            @Override
+            public void onError(String message) {
+                // Không làm hỏng màn chi tiết sản phẩm, chỉ log/toast ở Activity nếu muốn
+                voucherState.postValue(null);
+            }
+        });
     }
 }

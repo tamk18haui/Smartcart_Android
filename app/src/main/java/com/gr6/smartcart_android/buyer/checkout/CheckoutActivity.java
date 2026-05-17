@@ -3,8 +3,6 @@ package com.gr6.smartcart_android.buyer.checkout;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.text.TextUtils;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.TextView;
@@ -14,8 +12,14 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.lifecycle.ViewModelProvider;
+import android.graphics.Typeface;
+import android.view.Gravity;
+import android.view.View;
+import android.widget.ScrollView;
 
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import androidx.core.content.ContextCompat;
+
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.gr6.smartcart_android.R;
@@ -39,6 +43,9 @@ public class CheckoutActivity extends BaseActivity {
 
     public static final String SOURCE_BUY_NOW = "BUY_NOW";
     public static final String SOURCE_FROM_CART = "FROM_CART";
+    private Long pendingVoucherShopItemTotal = 0L;
+    private Long lastVoucherShopId;
+    private String lastVoucherCode;
 
     private LinearLayout cardAddress;
     private TextView txtReceiver;
@@ -196,18 +203,21 @@ public class CheckoutActivity extends BaseActivity {
         checkoutShopAdapter = new CheckoutShopAdapter(this);
 
         rvCheckoutShops.setLayoutManager(new LinearLayoutManager(this));
-        rvCheckoutShops.setNestedScrollingEnabled(false);
         rvCheckoutShops.setAdapter(checkoutShopAdapter);
 
-        checkoutShopAdapter.setOnShopVoucherClickListener((shopId, shopName, currentVoucherCode) -> {
+        rvCheckoutShops.setNestedScrollingEnabled(false);
+        rvCheckoutShops.setHasFixedSize(false);
+        rvCheckoutShops.setItemViewCacheSize(20);
+
+        checkoutShopAdapter.setOnShopVoucherClickListener((shopId, shopName, currentVoucherCode, shopItemTotal) -> {
             pendingVoucherShopId = shopId;
             pendingVoucherShopName = shopName;
             pendingVoucherCurrentCode = currentVoucherCode;
+            pendingVoucherShopItemTotal = shopItemTotal == null ? 0L : shopItemTotal;
 
             viewModel.loadShopVouchers(shopId);
         });
     }
-
     private void initEvents() {
         findViewById(R.id.btnBackCheckout).setOnClickListener(v -> finish());
 
@@ -249,9 +259,18 @@ public class CheckoutActivity extends BaseActivity {
             hideLoading();
 
             if (state.isSuccess()) {
+                lastVoucherShopId = null;
+                lastVoucherCode = null;
+
                 currentPreview = state.getData();
                 bindPreview();
             } else {
+                if (lastVoucherShopId != null && !isEmpty(lastVoucherCode)) {
+                    checkoutShopAdapter.setVoucherCode(lastVoucherShopId, null);
+                    lastVoucherShopId = null;
+                    lastVoucherCode = null;
+                }
+
                 showLongToast(state.getMessage());
             }
         });
@@ -288,6 +307,7 @@ public class CheckoutActivity extends BaseActivity {
                         pendingVoucherShopId,
                         pendingVoucherShopName,
                         pendingVoucherCurrentCode,
+                        pendingVoucherShopItemTotal,
                         state.getData()
                 );
             } else {
@@ -498,11 +518,11 @@ public class CheckoutActivity extends BaseActivity {
         txtTotalAmount.setText(formatVnd(currentPreview.getTotalAmount()));
         txtBottomTotalAmount.setText(formatVnd(currentPreview.getTotalAmount()));
     }
-
     private void showShopVoucherPicker(
             Long shopId,
             String shopName,
             String currentVoucherCode,
+            Long shopItemTotal,
             List<CheckoutVoucherResponse> vouchers
     ) {
         if (shopId == null || shopId <= 0) {
@@ -522,67 +542,347 @@ public class CheckoutActivity extends BaseActivity {
             }
         }
 
+        BottomSheetDialog dialog = new BottomSheetDialog(this);
+
+        ScrollView scrollView = new ScrollView(this);
+        scrollView.setOverScrollMode(View.OVER_SCROLL_NEVER);
+
+        LinearLayout root = new LinearLayout(this);
+        root.setOrientation(LinearLayout.VERTICAL);
+        root.setPadding(dp(18), dp(14), dp(18), dp(24));
+        root.setBackgroundColor(ContextCompat.getColor(this, R.color.surface));
+
+        scrollView.addView(root);
+
+        View handle = new View(this);
+        handle.setBackgroundResource(R.drawable.bg_bottom_sheet_handle);
+
+        LinearLayout.LayoutParams handleParams = new LinearLayout.LayoutParams(dp(46), dp(5));
+        handleParams.gravity = Gravity.CENTER_HORIZONTAL;
+        root.addView(handle, handleParams);
+
+        LinearLayout header = new LinearLayout(this);
+        header.setOrientation(LinearLayout.HORIZONTAL);
+        header.setGravity(Gravity.CENTER_VERTICAL);
+
+        LinearLayout.LayoutParams headerParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        headerParams.topMargin = dp(18);
+        root.addView(header, headerParams);
+
+        TextView icon = new TextView(this);
+        icon.setText("🎟");
+        icon.setGravity(Gravity.CENTER);
+        icon.setTextSize(24);
+        icon.setBackgroundResource(R.drawable.bg_checkout_voucher_badge);
+
+        header.addView(icon, new LinearLayout.LayoutParams(dp(52), dp(52)));
+
+        LinearLayout titleBox = new LinearLayout(this);
+        titleBox.setOrientation(LinearLayout.VERTICAL);
+
+        LinearLayout.LayoutParams titleBoxParams = new LinearLayout.LayoutParams(
+                0,
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                1
+        );
+        titleBoxParams.leftMargin = dp(12);
+        header.addView(titleBox, titleBoxParams);
+
+        TextView title = createVoucherSheetText(
+                "Chọn mã giảm giá",
+                20,
+                R.color.text_primary,
+                Typeface.BOLD
+        );
+        titleBox.addView(title);
+
+        TextView subtitle = createVoucherSheetText(
+                isEmpty(shopName) ? "Voucher chỉ áp dụng cho shop này" : shopName,
+                13,
+                R.color.text_secondary,
+                Typeface.NORMAL
+        );
+
+        LinearLayout.LayoutParams subtitleParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        subtitleParams.topMargin = dp(3);
+        titleBox.addView(subtitle, subtitleParams);
+
+        TextView orderValue = createVoucherSheetText(
+                "Giá trị sản phẩm của shop: " + formatVnd(shopItemTotal),
+                13,
+                R.color.brand_primary,
+                Typeface.BOLD
+        );
+
+        LinearLayout.LayoutParams orderValueParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        orderValueParams.topMargin = dp(14);
+        root.addView(orderValue, orderValueParams);
+
         if (activeVouchers.isEmpty()) {
-            showToast("Shop này chưa có mã giảm giá khả dụng");
+            TextView empty = createVoucherSheetText(
+                    "Shop này chưa có mã giảm giá khả dụng.",
+                    14,
+                    R.color.text_secondary,
+                    Typeface.NORMAL
+            );
+            empty.setGravity(Gravity.CENTER);
+            empty.setPadding(0, dp(28), 0, dp(28));
+            root.addView(empty);
+
+            TextView close = createVoucherSheetText(
+                    "Đóng",
+                    15,
+                    R.color.white,
+                    Typeface.BOLD
+            );
+            close.setGravity(Gravity.CENTER);
+            close.setBackgroundResource(R.drawable.bg_cart_checkout);
+
+            LinearLayout.LayoutParams closeParams = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    dp(50)
+            );
+            root.addView(close, closeParams);
+
+            close.setOnClickListener(v -> dialog.dismiss());
+
+            dialog.setContentView(scrollView);
+            dialog.show();
             return;
         }
 
-        List<String> displayItems = new ArrayList<>();
-
         for (CheckoutVoucherResponse voucher : activeVouchers) {
-            String selectedMark = "";
-
-            if (!isEmpty(currentVoucherCode)
-                    && currentVoucherCode.equalsIgnoreCase(voucher.getCode())) {
-                selectedMark = "  ✓";
-            }
-
-            displayItems.add(
-                    voucher.getCode()
-                            + " - "
-                            + voucher.getDisplayTitle()
-                            + "\n"
-                            + voucher.getDisplaySubtitle()
-                            + selectedMark
+            View voucherView = createVoucherCard(
+                    voucher,
+                    currentVoucherCode,
+                    shopItemTotal,
+                    () -> {
+                        applyShopVoucher(shopId, voucher.getCode());
+                        dialog.dismiss();
+                    }
             );
+
+            LinearLayout.LayoutParams voucherParams = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+            );
+            voucherParams.topMargin = dp(12);
+            root.addView(voucherView, voucherParams);
         }
 
         if (!isEmpty(currentVoucherCode)) {
-            displayItems.add("Không áp dụng voucher");
+            TextView remove = createVoucherSheetText(
+                    "Không áp dụng voucher",
+                    15,
+                    R.color.text_secondary,
+                    Typeface.BOLD
+            );
+            remove.setGravity(Gravity.CENTER);
+            remove.setBackgroundResource(R.drawable.bg_checkout_remove_voucher);
+
+            LinearLayout.LayoutParams removeParams = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    dp(50)
+            );
+            removeParams.topMargin = dp(16);
+            root.addView(remove, removeParams);
+
+            remove.setOnClickListener(v -> {
+                applyShopVoucher(shopId, null);
+                dialog.dismiss();
+            });
         }
 
-        String title = isEmpty(shopName)
-                ? "Chọn mã giảm giá"
-                : "Chọn mã giảm giá - " + shopName;
+        dialog.setContentView(scrollView);
+        dialog.show();
+    }
 
-        new MaterialAlertDialogBuilder(this)
-                .setTitle(title)
-                .setItems(displayItems.toArray(new String[0]), (dialog, which) -> {
-                    if (!isEmpty(currentVoucherCode) && which == displayItems.size() - 1) {
-                        applyShopVoucher(shopId, null);
-                        return;
-                    }
+    private View createVoucherCard(
+            CheckoutVoucherResponse voucher,
+            String currentVoucherCode,
+            Long shopItemTotal,
+            Runnable onClick
+    ) {
+        boolean selected = !isEmpty(currentVoucherCode)
+                && currentVoucherCode.equalsIgnoreCase(voucher.getCode());
 
-                    CheckoutVoucherResponse selectedVoucher = activeVouchers.get(which);
-                    applyShopVoucher(shopId, selectedVoucher.getCode());
-                })
-                .setNegativeButton("Hủy", null)
-                .show();
+        String unavailableReason = getVoucherUnavailableReason(voucher, shopItemTotal);
+        boolean canUse = unavailableReason == null;
+
+        LinearLayout card = new LinearLayout(this);
+        card.setOrientation(LinearLayout.HORIZONTAL);
+        card.setGravity(Gravity.CENTER_VERTICAL);
+        card.setPadding(dp(12), dp(12), dp(12), dp(12));
+        card.setBackgroundResource(
+                selected
+                        ? R.drawable.bg_checkout_voucher_card_selected
+                        : canUse
+                        ? R.drawable.bg_checkout_voucher_card
+                        : R.drawable.bg_checkout_voucher_card_disabled
+        );
+
+        TextView badge = new TextView(this);
+        badge.setText("PERCENT".equalsIgnoreCase(voucher.getDiscountType()) ? "%" : "₫");
+        badge.setGravity(Gravity.CENTER);
+        badge.setTextSize(22);
+        badge.setTypeface(null, Typeface.BOLD);
+        badge.setTextColor(ContextCompat.getColor(this, canUse ? R.color.white : R.color.text_secondary));
+        badge.setBackgroundResource(canUse
+                ? R.drawable.bg_checkout_voucher_badge_red
+                : R.drawable.bg_checkout_voucher_badge
+        );
+
+        LinearLayout.LayoutParams badgeParams = new LinearLayout.LayoutParams(dp(58), dp(58));
+        card.addView(badge, badgeParams);
+
+        LinearLayout info = new LinearLayout(this);
+        info.setOrientation(LinearLayout.VERTICAL);
+
+        LinearLayout.LayoutParams infoParams = new LinearLayout.LayoutParams(
+                0,
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                1
+        );
+        infoParams.leftMargin = dp(12);
+        card.addView(info, infoParams);
+
+        TextView title = createVoucherSheetText(
+                voucher.getDisplayTitle(),
+                16,
+                canUse ? R.color.text_primary : R.color.text_secondary,
+                Typeface.BOLD
+        );
+        info.addView(title);
+
+        TextView code = createVoucherSheetText(
+                "Mã: " + voucher.getCode(),
+                13,
+                canUse ? R.color.price_red : R.color.text_secondary,
+                Typeface.BOLD
+        );
+
+        LinearLayout.LayoutParams codeParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        codeParams.topMargin = dp(3);
+        info.addView(code, codeParams);
+
+        String subtitleText = canUse ? voucher.getDisplaySubtitle() : unavailableReason;
+
+        TextView subtitle = createVoucherSheetText(
+                subtitleText,
+                12,
+                canUse ? R.color.text_secondary : R.color.price_red,
+                canUse ? Typeface.NORMAL : Typeface.BOLD
+        );
+
+        LinearLayout.LayoutParams subtitleParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        subtitleParams.topMargin = dp(3);
+        info.addView(subtitle, subtitleParams);
+
+        TextView action = new TextView(this);
+        action.setGravity(Gravity.CENTER);
+        action.setText(selected ? "Đã chọn" : canUse ? "Chọn" : "Không đủ");
+        action.setTextSize(13);
+        action.setTypeface(null, Typeface.BOLD);
+        action.setTextColor(ContextCompat.getColor(
+                this,
+                selected ? R.color.white : canUse ? R.color.price_red : R.color.text_secondary
+        ));
+        action.setBackgroundResource(
+                selected
+                        ? R.drawable.bg_checkout_voucher_action_selected
+                        : canUse
+                        ? R.drawable.bg_checkout_voucher_action
+                        : R.drawable.bg_checkout_voucher_action_disabled
+        );
+
+        LinearLayout.LayoutParams actionParams = new LinearLayout.LayoutParams(dp(78), dp(34));
+        actionParams.leftMargin = dp(8);
+        card.addView(action, actionParams);
+
+        if (canUse) {
+            card.setOnClickListener(v -> onClick.run());
+            action.setOnClickListener(v -> onClick.run());
+        } else {
+            card.setAlpha(0.78f);
+            card.setOnClickListener(v -> showToast(unavailableReason));
+        }
+
+        return card;
+    }
+
+    private String getVoucherUnavailableReason(
+            CheckoutVoucherResponse voucher,
+            Long shopItemTotal
+    ) {
+        if (voucher == null) {
+            return "Voucher không hợp lệ";
+        }
+
+        long itemTotal = shopItemTotal == null ? 0L : shopItemTotal;
+        long minOrder = voucher.getMinOrderValue();
+
+        if (minOrder > 0 && itemTotal < minOrder) {
+            long missing = minOrder - itemTotal;
+            return "Cần mua thêm " + formatVnd(missing) + " để dùng mã này";
+        }
+
+        int usageLimit = voucher.getUsageLimit();
+        int usedCount = voucher.getUsedCount();
+
+        if (usageLimit > 0 && usedCount >= usageLimit) {
+            return "Mã này đã hết lượt sử dụng";
+        }
+
+        return null;
+    }
+
+    private TextView createVoucherSheetText(
+            String text,
+            int sp,
+            int colorRes,
+            int style
+    ) {
+        TextView textView = new TextView(this);
+        textView.setText(text == null ? "" : text);
+        textView.setTextSize(sp);
+        textView.setTextColor(ContextCompat.getColor(this, colorRes));
+        textView.setTypeface(null, style);
+        return textView;
     }
 
     private void applyShopVoucher(Long shopId, String voucherCode) {
         if (checkoutShopAdapter == null) return;
+
+        lastVoucherShopId = shopId;
+        lastVoucherCode = voucherCode;
 
         checkoutShopAdapter.setVoucherCode(shopId, voucherCode);
 
         if (isEmpty(voucherCode)) {
             showToast("Đã xóa voucher của shop");
         } else {
-            showToast("Đang áp dụng mã: " + voucherCode);
+            showToast("Đang kiểm tra mã: " + voucherCode);
         }
 
         loadPreview();
     }
+
+
 
     private void placeOrder() {
         if (selectedAddressId == null || selectedAddressId <= 0) {

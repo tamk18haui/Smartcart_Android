@@ -15,9 +15,18 @@ import com.gr6.smartcart_android.common.storage.UserSession;
 import com.gr6.smartcart_android.common.utils.ImageLoader;
 import com.gr6.smartcart_android.common.utils.ThemeColor;
 import com.gr6.smartcart_android.navigation.BuyerBottomNavHelper;
+import com.gr6.smartcart_android.buyer.account.profile.ProfileActivity;
+import com.gr6.smartcart_android.buyer.account.profile.repository.ProfileRepository;
+import com.gr6.smartcart_android.buyer.account.profile.response.ProfileResponse;
+import android.content.res.ColorStateList;
+import androidx.core.content.ContextCompat;
+import androidx.core.widget.ImageViewCompat;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 public class AccountActivity extends BaseActivity {
+    private SwipeRefreshLayout swipeAccount;
 
+    private ProfileRepository profileRepository;
     private ImageView imgBack;
     private ImageView imgAvatar;
 
@@ -46,11 +55,59 @@ public class AccountActivity extends BaseActivity {
         ThemeColor.applyWhiteNavigationBar(this);
 
         initViews();
+        profileRepository = new ProfileRepository(this);
+
         bindUserInfo();
         initEvents();
+        loadProfileFromServer(true);
         BuyerBottomNavHelper.setup(this, BuyerBottomNavHelper.TAB_ACCOUNT);
     }
+    private void loadProfileFromServer(boolean showFullLoading) {
+        if (!TokenManager.getInstance(this).hasToken()) {
+            bindUserInfo();
+            stopSwipeRefresh(swipeAccount);
+            return;
+        }
 
+        if (showFullLoading) {
+            showLoading();
+        }
+
+        profileRepository.getProfile(new ProfileRepository.ProfileCallback() {
+            @Override
+            public void onSuccess(ProfileResponse profile, String message) {
+                runOnUiThread(() -> {
+                    hideLoading();
+                    stopSwipeRefresh(swipeAccount);
+
+                    if (profile == null) {
+                        bindUserInfo();
+                        return;
+                    }
+
+                    UserSession session = UserSession.getInstance(AccountActivity.this);
+                    session.saveFullName(profile.getFullName());
+                    session.saveEmail(profile.getEmail());
+                    session.saveAvatarUrl(profile.getAvatarUrl());
+                    session.saveRole(profile.getRole());
+                    session.savePhoneNumber(profile.getPhoneNumber());
+
+                    bindUserInfo();
+                });
+            }
+
+            @Override
+            public void onError(String message) {
+                runOnUiThread(() -> {
+                    hideLoading();
+                    stopSwipeRefresh(swipeAccount);
+                    bindUserInfo();
+                    android.util.Log.e("ACCOUNT_PROFILE", message);
+                    showLongToast(message);
+                });
+            }
+        });
+    }
     private void initViews() {
         imgBack = findViewById(R.id.imgBack);
         imgAvatar = findViewById(R.id.imgAvatar);
@@ -70,6 +127,7 @@ public class AccountActivity extends BaseActivity {
         itemSupport = findViewById(R.id.itemSupport);
         itemAbout = findViewById(R.id.itemAbout);
         itemLogout = findViewById(R.id.itemLogout);
+        swipeAccount = findViewById(R.id.swipeAccount);
     }
 
     private void bindUserInfo() {
@@ -106,13 +164,31 @@ public class AccountActivity extends BaseActivity {
         }
 
         if (avatarUrl == null || avatarUrl.trim().isEmpty()) {
+            imgAvatar.setPadding(dp(16), dp(16), dp(16), dp(16));
+
+            ImageViewCompat.setImageTintList(
+                    imgAvatar,
+                    ColorStateList.valueOf(
+                            ContextCompat.getColor(this, R.color.brand_primary)
+                    )
+            );
+
             imgAvatar.setImageResource(R.drawable.ic_user);
         } else {
-            ImageLoader.loadCircle(this, avatarUrl, imgAvatar);
+            imgAvatar.setPadding(0, 0, 0, 0);
+            ImageViewCompat.setImageTintList(imgAvatar, null);
+
+            ImageLoader.loadCircle(this, avatarUrl.trim(), imgAvatar);
         }
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        bindUserInfo();
+    }
     private void initEvents() {
+        setupSwipeRefresh(swipeAccount, () -> loadProfileFromServer(false));
         imgBack.setOnClickListener(v -> finish());
 
         itemOrders.setOnClickListener(v -> openOrderHistory());
@@ -146,6 +222,15 @@ public class AccountActivity extends BaseActivity {
         );
 
         itemLogout.setOnClickListener(v -> logout());
+        imgAvatar.setOnClickListener(v -> openProfile());
+        txtFullName.setOnClickListener(v -> openProfile());
+        txtEmail.setOnClickListener(v -> openProfile());
+        txtUserCode.setOnClickListener(v -> openProfile());
+        txtRole.setOnClickListener(v -> openProfile());
+    }
+    private void openProfile() {
+        Intent intent = new Intent(this, ProfileActivity.class);
+        startActivity(intent);
     }
 
     private void openOrderHistory() {

@@ -12,7 +12,7 @@ public class Constants {
      * Máy thật dùng IP máy tính, ví dụ:
      * http://192.168.1.5:8080/
      */
-    public static final String BASE_URL = "http://192.168.2.22:8080/";
+    public static final String BASE_URL = "http://172.20.10.8:8080/";
 
     public static final int CONNECT_TIMEOUT_SECONDS = 30;
     public static final int READ_TIMEOUT_SECONDS = 30;
@@ -41,4 +41,8 @@ public class Constants {
     public static final String KEY_EMAIL = "email";
     public static final String KEY_AVATAR_URL = "avatar_url";
     public static final String KEY_ROLE = "role";
+    public static final String KEY_PHONE_NUMBER = "phone_number";
+
+    public static final String CLOUDINARY_CLOUD_NAME = "dtnyw0cyr";
+    public static final String CLOUDINARY_UPLOAD_PRESET = "smartcart_avatar";
 }

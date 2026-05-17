@@ -105,45 +105,51 @@ public class ProductRepository {
         });
     }
 
-    public void getShopVouchers(Long shopId, VoucherCallback callback) {
-        if (shopId == null || shopId <= 0) {
-            callback.onSuccess(null);
-            return;
-        }
-
-        apiService.getShopVouchers(shopId).enqueue(
-                new Callback<BaseResponse<List<ProductDetailResponse.ShopVoucherDTO>>>() {
-                    @Override
-                    public void onResponse(
-                            @NonNull Call<BaseResponse<List<ProductDetailResponse.ShopVoucherDTO>>> call,
-                            @NonNull Response<BaseResponse<List<ProductDetailResponse.ShopVoucherDTO>>> response
-                    ) {
-                        if (!response.isSuccessful()) {
-                            callback.onSuccess(null);
-                            return;
-                        }
-
-                        BaseResponse<List<ProductDetailResponse.ShopVoucherDTO>> body = response.body();
-
-                        if (body == null || !body.isSuccess()) {
-                            callback.onSuccess(null);
-                            return;
-                        }
-
-                        callback.onSuccess(body.getData());
-                    }
-
-                    @Override
-                    public void onFailure(
-                            @NonNull Call<BaseResponse<List<ProductDetailResponse.ShopVoucherDTO>>> call,
-                            @NonNull Throwable t
-                    ) {
-                        callback.onSuccess(null);
-                    }
+    public void getShopVouchers(
+            Long shopId,
+            VoucherCallback callback
+    ) {
+        apiService.getShopVouchers(shopId).enqueue(new Callback<BaseResponse<List<ProductDetailResponse.ShopVoucherDTO>>>() {
+            @Override
+            public void onResponse(
+                    @NonNull Call<BaseResponse<List<ProductDetailResponse.ShopVoucherDTO>>> call,
+                    @NonNull Response<BaseResponse<List<ProductDetailResponse.ShopVoucherDTO>>> response
+            ) {
+                if (!response.isSuccessful()) {
+                    callback.onError("Không lấy được voucher. Mã lỗi: " + response.code());
+                    return;
                 }
-        );
+
+                BaseResponse<List<ProductDetailResponse.ShopVoucherDTO>> body = response.body();
+
+                if (body == null) {
+                    callback.onError("Server không trả dữ liệu voucher");
+                    return;
+                }
+
+                if (!body.isSuccess()) {
+                    callback.onError(body.getSafeMessage());
+                    return;
+                }
+
+                callback.onSuccess(body.getData());
+            }
+
+            @Override
+            public void onFailure(
+                    @NonNull Call<BaseResponse<List<ProductDetailResponse.ShopVoucherDTO>>> call,
+                    @NonNull Throwable t
+            ) {
+                callback.onError("Không kết nối được server voucher: " + t.getMessage());
+            }
+        });
     }
 
+    public interface VoucherCallback {
+        void onSuccess(List<ProductDetailResponse.ShopVoucherDTO> vouchers);
+
+        void onError(String message);
+    }
     public interface ProductDetailCallback {
         void onSuccess(ProductDetailResponse data);
 
@@ -154,9 +160,5 @@ public class ProductRepository {
         void onSuccess(String message);
 
         void onError(String message);
-    }
-
-    public interface VoucherCallback {
-        void onSuccess(List<ProductDetailResponse.ShopVoucherDTO> vouchers);
     }
 }

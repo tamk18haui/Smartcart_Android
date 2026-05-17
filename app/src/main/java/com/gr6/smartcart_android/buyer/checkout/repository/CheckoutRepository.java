@@ -4,6 +4,8 @@ import android.content.Context;
 
 import androidx.annotation.NonNull;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.gr6.smartcart_android.buyer.checkout.api.CheckoutApiService;
 import com.gr6.smartcart_android.buyer.checkout.request.CheckoutPreviewRequest;
 import com.gr6.smartcart_android.buyer.checkout.request.CreateOrderRequest;
@@ -107,7 +109,7 @@ public class CheckoutRepository {
             String fallbackMessage
     ) {
         if (!response.isSuccessful()) {
-            callback.onError(fallbackMessage + ". Mã lỗi: " + response.code());
+            callback.onError(parseErrorMessage(response, fallbackMessage));
             return;
         }
 
@@ -124,6 +126,32 @@ public class CheckoutRepository {
         }
 
         callback.onSuccess(body.getData(), body.getSafeMessage());
+    }
+
+    private String parseErrorMessage(Response<?> response, String fallbackMessage) {
+        try {
+            if (response == null) {
+                return fallbackMessage;
+            }
+
+            if (response.errorBody() == null) {
+                return fallbackMessage + ". Mã lỗi: " + response.code();
+            }
+
+            String raw = response.errorBody().string();
+
+            JsonObject jsonObject = new Gson().fromJson(raw, JsonObject.class);
+
+            if (jsonObject != null
+                    && jsonObject.has("message")
+                    && !jsonObject.get("message").isJsonNull()) {
+                return jsonObject.get("message").getAsString();
+            }
+
+            return fallbackMessage + ". Mã lỗi: " + response.code();
+        } catch (Exception e) {
+            return fallbackMessage + ". Mã lỗi: " + response.code();
+        }
     }
 
     public interface CheckoutCallback<T> {

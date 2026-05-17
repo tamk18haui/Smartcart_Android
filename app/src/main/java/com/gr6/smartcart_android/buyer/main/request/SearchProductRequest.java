@@ -27,4 +27,27 @@ public class SearchProductRequest {
     public static SearchProductRequest empty() {
         return new SearchProductRequest("", null, null, null);
     }
+
+    public static SearchProductRequest ofKeywordAndCategory(
+            String keyword,
+            Long categoryId
+    ) {
+        return new SearchProductRequest(keyword, categoryId, null, null);
+    }
+
+    public String getKeyword() {
+        return keyword;
+    }
+
+    public Long getCategoryId() {
+        return categoryId;
+    }
+
+    public BigDecimal getMinPrice() {
+        return minPrice;
+    }
+
+    public BigDecimal getMaxPrice() {
+        return maxPrice;
+    }
 }

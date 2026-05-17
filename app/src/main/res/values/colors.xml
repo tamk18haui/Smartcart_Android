@@ -1,76 +1,148 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- ========================= -->
-    <!-- Price / Danger -->
-    <!-- ========================= -->
-    <color name="price_red">#EF4444</color>
+    <!-- ========================================================= -->
+    <!-- SMARTCART MODERN COMMERCE COLOR SYSTEM -->
+    <!-- Navy Blue + Emerald + Coral + Violet -->
+    <!-- Không dùng gradient, nhưng vẫn giữ tên gradient để không vỡ drawable cũ -->
+    <!-- ========================================================= -->
+
 
     <!-- ========================= -->
-    <!-- Brand: Cyber Sapphire Blue (Xanh Lam Cao Cấp) -->
+    <!-- Primary Brand: Modern Navy Blue -->
+    <!-- Dùng cho header, nút chính, icon active, bottom nav -->
     <!-- ========================= -->
-    <color name="brand_primary">#1A56DB</color> <!-- Xanh Sapphire đậm, cực kỳ sắc nét và chuyên nghiệp -->
-    <color name="brand_primary_dark">#1E429F</color>
-    <color name="brand_primary_light">#EDF2FF</color>
-    <color name="brand_secondary">#3B82F6</color> <!-- Xanh Electric làm điểm nhấn sáng -->
+    <color name="brand_primary">#2563EB</color>
+    <color name="brand_primary_dark">#1D4ED8</color>
+    <color name="brand_primary_light">#EFF6FF</color>
+    <color name="brand_secondary">#38BDF8</color>
 
-    <color name="brand_gradient_start">#60A5FA</color>
-    <color name="brand_gradient_center">#1A56DB</color>
-    <color name="brand_gradient_end">#111827</color> <!-- Vuốt gradient về dark slate nhìn siêu sâu -->
+    <!-- Giữ tên để không lỗi XML cũ, nhưng không còn phối gradient nữa -->
+    <color name="brand_gradient_start">#2563EB</color>
+    <color name="brand_gradient_center">#2563EB</color>
+    <color name="brand_gradient_end">#2563EB</color>
+
 
     <!-- ========================= -->
-    <!-- Background / Surface (Ice Blue Tone) -->
+    <!-- Commerce Accent: Coral Red -->
+    <!-- Dùng cho giá tiền, sale, lỗi, cảnh báo mạnh -->
     <!-- ========================= -->
-    <color name="background">#F4F8FC</color> <!-- Nền trắng tro ánh băng, tạo độ trong suốt cho UI -->
+    <color name="price_red">#F43F5E</color>
+    <color name="danger">#F43F5E</color>
+    <color name="danger_light">#FFF1F2</color>
+
+
+    <!-- ========================= -->
+    <!-- Trust Accent: Emerald Green -->
+    <!-- Dùng cho voucher hợp lệ, freeship, thành công -->
+    <!-- ========================= -->
+    <color name="success">#10B981</color>
+    <color name="success_light">#ECFDF5</color>
+    <color name="voucher_green">#10B981</color>
+    <color name="voucher_green_light">#ECFDF5</color>
+
+
+    <!-- ========================= -->
+    <!-- Premium Accent: Violet -->
+    <!-- Dùng cho badge nổi bật, điểm nhấn phụ, khuyến mãi đặc biệt -->
+    <!-- ========================= -->
+    <color name="accent_violet">#7C3AED</color>
+    <color name="accent_violet_light">#F5F3FF</color>
+
+
+    <!-- ========================= -->
+    <!-- Warm Accent: Amber -->
+    <!-- Dùng cho cảnh báo nhẹ, trạng thái chờ -->
+    <!-- ========================= -->
+    <color name="warning">#F59E0B</color>
+    <color name="warning_light">#FFFBEB</color>
+
+
+    <!-- ========================= -->
+    <!-- Background / Surface -->
+    <!-- Nền sạch, hơi lạnh, hợp app ecommerce hiện đại -->
+    <!-- ========================= -->
+    <color name="background">#F6F8FB</color>
     <color name="surface">#FFFFFF</color>
-    <color name="surface_soft">#FAFCFF</color>
-    <color name="surface_blue_soft">#E1EFFE</color> <!-- Xanh bộ đội nhạt cực mịn -->
+    <color name="surface_soft">#F9FAFB</color>
+    <color name="surface_blue_soft">#EFF6FF</color>
+
 
     <!-- ========================= -->
-    <!-- Text (Deep Navy Black) -->
+    <!-- Text -->
     <!-- ========================= -->
-    <color name="text_primary">#111928</color> <!-- Đen ánh xanh rất sâu, nhìn sang hơn đen thường -->
-    <color name="text_secondary">#4B5563</color>
-    <color name="text_hint">#9CA3AF</color>
+    <color name="text_primary">#0F172A</color>
+    <color name="text_secondary">#64748B</color>
+    <color name="text_hint">#94A3B8</color>
     <color name="text_white">#FFFFFFFF</color>
+
 
     <!-- ========================= -->
     <!-- Border / Divider -->
     <!-- ========================= -->
-    <color name="border">#E5EDF6</color>
+    <color name="border">#E2E8F0</color>
     <color name="brand_border">#BFDBFE</color>
-    <color name="divider">#F0F5FA</color>
+    <color name="divider">#EEF2F7</color>
 
-    <!-- ========================= -->
-    <!-- State -->
-    <!-- ========================= -->
-    <color name="danger">#EF4444</color>
-    <color name="danger_light">#FEE2E2</color>
-
-    <color name="success">#0E9F6E</color> <!-- Xanh mint đậm, rất hợp rơ với tone xanh dương -->
-    <color name="success_light">#E3FBEF</color>
-
-    <color name="warning">#F5A623</color>
-    <color name="warning_light">#FFF8E6</color>
 
     <!-- ========================= -->
     <!-- Badge -->
     <!-- ========================= -->
-    <color name="badge_sale_bg">#EDF2FF</color>
-    <color name="badge_sale_text">#1A56DB</color>
-    <color name="badge_free_ship_bg">#E3FBEF</color>
-    <color name="badge_free_ship_text">#0E9F6E</color>
+    <color name="badge_sale_bg">#FFF1F2</color>
+    <color name="badge_sale_text">#F43F5E</color>
+
+    <color name="badge_free_ship_bg">#ECFDF5</color>
+    <color name="badge_free_ship_text">#10B981</color>
+
+    <color name="badge_blue_bg">#EFF6FF</color>
+    <color name="badge_blue_text">#2563EB</color>
+
+    <color name="badge_violet_bg">#F5F3FF</color>
+    <color name="badge_violet_text">#7C3AED</color>
+
+    <color name="badge_warning_bg">#FFFBEB</color>
+    <color name="badge_warning_text">#F59E0B</color>
+
+
+    <!-- ========================= -->
+    <!-- Voucher -->
+    <!-- ========================= -->
+    <color name="voucher_bg_light">#FFF1F2</color>
+    <color name="voucher_stroke">#FDA4AF</color>
+    <color name="voucher_disabled_bg">#F1F5F9</color>
+    <color name="voucher_disabled_text">#94A3B8</color>
+
 
     <!-- ========================= -->
     <!-- Bottom navigation -->
     <!-- ========================= -->
-    <color name="nav_active">#1A56DB</color>
-    <color name="nav_inactive">#9CA3AF</color>
+    <color name="nav_active">#2563EB</color>
+    <color name="nav_inactive">#94A3B8</color>
+
+
+    <!-- ========================= -->
+    <!-- Common Gray / Ripple -->
+    <!-- ========================= -->
+    <color name="bg_app_gray">#F6F8FB</color>
+    <color name="bg_card_light">#F9FAFB</color>
+    <color name="stroke_light">#E2E8F0</color>
+    <color name="ripple_gray">#E2E8F0</color>
+
+    <color name="text_gray">#64748B</color>
+    <color name="text_gray_light">#94A3B8</color>
+
 
     <!-- ========================= -->
     <!-- Default -->
     <!-- ========================= -->
     <color name="white">#FFFFFFFF</color>
     <color name="black">#FF000000</color>
+
+
+    <!-- ========================= -->
+    <!-- Deprecated Alias -->
+    <!-- Giữ lại để không vỡ layout cũ, nhưng sau này không nên dùng primary_orange nữa -->
+    <!-- ========================= -->
+    <color name="primary_orange">#F43F5E</color>
 
 </resources>
