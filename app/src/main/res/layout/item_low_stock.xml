@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="170dp"
+    android:layout_height="190dp"
+    android:layout_marginEnd="12dp"
+    android:orientation="vertical"
+    android:padding="12dp"
+    android:background="@drawable/bg_seller_card">
+
+    <ImageView
+        android:id="@+id/imgProduct"
+        android:layout_width="match_parent"
+        android:layout_height="112dp"
+        android:scaleType="centerCrop"
+        android:background="@drawable/bg_image_placeholder" />
+
+    <TextView
+        android:id="@+id/txtName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="9dp"
+        android:singleLine="true"
+        android:ellipsize="end"
+        android:text="Tên sản phẩm"
+        android:textColor="@color/seller_text_primary"
+        android:textStyle="bold"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/txtStock"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="Chỉ còn 2 sp"
+        android:textColor="@color/danger"
+        android:textStyle="bold"
+        android:textSize="14sp" />
+
+</LinearLayout>

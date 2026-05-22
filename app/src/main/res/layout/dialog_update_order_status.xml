@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="22dp"
+    android:background="@color/seller_surface">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Cập nhật trạng thái"
+        android:textColor="@color/seller_text_primary"
+        android:textStyle="bold"
+        android:textSize="22sp"
+        android:gravity="center" />
+
+    <RadioGroup
+        android:id="@+id/rgStatus"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:orientation="vertical">
+
+        <RadioButton
+            android:id="@+id/rbPending"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:text="CHỜ XÁC NHẬN"
+            android:textStyle="bold"
+            android:textColor="@color/seller_text_primary" />
+
+        <RadioButton
+            android:id="@+id/rbConfirmed"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:text="ĐÃ XÁC NHẬN"
+            android:textStyle="bold"
+            android:textColor="@color/seller_text_primary" />
+
+        <RadioButton
+            android:id="@+id/rbShipping"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:text="ĐANG GIAO"
+            android:textStyle="bold"
+            android:textColor="@color/seller_text_primary" />
+
+        <RadioButton
+            android:id="@+id/rbDelivered"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:text="HOÀN THÀNH GIAO"
+            android:textStyle="bold"
+            android:textColor="@color/seller_text_primary" />
+
+        <RadioButton
+            android:id="@+id/rbCancelled"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:text="ĐÃ HỦY"
+            android:textStyle="bold"
+            android:textColor="@color/danger" />
+    </RadioGroup>
+
+    <EditText
+        android:id="@+id/edtCancelReason"
+        android:layout_width="match_parent"
+        android:layout_height="94dp"
+        android:layout_marginTop="12dp"
+        android:gravity="top"
+        android:hint="Nhập lý do khi hủy đơn..."
+        android:padding="14dp"
+        android:inputType="textMultiLine"
+        android:maxLines="3"
+        android:background="@drawable/bg_seller_input" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="54dp"
+        android:orientation="horizontal"
+        android:layout_marginTop="18dp">
+
+        <TextView
+            android:id="@+id/btnCancel"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="Hủy"
+            android:textStyle="bold"
+            android:textColor="@color/seller_text_secondary" />
+
+        <TextView
+            android:id="@+id/btnConfirm"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="Xác nhận"
+            android:textStyle="bold"
+            android:textColor="@color/seller_text_white"
+            android:background="@drawable/bg_seller_button_primary" />
+    </LinearLayout>
+
+</LinearLayout>
