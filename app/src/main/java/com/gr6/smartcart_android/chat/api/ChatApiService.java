@@ -1,9 +1,9 @@
 package com.gr6.smartcart_android.chat.api;
 
-import com.gr6.smartcart_android.chat.model.ChatMessageRequest;
-import com.gr6.smartcart_android.chat.model.ChatMessageResponse;
-import com.gr6.smartcart_android.chat.model.ConversationResponse;
-import com.gr6.smartcart_android.chat.model.SpringPageResponse;
+import com.gr6.smartcart_android.chat.request.ChatMessageRequest;
+import com.gr6.smartcart_android.chat.response.ChatMessageResponse;
+import com.gr6.smartcart_android.chat.response.ChatMessagesPageResponse;
+import com.gr6.smartcart_android.chat.response.ConversationResponse;
 import com.gr6.smartcart_android.common.base.BaseResponse;
 
 import java.util.List;
@@ -22,15 +22,19 @@ public interface ChatApiService {
     Call<BaseResponse<List<ConversationResponse>>> getConversations();
 
     @GET("api/v1/chat/messages/{partnerId}")
-    Call<BaseResponse<SpringPageResponse<ChatMessageResponse>>> getMessages(
+    Call<BaseResponse<ChatMessagesPageResponse>> getMessages(
             @Path("partnerId") Long partnerId,
             @Query("page") int page,
             @Query("size") int size
     );
 
     @POST("api/v1/chat/messages")
-    Call<BaseResponse<ChatMessageResponse>> sendMessage(@Body ChatMessageRequest request);
+    Call<BaseResponse<ChatMessageResponse>> sendMessage(
+            @Body ChatMessageRequest request
+    );
 
     @PATCH("api/v1/chat/messages/{partnerId}/read")
-    Call<BaseResponse<Integer>> markAsRead(@Path("partnerId") Long partnerId);
+    Call<BaseResponse<Integer>> markAsRead(
+            @Path("partnerId") Long partnerId
+    );
 }

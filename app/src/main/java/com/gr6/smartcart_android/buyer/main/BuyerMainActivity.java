@@ -1,15 +1,17 @@
 package com.gr6.smartcart_android.buyer.main;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
+import android.view.Window;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.core.content.ContextCompat;
 import androidx.core.widget.NestedScrollView;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -18,11 +20,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.gr6.smartcart_android.R;
-import com.gr6.smartcart_android.buyer.cart.CartActivity;
-import com.gr6.smartcart_android.buyer.chat.ChatListActivity;
 import com.gr6.smartcart_android.buyer.main.response.HomeCategoryResponse;
 import com.gr6.smartcart_android.buyer.main.response.HomeProductResponse;
-import com.gr6.smartcart_android.buyer.product.ProductDetailActivity;
+import com.gr6.smartcart_android.chat.ChatListActivity;
 import com.gr6.smartcart_android.common.base.BaseActivity;
 import com.gr6.smartcart_android.common.storage.UserSession;
 import com.gr6.smartcart_android.common.utils.ThemeColor;
@@ -30,7 +30,7 @@ import com.gr6.smartcart_android.common.utils.ThemeColor;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import com.gr6.smartcart_android.buyer.account.AccountActivity;
+
 import com.gr6.smartcart_android.navigation.BuyerBottomNavHelper;
 
 public class BuyerMainActivity extends BaseActivity {
@@ -58,6 +58,17 @@ public class BuyerMainActivity extends BaseActivity {
 
         ThemeColor.applyBrandStatusBar(this);
         ThemeColor.applyWhiteNavigationBar(this);
+        Window window = getWindow();
+
+// Tô màu thanh pin/sóng giống màu header
+        window.setStatusBarColor(ContextCompat.getColor(this, R.color.brand_primary));
+
+// Nếu nền status bar là màu đậm thì icon pin/sóng phải màu trắng
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            int flags = window.getDecorView().getSystemUiVisibility();
+            flags &= ~View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+            window.getDecorView().setSystemUiVisibility(flags);
+        }
 
         viewModel = new ViewModelProvider(this).get(BuyerHomeViewModel.class);
 

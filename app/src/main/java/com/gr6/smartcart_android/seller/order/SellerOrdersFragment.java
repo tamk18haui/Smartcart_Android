@@ -13,6 +13,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -160,11 +161,21 @@ public class SellerOrdersFragment extends Fragment {
     }
 
     private void setChipActive(TextView chip, boolean active) {
-        chip.setSelected(active);
-        chip.setTextColor(active ? getResources().getColor(R.color.seller_text_white) : getResources().getColor(R.color.seller_text_primary));
-        chip.setBackgroundResource(active ? R.drawable.bg_seller_button_primary : R.drawable.bg_seller_chip_soft);
-    }
+        if (chip == null || getContext() == null) return;
 
+        chip.setSelected(active);
+
+        int textColor = ContextCompat.getColor(
+                requireContext(),
+                active ? R.color.text_white : R.color.text_primary
+        );
+
+        chip.setTextColor(textColor);
+
+        chip.setBackgroundResource(
+                active ? R.drawable.bg_seller_button_primary : R.drawable.bg_seller_chip_soft
+        );
+    }
     private void applyFilter() {
         List<OrderListResponse> filtered = new ArrayList<>();
         for (OrderListResponse order : allOrders) {

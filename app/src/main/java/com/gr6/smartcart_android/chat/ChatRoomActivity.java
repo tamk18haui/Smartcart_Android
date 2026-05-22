@@ -1,274 +1,226 @@
 package com.gr6.smartcart_android.chat;
 
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
+import android.content.Context;
 import android.widget.EditText;
-import android.widget.ProgressBar;
+import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.gr6.smartcart_android.R;
-import com.gr6.smartcart_android.chat.adapter.MessageAdapter;
-import com.gr6.smartcart_android.chat.model.ChatMessageResponse;
-import com.gr6.smartcart_android.chat.model.SpringPageResponse;
-import com.gr6.smartcart_android.chat.repository.ChatRepository;
-import com.gr6.smartcart_android.chat.websocket.ChatWebSocketClient;
-import com.gr6.smartcart_android.common.base.BaseResponse;
+import com.gr6.smartcart_android.chat.response.ChatMessageResponse;
+import com.gr6.smartcart_android.common.base.BaseActivity;
 import com.gr6.smartcart_android.common.storage.UserSession;
+import com.gr6.smartcart_android.common.utils.ImageLoader;
+import com.gr6.smartcart_android.common.utils.ThemeColor;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+public class ChatRoomActivity extends BaseActivity {
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+    public static final String EXTRA_PARTNER_ID = "partner_id";
+    public static final String EXTRA_PARTNER_NAME = "partner_name";
+    public static final String EXTRA_PARTNER_AVATAR = "partner_avatar";
 
-public class ChatRoomActivity extends AppCompatActivity {
-
-    public static final String EXTRA_PARTNER_ID = "extra_partner_id";
-    public static final String EXTRA_PARTNER_NAME = "extra_partner_name";
-    public static final String EXTRA_PARTNER_AVATAR = "extra_partner_avatar";
-
-    private TextView btnBack;
-    private TextView tvPartnerName;
-    private TextView tvConnectionStatus;
-    private RecyclerView rvMessages;
-    private ProgressBar progressBar;
+    private ImageView imgBack;
+    private ImageView imgPartnerAvatar;
+    private TextView txtPartnerName;
+    private TextView txtSocketStatus;
+    private RecyclerView rcvMessages;
     private EditText edtMessage;
-    private TextView btnSend;
+    private ImageView btnSend;
+    private View layoutEmpty;
 
-    private MessageAdapter adapter;
-    private ChatRepository repository;
-    private ChatWebSocketClient webSocketClient;
+    private ChatRoomViewModel viewModel;
+    private ChatMessageAdapter adapter;
 
-    private final List<ChatMessageResponse> messages = new ArrayList<>();
-
-    private Long currentUserId;
     private Long partnerId;
     private String partnerName;
+    private String partnerAvatar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_room);
 
-        currentUserId = UserSession.getInstance(this).getUserId();
-        partnerId = getIntent().getLongExtra(EXTRA_PARTNER_ID, -1L);
-        if (partnerId == -1L) partnerId = null;
+        ThemeColor.applyBrandStatusBar(this);
+        ThemeColor.applyWhiteNavigationBar(this);
 
-        partnerName = getIntent().getStringExtra(EXTRA_PARTNER_NAME);
-        if (TextUtils.isEmpty(partnerName)) {
-            partnerName = "Khách hàng";
+        viewModel = new ViewModelProvider(this).get(ChatRoomViewModel.class);
+
+        readIntent();
+        initViews();
+        setupRecyclerView();
+        initEvents();
+        observeData();
+
+        viewModel.init(partnerId);
+    }
+
+    private void readIntent() {
+        partnerId = getIntent().getLongExtra(EXTRA_PARTNER_ID, -1L);
+
+        if (partnerId == -1L) {
+            partnerId = null;
         }
 
-        if (currentUserId == null || partnerId == null) {
-            Toast.makeText(this, "Thiếu thông tin người dùng để mở chat", Toast.LENGTH_SHORT).show();
-            finish();
+        partnerName = getIntent().getStringExtra(EXTRA_PARTNER_NAME);
+        partnerAvatar = getIntent().getStringExtra(EXTRA_PARTNER_AVATAR);
+    }
+
+    private void initViews() {
+        imgBack = findViewById(R.id.imgBack);
+        imgPartnerAvatar = findViewById(R.id.imgPartnerAvatar);
+        txtPartnerName = findViewById(R.id.txtPartnerName);
+        txtSocketStatus = findViewById(R.id.txtSocketStatus);
+        rcvMessages = findViewById(R.id.rcvMessages);
+        edtMessage = findViewById(R.id.edtMessage);
+        btnSend = findViewById(R.id.btnSend);
+        layoutEmpty = findViewById(R.id.layoutEmpty);
+
+        txtPartnerName.setText(
+                partnerName == null || partnerName.trim().isEmpty()
+                        ? "SmartCart Chat"
+                        : partnerName.trim()
+        );
+
+        if (partnerAvatar == null || partnerAvatar.trim().isEmpty()) {
+            imgPartnerAvatar.setImageResource(R.drawable.ic_user);
+        } else {
+            ImageLoader.loadCircle(this, partnerAvatar, imgPartnerAvatar);
+        }
+    }
+
+    private void setupRecyclerView() {
+        adapter = new ChatMessageAdapter();
+        adapter.setCurrentUserId(UserSession.getInstance(this).getUserId());
+
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        layoutManager.setStackFromEnd(true);
+
+        rcvMessages.setLayoutManager(layoutManager);
+        rcvMessages.setAdapter(adapter);
+    }
+
+    private void initEvents() {
+        imgBack.setOnClickListener(v -> finish());
+
+        btnSend.setOnClickListener(v -> sendMessage());
+
+        edtMessage.setOnEditorActionListener((v, actionId, event) -> {
+            sendMessage();
+            return true;
+        });
+    }
+
+    private void observeData() {
+        viewModel.getMessagesState().observe(this, state -> {
+            if (state == null) return;
+
+            if (state.isLoading()) {
+                showLoading();
+                return;
+            }
+
+            hideLoading();
+
+            if (state.isSuccess()) {
+                adapter.setData(state.getData());
+                updateEmptyState(state.getData().isEmpty());
+                scrollToBottom();
+            } else {
+                showLongToast(state.getMessage());
+                updateEmptyState(true);
+            }
+        });
+
+        viewModel.getSendMessageState().observe(this, state -> {
+            if (state == null) return;
+
+            if (state.isLoading()) {
+                btnSend.setEnabled(false);
+                return;
+            }
+
+            btnSend.setEnabled(true);
+
+            if (state.isSuccess()) {
+                edtMessage.setText("");
+
+                ChatMessageResponse restMessage = state.getData();
+
+                if (restMessage != null) {
+                    adapter.addMessage(restMessage);
+                    updateEmptyState(false);
+                    scrollToBottom();
+                }
+            } else {
+                showToast(state.getMessage());
+            }
+        });
+
+        viewModel.getIncomingMessage().observe(this, message -> {
+            if (message == null) return;
+
+            adapter.addMessage(message);
+            updateEmptyState(false);
+            scrollToBottom();
+        });
+
+        viewModel.getSocketStatus().observe(this, status -> {
+            if (status == null || status.trim().isEmpty()) {
+                txtSocketStatus.setText("");
+            } else {
+                txtSocketStatus.setText(status);
+            }
+        });
+    }
+
+    private void sendMessage() {
+        String content = edtMessage.getText().toString().trim();
+
+        if (content.isEmpty()) {
+            showToast("Nhập tin nhắn trước đã");
             return;
         }
 
-        bindViews();
-        setupRecyclerView();
+        viewModel.sendMessage(content);
+        hideKeyboard();
+    }
 
-        repository = new ChatRepository(this);
+    private void updateEmptyState(boolean empty) {
+        layoutEmpty.setVisibility(empty ? View.VISIBLE : View.GONE);
+        rcvMessages.setVisibility(empty ? View.GONE : View.VISIBLE);
+    }
 
-        btnBack.setOnClickListener(v -> finish());
-        btnSend.setOnClickListener(v -> sendCurrentMessage());
+    private void scrollToBottom() {
+        rcvMessages.post(() -> {
+            int count = adapter.getItemCount();
 
-        tvPartnerName.setText(partnerName);
+            if (count > 0) {
+                rcvMessages.smoothScrollToPosition(count - 1);
+            }
+        });
+    }
 
-        loadMessages();
-        markConversationAsRead();
-        connectWebSocket();
+    private void hideKeyboard() {
+        try {
+            InputMethodManager imm =
+                    (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+
+            if (imm != null) {
+                imm.hideSoftInputFromWindow(edtMessage.getWindowToken(), 0);
+            }
+        } catch (Exception ignored) {
+        }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (webSocketClient != null) {
-            webSocketClient.disconnect();
-        }
-    }
-
-    private void bindViews() {
-        btnBack = findViewById(R.id.btnBack);
-        tvPartnerName = findViewById(R.id.tvPartnerName);
-        tvConnectionStatus = findViewById(R.id.tvConnectionStatus);
-        rvMessages = findViewById(R.id.rvMessages);
-        progressBar = findViewById(R.id.progressBar);
-        edtMessage = findViewById(R.id.edtMessage);
-        btnSend = findViewById(R.id.btnSend);
-    }
-
-    private void setupRecyclerView() {
-        adapter = new MessageAdapter(messages, currentUserId);
-
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        layoutManager.setStackFromEnd(true);
-
-        rvMessages.setLayoutManager(layoutManager);
-        rvMessages.setAdapter(adapter);
-    }
-
-    private void loadMessages() {
-        progressBar.setVisibility(View.VISIBLE);
-
-        repository.getMessages(partnerId, 0, 50).enqueue(new Callback<BaseResponse<SpringPageResponse<ChatMessageResponse>>>() {
-            @Override
-            public void onResponse(@NonNull Call<BaseResponse<SpringPageResponse<ChatMessageResponse>>> call,
-                                   @NonNull Response<BaseResponse<SpringPageResponse<ChatMessageResponse>>> response) {
-                progressBar.setVisibility(View.GONE);
-
-                BaseResponse<SpringPageResponse<ChatMessageResponse>> body = response.body();
-                if (response.isSuccessful() && body != null && body.getData() != null) {
-                    List<ChatMessageResponse> loaded = new ArrayList<>(body.getData().getContent());
-                    Collections.reverse(loaded);
-
-                    messages.clear();
-                    messages.addAll(loaded);
-                    adapter.notifyDataSetChanged();
-                    scrollToBottom();
-                }
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<BaseResponse<SpringPageResponse<ChatMessageResponse>>> call,
-                                  @NonNull Throwable t) {
-                progressBar.setVisibility(View.GONE);
-                Toast.makeText(ChatRoomActivity.this, "Không tải được tin nhắn", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-    private void connectWebSocket() {
-        webSocketClient = new ChatWebSocketClient(this, new ChatWebSocketClient.Listener() {
-            @Override
-            public void onConnected() {
-                runOnUiThread(() -> tvConnectionStatus.setText("Đang online"));
-            }
-
-            @Override
-            public void onDisconnected() {
-                runOnUiThread(() -> tvConnectionStatus.setText("Mất kết nối realtime"));
-            }
-
-            @Override
-            public void onMessage(ChatMessageResponse message) {
-                runOnUiThread(() -> {
-                    if (!isMessageOfCurrentRoom(message)) {
-                        return;
-                    }
-
-                    addMessageIfNotExists(message);
-                    scrollToBottom();
-
-                    if (sameId(message.getSenderId(), partnerId)) {
-                        markConversationAsRead();
-                    }
-                });
-            }
-
-            @Override
-            public void onError(String message) {
-                runOnUiThread(() -> tvConnectionStatus.setText("Realtime chưa sẵn sàng"));
-            }
-        });
-
-        webSocketClient.connect(currentUserId);
-    }
-
-    private void sendCurrentMessage() {
-        String content = edtMessage.getText() == null ? "" : edtMessage.getText().toString().trim();
-        if (content.isEmpty()) {
-            return;
-        }
-
-        edtMessage.setText("");
-
-        boolean sentBySocket = webSocketClient != null && webSocketClient.sendMessage(partnerId, content);
-        if (!sentBySocket) {
-            sendMessageByRest(content);
-        }
-    }
-
-    private void sendMessageByRest(String content) {
-        repository.sendMessage(partnerId, content).enqueue(new Callback<BaseResponse<ChatMessageResponse>>() {
-            @Override
-            public void onResponse(@NonNull Call<BaseResponse<ChatMessageResponse>> call,
-                                   @NonNull Response<BaseResponse<ChatMessageResponse>> response) {
-                BaseResponse<ChatMessageResponse> body = response.body();
-
-                if (response.isSuccessful() && body != null && body.getData() != null) {
-                    addMessageIfNotExists(body.getData());
-                    scrollToBottom();
-                } else {
-                    Toast.makeText(ChatRoomActivity.this, "Không gửi được tin nhắn", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<BaseResponse<ChatMessageResponse>> call,
-                                  @NonNull Throwable t) {
-                Toast.makeText(ChatRoomActivity.this, "Không gửi được tin nhắn", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-    private void markConversationAsRead() {
-        repository.markAsRead(partnerId).enqueue(new Callback<BaseResponse<Integer>>() {
-            @Override
-            public void onResponse(@NonNull Call<BaseResponse<Integer>> call,
-                                   @NonNull Response<BaseResponse<Integer>> response) {
-                // Không cần hiển thị gì cho người dùng.
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<BaseResponse<Integer>> call,
-                                  @NonNull Throwable t) {
-                // Bỏ qua để không làm gián đoạn trải nghiệm chat.
-            }
-        });
-    }
-
-    private boolean isMessageOfCurrentRoom(ChatMessageResponse message) {
-        if (message == null) return false;
-
-        boolean partnerToMe = sameId(message.getSenderId(), partnerId) && sameId(message.getReceiverId(), currentUserId);
-        boolean meToPartner = sameId(message.getSenderId(), currentUserId) && sameId(message.getReceiverId(), partnerId);
-
-        return partnerToMe || meToPartner;
-    }
-
-    private void addMessageIfNotExists(ChatMessageResponse message) {
-        if (message == null) return;
-
-        Long messageId = message.getMessageId();
-        if (messageId != null) {
-            for (ChatMessageResponse item : messages) {
-                if (messageId.equals(item.getMessageId())) {
-                    return;
-                }
-            }
-        }
-
-        messages.add(message);
-        adapter.notifyItemInserted(messages.size() - 1);
-    }
-
-    private void scrollToBottom() {
-        if (!messages.isEmpty()) {
-            rvMessages.scrollToPosition(messages.size() - 1);
-        }
-    }
-
-    private boolean sameId(Long a, Long b) {
-        return a != null && b != null && a.equals(b);
+        viewModel.disconnectSocket();
     }
 }

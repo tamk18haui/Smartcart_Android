@@ -145,4 +145,29 @@
     <!-- ========================= -->
     <color name="primary_orange">#F43F5E</color>
 
+    <!-- ========================= -->
+    <!-- Seller aliases - để các XML seller cũ không lỗi resource linking -->
+    <!-- ========================= -->
+    <color name="seller_primary">#2563EB</color>
+    <color name="seller_primary_dark">#1D4ED8</color>
+    <color name="seller_primary_light">#EFF6FF</color>
+
+    <color name="seller_surface">#FFFFFF</color>
+    <color name="seller_surface_soft">#F8FAFC</color>
+    <color name="seller_background">#F1F5F9</color>
+
+    <color name="seller_text_primary">#0F172A</color>
+    <color name="seller_text_secondary">#64748B</color>
+    <color name="seller_text_hint">#94A3B8</color>
+    <color name="seller_text_white">#FFFFFF</color>
+
+    <color name="seller_divider">#E2E8F0</color>
+    <color name="seller_border">#E2E8F0</color>
+
+    <color name="seller_success">#10B981</color>
+    <color name="seller_success_light">#ECFDF5</color>
+    <color name="seller_warning">#F59E0B</color>
+    <color name="seller_warning_light">#FFFBEB</color>
+    <color name="seller_danger">#F43F5E</color>
+    <color name="seller_danger_light">#FFF1F2</color>
 </resources>

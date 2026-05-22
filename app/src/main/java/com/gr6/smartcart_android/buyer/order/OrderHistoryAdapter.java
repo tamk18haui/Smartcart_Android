@@ -1,6 +1,7 @@
 package com.gr6.smartcart_android.buyer.order;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.GradientDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -82,13 +83,16 @@ public class OrderHistoryAdapter extends RecyclerView.Adapter<OrderHistoryAdapte
         bindItems(holder.layoutItems, order.getItems());
         bindCancelButton(holder.btnCancelOrder, order);
 
-        holder.btnDetail.setOnClickListener(v ->
-                Toast.makeText(
-                        context,
-                        "Xem chi tiết shopOrderId = " + order.getShopOrderId(),
-                        Toast.LENGTH_SHORT
-                ).show()
-        );
+        holder.btnDetail.setOnClickListener(v -> {
+            if (order.getShopOrderId() == null || order.getShopOrderId() <= 0) {
+                Toast.makeText(context, "Không tìm thấy mã đơn hàng", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            Intent intent = new Intent(context, OrderDetailActivity.class);
+            intent.putExtra(OrderDetailActivity.EXTRA_SHOP_ORDER_ID, order.getShopOrderId());
+            context.startActivity(intent);
+        });
 
         holder.btnBuyAgain.setOnClickListener(v ->
                 Toast.makeText(

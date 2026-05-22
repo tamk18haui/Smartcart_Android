@@ -1,6 +1,7 @@
 package com.gr6.smartcart_android.buyer.order.api;
 
 import com.gr6.smartcart_android.buyer.order.request.CancelOrderRequest;
+import com.gr6.smartcart_android.buyer.order.response.OrderDetailResponse;
 import com.gr6.smartcart_android.buyer.order.response.OrderHistoryResponse;
 import com.gr6.smartcart_android.common.base.BaseResponse;
 
@@ -16,6 +17,11 @@ public interface OrderApiService {
 
     @GET("api/v2/orders/tracking/history")
     Call<BaseResponse<List<OrderHistoryResponse>>> getOrderHistory();
+
+    @GET("api/v2/orders/tracking/{shopOrderId}")
+    Call<BaseResponse<OrderDetailResponse>> getOrderDetail(
+            @Path("shopOrderId") Long shopOrderId
+    );
 
     @POST("api/v2/orders/refund/{shopOrderId}/cancel")
     Call<BaseResponse<String>> cancelOrder(

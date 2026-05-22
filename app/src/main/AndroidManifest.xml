@@ -21,12 +21,58 @@
         <activity
             android:name=".auth.register.RegisterActivity"
             android:exported="false" />
+
         <activity
-            android:name=".buyer.chat.ChatListActivity"
+            android:name=".chat.ChatListActivity"
             android:exported="false" />
 
         <activity
-            android:name=".buyer.chat.ChatActivity"
+            android:name=".chat.ChatRoomActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".buyer.order.OrderDetailActivity"
+            android:exported="false" />
+
+        <!-- SELLER -->
+        <activity
+            android:name=".seller.main.SellerHomeActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".seller.product.AddProductActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".seller.product.BrandPickerActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".seller.product.CategoryPickerActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".seller.product.ShippingActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".seller.product.VariantEditorActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".seller.shop.SellerShopInfoActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".seller.order.SellerOrderDetailActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".seller.voucher.SellerVoucherActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".seller.voucher.CreateVoucherActivity"
             android:exported="false" />
 
         <activity

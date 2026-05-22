@@ -6,24 +6,26 @@
     android:id="@+id/rootBuyerHome"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background">
+    android:background="@color/background"
+    android:fitsSystemWindows="true">
 
-    <!-- 1. FIXED HEADER (Thanh tìm kiếm và icon ngang hàng) -->
+    <!-- 1. FIXED HEADER -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/layoutHeaderFixed"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:minHeight="72dp"
         android:background="@drawable/bg_brand_gradient"
         android:elevation="8dp"
-        android:paddingStart="16dp"
-        android:paddingTop="12dp"
-        android:paddingEnd="16dp"
+        android:paddingStart="12dp"
+        android:paddingTop="16dp"
+        android:paddingEnd="12dp"
         android:paddingBottom="12dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <!-- ẨN LỜI CHÀO: Giữ lại ID để Java không bị lỗi NullPointerException -->
+        <!-- ẨN LỜI CHÀO -->
         <LinearLayout
             android:id="@+id/layoutUserInfo"
             android:layout_width="0dp"
@@ -42,21 +44,21 @@
             android:id="@+id/layoutSearch"
             android:layout_width="0dp"
             android:layout_height="44dp"
-            android:layout_marginEnd="12dp"
+            android:layout_marginEnd="8dp"
             android:background="@drawable/bg_home_search"
             android:elevation="2dp"
             android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:paddingStart="12dp"
-            android:paddingEnd="12dp"
-            app:layout_constraintBottom_toBottomOf="parent"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            app:layout_constraintBottom_toBottomOf="@id/imgMessage"
             app:layout_constraintEnd_toStartOf="@id/imgMessage"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toTopOf="@id/imgMessage">
 
             <ImageView
-                android:layout_width="22dp"
-                android:layout_height="22dp"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
                 android:src="@drawable/ic_search"
                 app:tint="@color/text_secondary" />
 
@@ -64,11 +66,11 @@
                 android:id="@+id/edtSearch"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_marginStart="8dp"
+                android:layout_marginStart="6dp"
                 android:layout_weight="1"
                 android:background="@android:color/transparent"
                 android:fontFamily="sans-serif"
-                android:hint="Tìm sản phẩm, cửa hàng..."
+                android:hint="Tìm sản phẩm..."
                 android:imeOptions="actionSearch"
                 android:inputType="text"
                 android:singleLine="true"
@@ -77,15 +79,15 @@
                 android:textSize="14sp" />
         </LinearLayout>
 
-        <!-- ICON TIN NHẮN (MESSAGE) -->
+        <!-- ICON TIN NHẮN -->
         <ImageView
             android:id="@+id/imgMessage"
-            android:layout_width="44dp"
-            android:layout_height="44dp"
-            android:layout_marginEnd="8dp"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:layout_marginEnd="6dp"
             android:background="@drawable/bg_icon_header"
             android:foreground="?attr/selectableItemBackgroundBorderless"
-            android:padding="10dp"
+            android:padding="9dp"
             android:src="@drawable/ic_message"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/imgCart"
@@ -95,15 +97,15 @@
         <!-- ICON GIỎ HÀNG -->
         <ImageView
             android:id="@+id/imgCart"
-            android:layout_width="44dp"
-            android:layout_height="44dp"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
             android:background="@drawable/bg_icon_header"
             android:foreground="?attr/selectableItemBackgroundBorderless"
-            android:padding="10dp"
+            android:padding="9dp"
             android:src="@drawable/ic_cart"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toBottomOf="@id/imgMessage"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintTop_toTopOf="@id/imgMessage"
             app:tint="@color/white" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
@@ -111,7 +113,7 @@
     <!-- 2. SCROLLABLE CONTENT -->
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipeRefresh"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@id/layoutBottomNav"
         app:layout_constraintEnd_toEndOf="parent"
@@ -129,9 +131,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:paddingStart="20dp"
+                android:paddingStart="16dp"
                 android:paddingTop="16dp"
-                android:paddingEnd="20dp"
+                android:paddingEnd="16dp"
                 android:paddingBottom="24dp">
 
                 <!-- BANNER -->
@@ -148,7 +150,7 @@
                         android:background="@drawable/bg_home_banner"
                         android:gravity="center_vertical"
                         android:orientation="horizontal"
-                        android:padding="20dp">
+                        android:padding="18dp">
 
                         <LinearLayout
                             android:layout_width="0dp"
@@ -188,8 +190,8 @@
                         </LinearLayout>
 
                         <ImageView
-                            android:layout_width="76dp"
-                            android:layout_height="76dp"
+                            android:layout_width="70dp"
+                            android:layout_height="70dp"
                             android:src="@drawable/ic_empty_box"
                             app:tint="@color/white" />
                     </LinearLayout>
@@ -199,7 +201,7 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="28dp"
+                    android:layout_marginTop="24dp"
                     android:orientation="vertical">
 
                     <TextView
@@ -276,7 +278,7 @@
     <!-- 3. BOTTOM NAV -->
     <LinearLayout
         android:id="@+id/layoutBottomNav"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="72dp"
         android:background="@drawable/bg_bottom_nav"
         android:elevation="16dp"

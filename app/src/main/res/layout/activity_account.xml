@@ -10,7 +10,8 @@
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipeAccount"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_marginBottom="64dp">
 
         <ScrollView
             android:layout_width="match_parent"
@@ -18,84 +19,101 @@
             android:fillViewport="true"
             android:overScrollMode="never">
 
-            <!-- LinearLayout chứa toàn bộ nội dung cuộn (có padding bottom để không bị che bởi Bottom Nav) -->
+            <!-- LinearLayout chứa toàn bộ nội dung cuộn -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:paddingBottom="100dp">
+                android:paddingBottom="24dp">
 
-                <!-- Header -->
-                <FrameLayout
+                <!-- SỬA TẠI ĐÂY: Thêm fitsSystemWindows="true" để tự động chừa chỗ cho thanh sim sóng trên mọi dòng máy -->
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
-                    android:layout_height="210dp"
-                    android:background="@drawable/bg_account_header">
+                    android:layout_height="wrap_content"
+                    android:minHeight="190dp"
+                    android:background="@drawable/bg_account_header"
+                    android:fitsSystemWindows="true"
+                    android:paddingBottom="24dp">
 
+                    <!-- Hạ marginTop xuống 8dp vì fitsSystemWindows đã tạo sẵn khoảng trống an toàn -->
                     <ImageView
                         android:id="@+id/imgBack"
-                        android:layout_width="42dp"
-                        android:layout_height="42dp"
-                        android:layout_gravity="top|start"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
                         android:layout_marginStart="16dp"
-                        android:layout_marginTop="16dp"
+                        android:layout_marginTop="8dp"
                         android:background="@drawable/bg_account_icon"
                         android:padding="10dp"
                         android:src="@drawable/ic_back"
-                        app:tint="@color/white" />
+                        app:tint="@color/white"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
 
+                    <!-- Hạ marginTop xuống 14dp để cân bằng với nút Back -->
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="top|center_horizontal"
-                        android:layout_marginTop="26dp"
+                        android:layout_marginTop="14dp"
                         android:text="Tài khoản"
                         android:textColor="@color/white"
-                        android:textSize="21sp"
-                        android:textStyle="bold" />
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
 
                     <!-- Thông tin User -->
                     <LinearLayout
-                        android:layout_width="match_parent"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="bottom"
+                        android:layout_marginTop="24dp"
+                        android:gravity="center_vertical"
                         android:orientation="horizontal"
                         android:paddingStart="20dp"
                         android:paddingEnd="20dp"
-                        android:paddingBottom="32dp">
+                        app:layout_constraintTop_toBottomOf="@id/imgBack"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent">
 
-                        <FrameLayout
-                            android:layout_width="82dp"
-                            android:layout_height="82dp">
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:layout_width="76dp"
+                            android:layout_height="76dp">
 
                             <ImageView
                                 android:id="@+id/imgAvatar"
-                                android:layout_width="82dp"
-                                android:layout_height="82dp"
+                                android:layout_width="76dp"
+                                android:layout_height="76dp"
                                 android:background="@drawable/bg_account_avatar"
-                                android:padding="16dp"
+                                android:padding="14dp"
                                 android:scaleType="centerCrop"
                                 android:src="@drawable/ic_user"
-                                app:tint="@color/brand_primary" />
+                                app:tint="@color/brand_primary"
+                                app:layout_constraintTop_toTopOf="parent"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintEnd_toEndOf="parent"/>
 
                             <TextView
                                 android:id="@+id/txtRole"
-                                android:layout_width="52dp"
-                                android:layout_height="22dp"
-                                android:layout_gravity="bottom|center_horizontal"
+                                android:layout_width="50dp"
+                                android:layout_height="20dp"
                                 android:background="@drawable/bg_account_role"
                                 android:gravity="center"
                                 android:text="BUYER"
                                 android:textColor="@color/white"
                                 android:textSize="9sp"
-                                android:textStyle="bold" />
+                                android:textStyle="bold"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toStartOf="parent" />
 
-                        </FrameLayout>
+                        </androidx.constraintlayout.widget.ConstraintLayout>
 
                         <LinearLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_gravity="center_vertical"
-                            android:layout_marginStart="15dp"
+                            android:layout_marginStart="16dp"
                             android:layout_weight="1"
                             android:orientation="vertical">
 
@@ -104,19 +122,19 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:ellipsize="end"
-                                android:singleLine="true"
+                                android:maxLines="1"
                                 android:text="Người dùng SmartCart"
                                 android:textColor="@color/white"
-                                android:textSize="22sp"
+                                android:textSize="20sp"
                                 android:textStyle="bold" />
 
                             <TextView
                                 android:id="@+id/txtEmail"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="5dp"
+                                android:layout_marginTop="4dp"
                                 android:ellipsize="end"
-                                android:singleLine="true"
+                                android:maxLines="1"
                                 android:text="email@gmail.com"
                                 android:textColor="#E6F3FF"
                                 android:textSize="14sp" />
@@ -124,23 +142,23 @@
                             <TextView
                                 android:id="@+id/txtUserCode"
                                 android:layout_width="wrap_content"
-                                android:layout_height="26dp"
-                                android:layout_marginTop="9dp"
+                                android:layout_height="24dp"
+                                android:layout_marginTop="8dp"
                                 android:background="@drawable/bg_user_code"
                                 android:gravity="center"
                                 android:paddingStart="10dp"
                                 android:paddingEnd="10dp"
                                 android:text="ID: SC-1"
                                 android:textColor="@color/white"
-                                android:textSize="12sp"
+                                android:textSize="11sp"
                                 android:textStyle="bold"
-                                android:visibility="gone"/>
+                                android:visibility="gone" />
 
                         </LinearLayout>
 
                     </LinearLayout>
 
-                </FrameLayout>
+                </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <!-- Đơn hàng của tôi -->
                 <LinearLayout
@@ -150,14 +168,15 @@
                     android:layout_marginTop="14dp"
                     android:layout_marginEnd="16dp"
                     android:background="@drawable/bg_account_card"
-                    android:elevation="3dp"
+                    android:elevation="2dp"
                     android:orientation="vertical"
                     android:padding="16dp">
 
                     <LinearLayout
                         android:id="@+id/itemOrderHistory"
                         android:layout_width="match_parent"
-                        android:layout_height="42dp"
+                        android:layout_height="wrap_content"
+                        android:minHeight="40dp"
                         android:gravity="center_vertical"
                         android:orientation="horizontal">
 
@@ -167,20 +186,20 @@
                             android:layout_weight="1"
                             android:text="Đơn hàng của tôi"
                             android:textColor="@color/text_primary"
-                            android:textSize="18sp"
+                            android:textSize="16sp"
                             android:textStyle="bold" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Xem lịch sử đơn hàng"
+                            android:text="Xem lịch sử"
                             android:textColor="@color/brand_primary"
                             android:textSize="13sp"
                             android:textStyle="bold" />
 
                         <ImageView
-                            android:layout_width="18dp"
-                            android:layout_height="18dp"
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
                             android:layout_marginStart="4dp"
                             android:src="@drawable/ic_chevron_right"
                             app:tint="@color/brand_primary" />
@@ -191,105 +210,117 @@
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
                         android:layout_marginTop="8dp"
-                        android:layout_marginBottom="8dp"
+                        android:layout_marginBottom="12dp"
                         android:background="@color/divider" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="86dp"
+                        android:layout_height="wrap_content"
                         android:gravity="center"
                         android:orientation="horizontal">
 
                         <LinearLayout
                             android:id="@+id/itemOrders"
                             android:layout_width="0dp"
-                            android:layout_height="match_parent"
+                            android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:gravity="center"
-                            android:orientation="vertical">
+                            android:orientation="vertical"
+                            android:background="?android:attr/selectableItemBackground"
+                            android:focusable="true"
+                            android:clickable="true">
 
                             <ImageView
-                                android:layout_width="30dp"
-                                android:layout_height="30dp"
+                                android:layout_width="28dp"
+                                android:layout_height="28dp"
                                 android:src="@drawable/ic_cart"
                                 app:tint="@color/brand_primary" />
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="8dp"
+                                android:layout_marginTop="6dp"
                                 android:text="Tất cả"
                                 android:textColor="@color/text_primary"
-                                android:textSize="13sp" />
+                                android:textSize="12sp" />
 
                         </LinearLayout>
 
                         <LinearLayout
                             android:layout_width="0dp"
-                            android:layout_height="match_parent"
+                            android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:gravity="center"
-                            android:orientation="vertical">
+                            android:orientation="vertical"
+                            android:background="?android:attr/selectableItemBackground"
+                            android:focusable="true"
+                            android:clickable="true">
 
                             <ImageView
-                                android:layout_width="30dp"
-                                android:layout_height="30dp"
+                                android:layout_width="28dp"
+                                android:layout_height="28dp"
                                 android:src="@drawable/ic_check"
                                 app:tint="@color/warning" />
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="8dp"
+                                android:layout_marginTop="6dp"
                                 android:text="Chờ xác nhận"
                                 android:textColor="@color/text_primary"
-                                android:textSize="13sp" />
+                                android:textSize="12sp" />
 
                         </LinearLayout>
 
                         <LinearLayout
                             android:layout_width="0dp"
-                            android:layout_height="match_parent"
+                            android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:gravity="center"
-                            android:orientation="vertical">
+                            android:orientation="vertical"
+                            android:background="?android:attr/selectableItemBackground"
+                            android:focusable="true"
+                            android:clickable="true">
 
                             <ImageView
-                                android:layout_width="30dp"
-                                android:layout_height="30dp"
+                                android:layout_width="28dp"
+                                android:layout_height="28dp"
                                 android:src="@drawable/ic_shop"
                                 app:tint="@color/success" />
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="8dp"
+                                android:layout_marginTop="6dp"
                                 android:text="Đang giao"
                                 android:textColor="@color/text_primary"
-                                android:textSize="13sp" />
+                                android:textSize="12sp" />
 
                         </LinearLayout>
 
                         <LinearLayout
                             android:layout_width="0dp"
-                            android:layout_height="match_parent"
+                            android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:gravity="center"
-                            android:orientation="vertical">
+                            android:orientation="vertical"
+                            android:background="?android:attr/selectableItemBackground"
+                            android:focusable="true"
+                            android:clickable="true">
 
                             <ImageView
-                                android:layout_width="30dp"
-                                android:layout_height="30dp"
+                                android:layout_width="28dp"
+                                android:layout_height="28dp"
                                 android:src="@drawable/ic_star"
                                 app:tint="@color/price_red" />
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="8dp"
+                                android:layout_marginTop="6dp"
                                 android:text="Đánh giá"
                                 android:textColor="@color/text_primary"
-                                android:textSize="13sp" />
+                                android:textSize="12sp" />
 
                         </LinearLayout>
 
@@ -305,7 +336,7 @@
                     android:layout_marginTop="14dp"
                     android:layout_marginEnd="16dp"
                     android:background="@drawable/bg_account_card"
-                    android:elevation="3dp"
+                    android:elevation="2dp"
                     android:orientation="vertical">
 
                     <include layout="@layout/item_account_menu_address" />
@@ -323,7 +354,7 @@
                     android:layout_marginTop="14dp"
                     android:layout_marginEnd="16dp"
                     android:background="@drawable/bg_account_card"
-                    android:elevation="3dp"
+                    android:elevation="2dp"
                     android:orientation="vertical">
 
                     <include layout="@layout/item_account_menu_password" />
@@ -337,14 +368,14 @@
         </ScrollView>
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
-    <!-- Bottom Navigation (Nằm đè lên dưới cùng, không bị cuộn theo SwipeRefreshLayout) -->
+    <!-- Bottom Navigation -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="72dp"
+        android:layout_height="64dp"
         android:layout_gravity="bottom"
         android:background="@drawable/bg_bottom_nav"
-        android:elevation="10dp"
-        android:gravity="center"
+        android:elevation="8dp"
+        android:gravity="center_vertical"
         android:orientation="horizontal">
 
         <LinearLayout
@@ -353,11 +384,14 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:gravity="center"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:background="?android:attr/selectableItemBackground"
+            android:focusable="true"
+            android:clickable="true">
 
             <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
                 android:src="@drawable/ic_home"
                 app:tint="@color/nav_inactive" />
 
@@ -367,7 +401,7 @@
                 android:layout_marginTop="4dp"
                 android:text="Trang chủ"
                 android:textColor="@color/nav_inactive"
-                android:textSize="12sp" />
+                android:textSize="11sp" />
 
         </LinearLayout>
 
@@ -377,11 +411,14 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:gravity="center"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:background="?android:attr/selectableItemBackground"
+            android:focusable="true"
+            android:clickable="true">
 
             <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
                 android:src="@drawable/ic_category"
                 app:tint="@color/nav_inactive" />
 
@@ -391,7 +428,7 @@
                 android:layout_marginTop="4dp"
                 android:text="Danh mục"
                 android:textColor="@color/nav_inactive"
-                android:textSize="12sp" />
+                android:textSize="11sp" />
 
         </LinearLayout>
 
@@ -401,11 +438,14 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:gravity="center"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:background="?android:attr/selectableItemBackground"
+            android:focusable="true"
+            android:clickable="true">
 
             <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
                 android:src="@drawable/ic_notification"
                 app:tint="@color/nav_inactive" />
 
@@ -415,7 +455,7 @@
                 android:layout_marginTop="4dp"
                 android:text="Thông báo"
                 android:textColor="@color/nav_inactive"
-                android:textSize="12sp" />
+                android:textSize="11sp" />
 
         </LinearLayout>
 
@@ -426,11 +466,13 @@
             android:layout_weight="1"
             android:background="@drawable/bg_bottom_nav_selected"
             android:gravity="center"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:focusable="true"
+            android:clickable="true">
 
             <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
                 android:src="@drawable/ic_user"
                 app:tint="@color/brand_primary" />
 
@@ -440,7 +482,7 @@
                 android:layout_marginTop="4dp"
                 android:text="Tài khoản"
                 android:textColor="@color/brand_primary"
-                android:textSize="12sp"
+                android:textSize="11sp"
                 android:textStyle="bold" />
 
         </LinearLayout>

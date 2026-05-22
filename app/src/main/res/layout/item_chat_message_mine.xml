@@ -12,12 +12,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="72dp"
-        android:background="@drawable/bg_chat_bubble_me"
+        android:background="@drawable/bg_chat_bubble_mine"
         android:lineSpacingExtra="2dp"
+        android:maxWidth="280dp"
         android:paddingStart="14dp"
-        android:paddingTop="10dp"
+        android:paddingTop="9dp"
         android:paddingEnd="14dp"
-        android:paddingBottom="10dp"
+        android:paddingBottom="9dp"
         android:text="Tin nhắn của tôi"
         android:textColor="@color/white"
         android:textSize="14sp" />
@@ -26,9 +27,10 @@
         android:id="@+id/txtTime"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="3dp"
-        android:layout_marginEnd="4dp"
-        android:text="20:30"
-        android:textColor="@color/text_hint"
+        android:layout_marginTop="2dp"
+        android:layout_marginEnd="6dp"
+        android:text="12:00"
+        android:textColor="@color/text_secondary"
         android:textSize="11sp" />
+
 </LinearLayout>

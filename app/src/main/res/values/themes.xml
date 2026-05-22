@@ -8,6 +8,7 @@
         <item name="colorSecondary">@color/brand_secondary</item>
         <item name="android:colorAccent">@color/brand_primary</item>
 
+
         <!-- Window -->
         <item name="android:windowBackground">@color/background</item>
         <item name="android:statusBarColor">@color/brand_primary</item>
@@ -133,5 +134,6 @@
     <style name="CircleImage">
         <item name="cornerSize">50%</item>
     </style>
+
 
 </resources>

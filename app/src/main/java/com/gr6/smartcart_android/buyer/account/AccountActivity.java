@@ -22,7 +22,7 @@ import android.content.res.ColorStateList;
 import androidx.core.content.ContextCompat;
 import androidx.core.widget.ImageViewCompat;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-import com.gr6.smartcart_android.buyer.chat.ChatListActivity;
+import com.gr6.smartcart_android.chat.ChatListActivity;
 
 public class AccountActivity extends BaseActivity {
     private SwipeRefreshLayout swipeAccount;

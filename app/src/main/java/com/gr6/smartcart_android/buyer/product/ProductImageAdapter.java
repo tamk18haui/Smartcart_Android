@@ -43,7 +43,13 @@ public class ProductImageAdapter extends RecyclerView.Adapter<ProductImageAdapte
             int viewType
     ) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_product_image, parent, false);
+                .inflate(R.layout.item_product_detail_image, parent, false);
+
+        view.setLayoutParams(new ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT
+        ));
+
         return new ImageViewHolder(view);
     }
 
@@ -53,7 +59,12 @@ public class ProductImageAdapter extends RecyclerView.Adapter<ProductImageAdapte
             int position
     ) {
         String imageUrl = images.get(position);
-        ImageLoader.load(holder.itemView.getContext(), imageUrl, holder.imgProduct);
+
+        if (imageUrl == null || imageUrl.trim().isEmpty()) {
+            holder.imgProduct.setImageResource(R.drawable.bg_image_placeholder);
+        } else {
+            ImageLoader.load(holder.itemView.getContext(), imageUrl, holder.imgProduct);
+        }
     }
 
     @Override
