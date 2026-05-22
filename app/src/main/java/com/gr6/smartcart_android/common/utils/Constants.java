@@ -12,7 +12,7 @@ public class Constants {
      * Máy thật dùng IP máy tính, ví dụ:
      * http://192.168.1.5:8080/
      */
-    public static final String BASE_URL = "http://172.20.10.8:8080/";
+    public static final String BASE_URL = "http://192.168.2.22:8080/";
 
     public static final int CONNECT_TIMEOUT_SECONDS = 30;
     public static final int READ_TIMEOUT_SECONDS = 30;

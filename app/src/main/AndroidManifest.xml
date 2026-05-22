@@ -8,7 +8,7 @@
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
+        android:label="SmartCart"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:usesCleartextTraffic="true"
@@ -20,6 +20,13 @@
 
         <activity
             android:name=".auth.register.RegisterActivity"
+            android:exported="false" />
+        <activity
+            android:name=".buyer.chat.ChatListActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".buyer.chat.ChatActivity"
             android:exported="false" />
 
         <activity

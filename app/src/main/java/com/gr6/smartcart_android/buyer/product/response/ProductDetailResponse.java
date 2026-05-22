@@ -60,6 +60,9 @@ public class ProductDetailResponse {
     @SerializedName("shopName")
     private String shopName;
 
+    @SerializedName("shopOwnerId")
+    private Long shopOwnerId;
+
     @SerializedName("shopImageUrl")
     private String shopImageUrl;
 
@@ -111,6 +114,10 @@ public class ProductDetailResponse {
     public Long getProductId() {
         if (productId != null) return productId;
         return id;
+    }
+
+    public Long getShopOwnerId() {
+        return shopOwnerId;
     }
 
     public String getName() {

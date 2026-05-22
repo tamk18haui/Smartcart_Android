@@ -4,6 +4,12 @@ import com.google.gson.annotations.SerializedName;
 
 public class ProfileResponse {
 
+    @SerializedName("userId")
+    private Long userId;
+
+    @SerializedName("id")
+    private Long id;
+
     @SerializedName("fullName")
     private String fullName;
 
@@ -18,6 +24,11 @@ public class ProfileResponse {
 
     @SerializedName("role")
     private String role;
+
+    public Long getUserId() {
+        if (userId != null) return userId;
+        return id;
+    }
 
     public String getFullName() {
         return fullName == null ? "" : fullName;

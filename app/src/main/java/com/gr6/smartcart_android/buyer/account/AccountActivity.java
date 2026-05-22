@@ -22,6 +22,7 @@ import android.content.res.ColorStateList;
 import androidx.core.content.ContextCompat;
 import androidx.core.widget.ImageViewCompat;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import com.gr6.smartcart_android.buyer.chat.ChatListActivity;
 
 public class AccountActivity extends BaseActivity {
     private SwipeRefreshLayout swipeAccount;
@@ -86,6 +87,7 @@ public class AccountActivity extends BaseActivity {
                     }
 
                     UserSession session = UserSession.getInstance(AccountActivity.this);
+                    session.saveUserId(profile.getUserId());
                     session.saveFullName(profile.getFullName());
                     session.saveEmail(profile.getEmail());
                     session.saveAvatarUrl(profile.getAvatarUrl());
@@ -201,9 +203,10 @@ public class AccountActivity extends BaseActivity {
                 showToast("Kho voucher sẽ làm ở bước sau")
         );
 
-        itemChat.setOnClickListener(v ->
-                showToast("Tin nhắn sẽ làm ở bước sau")
-        );
+        itemChat.setOnClickListener(v -> {
+            Intent intent = new Intent(this, ChatListActivity.class);
+            startActivity(intent);
+        });
 
         itemNotification.setOnClickListener(v ->
                 showToast("Thông báo sẽ làm ở bước sau")

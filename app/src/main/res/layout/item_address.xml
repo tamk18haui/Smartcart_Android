@@ -1,117 +1,150 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/rootAddressItem"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="12dp"
     android:background="@drawable/bg_address_card"
-    android:elevation="3dp"
-    android:orientation="vertical"
+    android:elevation="1.5dp"
     android:padding="16dp">
 
-    <LinearLayout
-        android:layout_width="match_parent"
+    <TextView
+        android:id="@+id/txtReceiverName"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:orientation="horizontal">
+        android:ellipsize="end"
+        android:singleLine="true"
+        android:text="Tên người nhận"
+        android:textColor="@color/text_primary"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:fontFamily="sans-serif-medium"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/txtDefaultBadge"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintHorizontal_chainStyle="packed"/>
 
-        <TextView
-            android:id="@+id/txtReceiverName"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:ellipsize="end"
-            android:singleLine="true"
-            android:text="Người nhận"
-            android:textColor="@color/text_primary"
-            android:textSize="17sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/txtDefaultBadge"
-            android:layout_width="wrap_content"
-            android:layout_height="26dp"
-            android:background="@drawable/bg_address_default_badge"
-            android:gravity="center"
-            android:paddingStart="10dp"
-            android:paddingEnd="10dp"
-            android:text="Mặc định"
-            android:textColor="@color/brand_primary"
-            android:textSize="12sp"
-            android:textStyle="bold"
-            android:visibility="gone" />
-
-    </LinearLayout>
+    <TextView
+        android:id="@+id/txtDefaultBadge"
+        android:layout_width="wrap_content"
+        android:layout_height="20dp"
+        android:layout_marginStart="8dp"
+        android:background="@drawable/bg_address_default_badge"
+        android:gravity="center"
+        android:paddingHorizontal="8dp"
+        android:text="Mặc định"
+        android:textColor="@color/brand_primary"
+        android:textSize="10sp"
+        android:textStyle="bold"
+        android:fontFamily="sans-serif-medium"
+        app:layout_constraintTop_toTopOf="@+id/txtReceiverName"
+        app:layout_constraintBottom_toBottomOf="@+id/txtReceiverName"
+        app:layout_constraintStart_toEndOf="@+id/txtReceiverName"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:visibility="gone"
+        tools:visibility="visible"/>
 
     <TextView
         android:id="@+id/txtReceiverPhone"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="7dp"
-        android:text="0123456789"
+        android:layout_marginTop="6dp"
+        android:text="Số điện thoại"
         android:textColor="@color/text_secondary"
-        android:textSize="14sp"
-        android:textStyle="bold" />
+        android:textSize="13sp"
+        android:fontFamily="sans-serif"
+        app:layout_constraintTop_toBottomOf="@+id/txtReceiverName"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
     <TextView
         android:id="@+id/txtFullAddress"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="9dp"
+        android:layout_marginTop="6dp"
         android:lineSpacingExtra="4dp"
-        android:text="Địa chỉ giao hàng"
+        android:text="Địa chỉ chi tiết nhận hàng"
         android:textColor="@color/text_secondary"
-        android:textSize="14sp" />
+        android:textSize="13sp"
+        android:fontFamily="sans-serif"
+        app:layout_constraintTop_toBottomOf="@+id/txtReceiverPhone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
     <View
+        android:id="@+id/addressDivider"
         android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginTop="14dp"
-        android:background="@color/divider" />
+        android:layout_height="0.5dp"
+        android:layout_marginTop="16dp"
+        android:background="#E5E5EA"
+        app:layout_constraintTop_toBottomOf="@+id/txtFullAddress"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="44dp"
-        android:layout_marginTop="8dp"
+    <TextView
+        android:id="@+id/btnSetDefault"
+        android:layout_width="wrap_content"
+        android:layout_height="38dp"
+        android:layout_marginTop="6dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:clickable="true"
+        android:focusable="true"
         android:gravity="center_vertical"
-        android:orientation="horizontal">
+        android:text="Thiết lập mặc định"
+        android:textColor="@color/brand_primary"
+        android:textSize="13sp"
+        android:fontFamily="sans-serif-medium"
+        app:layout_constraintTop_toBottomOf="@+id/addressDivider"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
-        <TextView
-            android:id="@+id/btnSetDefault"
-            android:layout_width="0dp"
-            android:layout_height="34dp"
-            android:layout_weight="1"
-            android:background="@drawable/bg_address_outline_button"
-            android:gravity="center"
-            android:text="Đặt mặc định"
-            android:textColor="@color/brand_primary"
-            android:textSize="13sp"
-            android:textStyle="bold" />
+    <TextView
+        android:id="@+id/btnDelete"
+        android:layout_width="wrap_content"
+        android:layout_height="38dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center"
+        android:paddingHorizontal="12dp"
+        android:text="Xóa"
+        android:textColor="@color/price_red"
+        android:textSize="13sp"
+        android:fontFamily="sans-serif-medium"
+        app:layout_constraintTop_toTopOf="@+id/btnSetDefault"
+        app:layout_constraintBottom_toBottomOf="@+id/btnSetDefault"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
-        <TextView
-            android:id="@+id/btnEdit"
-            android:layout_width="76dp"
-            android:layout_height="34dp"
-            android:layout_marginStart="10dp"
-            android:background="@drawable/bg_address_soft_button"
-            android:gravity="center"
-            android:text="Sửa"
-            android:textColor="@color/text_primary"
-            android:textSize="13sp"
-            android:textStyle="bold" />
+    <View
+        android:id="@+id/actionDivider"
+        android:layout_width="1dp"
+        android:layout_height="12dp"
+        android:background="#D1D1D6"
+        app:layout_constraintTop_toTopOf="@+id/btnDelete"
+        app:layout_constraintBottom_toBottomOf="@+id/btnDelete"
+        app:layout_constraintEnd_toStartOf="@+id/btnDelete"
+        android:layout_marginEnd="2dp"/>
 
-        <TextView
-            android:id="@+id/btnDelete"
-            android:layout_width="76dp"
-            android:layout_height="34dp"
-            android:layout_marginStart="10dp"
-            android:background="@drawable/bg_address_delete_button"
-            android:gravity="center"
-            android:text="Xóa"
-            android:textColor="@color/price_red"
-            android:textSize="13sp"
-            android:textStyle="bold" />
+    <TextView
+        android:id="@+id/btnEdit"
+        android:layout_width="wrap_content"
+        android:layout_height="38dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center"
+        android:paddingHorizontal="12dp"
+        android:text="Sửa"
+        android:textColor="#007AFF"
+        android:textSize="13sp"
+        android:fontFamily="sans-serif-medium"
+        app:layout_constraintTop_toTopOf="@+id/btnSetDefault"
+        app:layout_constraintBottom_toBottomOf="@+id/btnSetDefault"
+        app:layout_constraintEnd_toStartOf="@+id/actionDivider"
+        android:layout_marginEnd="2dp"/>
 
-    </LinearLayout>
-
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

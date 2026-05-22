@@ -4,6 +4,12 @@ import com.google.gson.annotations.SerializedName;
 
 public class LoginResponse {
 
+    @SerializedName("userId")
+    private Long userId;
+
+    @SerializedName("id")
+    private Long id;
+
     @SerializedName("token")
     private String token;
 
@@ -12,6 +18,18 @@ public class LoginResponse {
 
     @SerializedName("jwt")
     private String jwt;
+
+    @SerializedName("fullName")
+    private String fullName;
+
+    @SerializedName("name")
+    private String name;
+
+    @SerializedName("email")
+    private String email;
+
+    @SerializedName("avatarUrl")
+    private String avatarUrl;
 
     @SerializedName("role")
     private String role;
@@ -36,7 +54,20 @@ public class LoginResponse {
     }
 
     public UserDto getUser() {
-        return user;
+        if (user != null) {
+            return user;
+        }
+
+        UserDto dto = new UserDto();
+        dto.userId = userId;
+        dto.id = id;
+        dto.fullName = fullName;
+        dto.name = name;
+        dto.email = email;
+        dto.avatarUrl = avatarUrl;
+        dto.role = role;
+
+        return dto;
     }
 
     public static class UserDto {

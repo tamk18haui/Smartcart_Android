@@ -18,6 +18,7 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.gr6.smartcart_android.R;
+import com.gr6.smartcart_android.buyer.chat.ChatActivity;
 import com.gr6.smartcart_android.buyer.product.response.ProductDetailResponse;
 import com.gr6.smartcart_android.common.base.BaseActivity;
 import com.gr6.smartcart_android.common.utils.ImageLoader;
@@ -160,9 +161,7 @@ public class ProductDetailActivity extends BaseActivity {
                 showToast("Mã giảm giá sẽ được chọn khi thanh toán")
         );
 
-        btnMessage.setOnClickListener(v ->
-                showToast("Nhắn tin với shop sẽ làm ở bước sau")
-        );
+        btnMessage.setOnClickListener(v -> openChatWithShop());
 
         btnAddCart.setOnClickListener(v -> {
             pendingAction = ACTION_ADD_TO_CART;
@@ -173,6 +172,19 @@ public class ProductDetailActivity extends BaseActivity {
             pendingAction = ACTION_BUY_NOW;
             showVariantBottomSheet();
         });
+    }
+
+    private void openChatWithShop() {
+        if (productDetail == null || productDetail.getShopOwnerId() == null) {
+            showToast("Không tìm thấy chủ shop để nhắn tin");
+            return;
+        }
+
+        Intent intent = new Intent(this, ChatActivity.class);
+        intent.putExtra(ChatActivity.EXTRA_PARTNER_ID, productDetail.getShopOwnerId());
+        intent.putExtra(ChatActivity.EXTRA_PARTNER_NAME, productDetail.getShopName());
+        intent.putExtra(ChatActivity.EXTRA_PARTNER_AVATAR, productDetail.getShopImageUrl());
+        startActivity(intent);
     }
 
     private void observeData() {

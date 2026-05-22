@@ -136,22 +136,29 @@ public class LoginActivity extends BaseActivity {
             return;
         }
 
-        TokenManager.getInstance(this).saveToken(token);
-
         LoginResponse.UserDto user = loginResponse.getUser();
 
-        if (user != null) {
-            UserSession.getInstance(this).saveUserId(user.getUserId());
-            UserSession.getInstance(this).saveFullName(user.getFullName());
-            UserSession.getInstance(this).saveEmail(user.getEmail());
-            UserSession.getInstance(this).saveAvatarUrl(user.getAvatarUrl());
+        if (user == null || user.getUserId() == null) {
+            showLongToast("Login thành công nhưng chưa nhận được userId. Kiểm tra response API login.");
+            android.util.Log.e("LOGIN_USER_ID", "user hoặc userId null");
+            return;
         }
+
+        TokenManager.getInstance(this).saveToken(token);
+
+        UserSession session = UserSession.getInstance(this);
+        session.saveUserId(user.getUserId());
+        session.saveFullName(user.getFullName());
+        session.saveEmail(user.getEmail());
+        session.saveAvatarUrl(user.getAvatarUrl());
 
         String role = loginResponse.getRole();
 
         if (!Validator.isEmpty(role)) {
-            UserSession.getInstance(this).saveRole(role);
+            session.saveRole(role);
         }
+
+        android.util.Log.d("LOGIN_USER_ID", "Saved userId = " + user.getUserId());
 
         showToast("Đăng nhập thành công");
 
@@ -160,7 +167,6 @@ public class LoginActivity extends BaseActivity {
         startActivity(intent);
         finish();
     }
-
     private void togglePassword() {
         imgTogglePassword.animate()
                 .scaleX(0.75f)

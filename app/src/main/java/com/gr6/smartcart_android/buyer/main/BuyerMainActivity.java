@@ -19,6 +19,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.gr6.smartcart_android.R;
 import com.gr6.smartcart_android.buyer.cart.CartActivity;
+import com.gr6.smartcart_android.buyer.chat.ChatListActivity;
 import com.gr6.smartcart_android.buyer.main.response.HomeCategoryResponse;
 import com.gr6.smartcart_android.buyer.main.response.HomeProductResponse;
 import com.gr6.smartcart_android.buyer.product.ProductDetailActivity;
@@ -40,7 +41,7 @@ public class BuyerMainActivity extends BaseActivity {
 
     private EditText edtSearch;
     private ImageView imgCart;
-    private ImageView imgNotification;
+    private ImageView imgMessage;
     private TextView txtUserName;
     private TextView txtEmpty;
     private TextView txtProductCount;
@@ -75,7 +76,7 @@ public class BuyerMainActivity extends BaseActivity {
 
         edtSearch = findViewById(R.id.edtSearch);
         imgCart = findViewById(R.id.imgCart);
-        imgNotification = findViewById(R.id.imgNotification);
+        imgMessage = findViewById(R.id.imgMessage);
         txtUserName = findViewById(R.id.txtUserName);
         txtEmpty = findViewById(R.id.txtEmpty);
         txtProductCount = findViewById(R.id.txtProductCount);
@@ -113,8 +114,8 @@ public class BuyerMainActivity extends BaseActivity {
             startActivity(intent);
         });
 
-        imgNotification.setOnClickListener(v -> {
-            Intent intent = new Intent(this, com.gr6.smartcart_android.buyer.notification.NotificationActivity.class);
+        imgMessage.setOnClickListener(v -> {
+            Intent intent = new Intent(this, ChatListActivity.class);
             startActivity(intent);
         });
 
