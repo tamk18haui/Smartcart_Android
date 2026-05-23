@@ -14,14 +14,21 @@
         android:usesCleartextTraffic="true"
         android:theme="@style/Theme.SmartCartAndroid">
 
+        <!-- Điều hướng role sau đăng nhập -->
         <activity
             android:name=".navigation.RoleRouterActivity"
             android:exported="false" />
 
+        <!-- Auth -->
         <activity
             android:name=".auth.register.RegisterActivity"
             android:exported="false" />
 
+        <activity
+            android:name=".auth.login.LoginActivity"
+            android:exported="false" />
+
+        <!-- Chat dùng chung -->
         <activity
             android:name=".chat.ChatListActivity"
             android:exported="false" />
@@ -30,24 +37,65 @@
             android:name=".chat.ChatRoomActivity"
             android:exported="false" />
 
+        <!-- ================= BUYER ================= -->
+
+        <activity
+            android:name=".buyer.main.BuyerMainActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".buyer.product.ProductDetailActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".buyer.account.AccountActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".buyer.account.profile.ProfileActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".buyer.address.AddressActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".buyer.address.AddressFormActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".buyer.notification.NotificationActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".buyer.cart.CartActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".buyer.order.OrderHistoryActivity"
+            android:exported="false" />
+
         <activity
             android:name=".buyer.order.OrderDetailActivity"
             android:exported="false" />
 
         <activity
-            android:name=".buyer.review.ReviewActivity"
-            android:exported="false" />
-        <activity
-            android:name=".buyer.search.SearchProductActivity"
+            android:name=".buyer.checkout.CheckoutActivity"
             android:exported="false" />
 
-        <!-- SELLER -->
+        <!-- ================= SELLER ================= -->
+
         <activity
             android:name=".seller.main.SellerHomeActivity"
             android:exported="false" />
 
+        <!-- Seller: sản phẩm -->
         <activity
             android:name=".seller.product.AddProductActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".seller.product.SellerProductDetailActivity"
             android:exported="false" />
 
         <activity
@@ -66,14 +114,22 @@
             android:name=".seller.product.VariantEditorActivity"
             android:exported="false" />
 
+        <!-- Seller: thông tin cửa hàng -->
         <activity
             android:name=".seller.shop.SellerShopInfoActivity"
             android:exported="false" />
 
+        <!-- Seller: ví người bán -->
+        <activity
+            android:name=".seller.wallet.SellerWalletActivity"
+            android:exported="false" />
+
+        <!-- Seller: đơn hàng -->
         <activity
             android:name=".seller.order.SellerOrderDetailActivity"
             android:exported="false" />
 
+        <!-- Seller: voucher -->
         <activity
             android:name=".seller.voucher.SellerVoucherActivity"
             android:exported="false" />
@@ -82,47 +138,14 @@
             android:name=".seller.voucher.CreateVoucherActivity"
             android:exported="false" />
 
-        <activity
-            android:name=".buyer.main.BuyerMainActivity"
-            android:exported="false" />
-        <activity
-            android:name=".buyer.product.ProductDetailActivity"
-            android:exported="false" />
-        <activity
-            android:name=".buyer.account.AccountActivity"
-            android:exported="false" />
-        <activity
-            android:name=".buyer.address.AddressActivity"
-            android:exported="false" />
-
-        <activity
-            android:name=".buyer.address.AddressFormActivity"
-            android:exported="false" />
-        <activity
-            android:name=".buyer.notification.NotificationActivity"
-            android:exported="false" />
-        <activity
-            android:name=".buyer.account.profile.ProfileActivity"
-            android:exported="false" />
-        <activity
-            android:name=".buyer.cart.CartActivity"
-            android:exported="false" />
-        <activity
-            android:name=".buyer.order.OrderHistoryActivity"
-            android:exported="false" />
-
-        <activity
-            android:name=".auth.login.LoginActivity"
-            android:exported="false" />
-        <activity
-            android:name=".buyer.checkout.CheckoutActivity"
-            android:exported="false" />
+        <!-- Launcher giữ nguyên theo buyer hiện tại -->
         <activity
             android:name=".MainActivity"
             android:exported="true">
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 

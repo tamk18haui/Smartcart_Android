@@ -93,7 +93,6 @@ public class SellerWalletActivity extends BaseActivity {
 
     private void bindEvents() {
         findViewById(R.id.btnBack).setOnClickListener(v -> finish());
-        findViewById(R.id.btnReloadWallet).setOnClickListener(v -> loadAllData(true));
         findViewById(R.id.btnWithdraw).setOnClickListener(v -> showWithdrawDialog());
         findViewById(R.id.btnWalletSetting).setOnClickListener(v ->
                 showToast("Thông tin ngân hàng sẽ được nhập khi tạo yêu cầu rút tiền")
@@ -188,7 +187,7 @@ public class SellerWalletActivity extends BaseActivity {
                         BaseResponse<RevenueReportResponse> body = response.body();
                         if (!response.isSuccessful() || body == null || !body.isSuccess() || body.getData() == null) {
                             txtTodayRevenue.setText("+0đ");
-                            txtRevenueOrderCount.setText("0 đơn");
+                            txtRevenueOrderCount.setText("Hôm nay 0 đơn • Hôm qua 0 đơn");
                             chartRevenue.setData(new ArrayList<>());
                             return;
                         }
@@ -202,7 +201,7 @@ public class SellerWalletActivity extends BaseActivity {
                             @NonNull Throwable t
                     ) {
                         txtTodayRevenue.setText("+0đ");
-                        txtRevenueOrderCount.setText("0 đơn");
+                        txtRevenueOrderCount.setText("Hôm nay 0 đơn • Hôm qua 0 đơn");
                         chartRevenue.setData(new ArrayList<>());
                     }
                 });
@@ -212,25 +211,31 @@ public class SellerWalletActivity extends BaseActivity {
         List<DailyRevenueResponse> days = report == null ? new ArrayList<>() : report.getDailyDetails();
         long todayRevenue = 0L;
         long todayOrders = 0L;
+        long yesterdayOrders = 0L;
+        String yesterday = getYesterdayApiDate();
 
         for (DailyRevenueResponse item : days) {
-            if (item != null && today.equals(item.getDate())) {
+            if (item == null) continue;
+            if (today.equals(item.getDate())) {
                 todayRevenue = item.getRevenue();
                 todayOrders = item.getOrderCount();
-                break;
+            } else if (yesterday.equals(item.getDate())) {
+                yesterdayOrders = item.getOrderCount();
             }
         }
 
         txtTodayRevenue.setText("+" + formatMoney(todayRevenue));
-        txtRevenueOrderCount.setText(todayOrders + " đơn");
+        txtRevenueOrderCount.setText("Hôm nay " + todayOrders + " đơn • Hôm qua " + yesterdayOrders + " đơn");
         chartRevenue.setData(days);
     }
 
     private void renderRevenueFromOrders(List<OrderListResponse> orders) {
         List<DailyRevenueResponse> days = createEmptySevenDayRevenue();
         String today = formatApiDate(new Date());
+        String yesterday = getYesterdayApiDate();
         long todayRevenue = 0L;
         long todayOrders = 0L;
+        long yesterdayOrders = 0L;
 
         if (orders != null) {
             for (OrderListResponse order : orders) {
@@ -249,12 +254,14 @@ public class SellerWalletActivity extends BaseActivity {
                 if (today.equals(day)) {
                     todayRevenue += amount;
                     todayOrders++;
+                } else if (yesterday.equals(day)) {
+                    yesterdayOrders++;
                 }
             }
         }
 
         txtTodayRevenue.setText("+" + formatMoney(todayRevenue));
-        txtRevenueOrderCount.setText(todayOrders + " đơn");
+        txtRevenueOrderCount.setText("Hôm nay " + todayOrders + " đơn • Hôm qua " + yesterdayOrders + " đơn");
         chartRevenue.setData(days);
     }
 
@@ -416,7 +423,7 @@ public class SellerWalletActivity extends BaseActivity {
         icon.setText(tx.isIncome() ? "+" : "−");
         icon.setTextSize(24);
         icon.setTypeface(null, android.graphics.Typeface.BOLD);
-        icon.setTextColor(ContextCompat.getColor(this, tx.isIncome() ? R.color.success : R.color.seller_primary));
+        icon.setTextColor(ContextCompat.getColor(this, tx.isIncome() ? R.color.success : R.color.danger));
         icon.setBackgroundResource(tx.isIncome() ? R.drawable.bg_wallet_icon_income : R.drawable.bg_wallet_icon_withdraw);
         row.addView(icon, new LinearLayout.LayoutParams(dp(52), dp(52)));
 
@@ -429,7 +436,7 @@ public class SellerWalletActivity extends BaseActivity {
 
         TextView amount = new TextView(this);
         amount.setText((tx.isIncome() ? "+" : "-") + formatMoney(Math.abs(tx.getAmount())));
-        amount.setTextColor(ContextCompat.getColor(this, tx.isIncome() ? R.color.success : R.color.text_primary));
+        amount.setTextColor(ContextCompat.getColor(this, tx.isIncome() ? R.color.success : R.color.danger));
         amount.setTextSize(17);
         amount.setTypeface(null, android.graphics.Typeface.BOLD);
         row.addView(amount);
@@ -459,9 +466,39 @@ public class SellerWalletActivity extends BaseActivity {
         info.addView(createSubTitle(shortDateTime(request.getCreatedAt()) + " • " + statusLabel(request.getStatus())));
         row.addView(info, weightedParams());
 
-        TextView amount = createAmount("-" + formatMoney(request.getAmount()), R.color.text_primary);
+        TextView amount = createAmount("-" + formatMoney(request.getAmount()), R.color.danger);
         row.addView(amount);
+
+        row.setOnClickListener(v -> showWithdrawDetailDialog(request));
         return row;
+    }
+
+    private void showWithdrawDetailDialog(WithdrawResponse request) {
+        if (request == null) return;
+
+        StringBuilder detail = new StringBuilder();
+        detail.append("Mã yêu cầu: #").append(request.getWithdrawId() == null ? "--" : request.getWithdrawId()).append("\n");
+        detail.append("Trạng thái: ").append(statusLabel(request.getStatus())).append("\n");
+        detail.append("Số tiền: -").append(formatMoney(request.getAmount())).append("\n\n");
+
+        detail.append("Ngân hàng: ").append(emptyText(request.getBankName())).append("\n");
+        detail.append("Số tài khoản: ").append(emptyText(request.getBankAccountNumber())).append("\n");
+        detail.append("Chủ tài khoản: ").append(emptyText(request.getBankAccountHolder())).append("\n\n");
+
+        detail.append("Ghi chú người bán: ").append(emptyText(request.getSellerNote())).append("\n");
+        detail.append("Ghi chú admin: ").append(emptyText(request.getAdminNote())).append("\n");
+        detail.append("Mã chuyển khoản: ").append(emptyText(request.getTransferCode())).append("\n");
+        detail.append("Người xử lý: ").append(emptyText(request.getProcessedBy())).append("\n\n");
+
+        detail.append("Tạo lúc: ").append(shortDateTime(request.getCreatedAt())).append("\n");
+        detail.append("Xử lý lúc: ").append(shortDateTime(request.getProcessedAt())).append("\n");
+        detail.append("Cập nhật lúc: ").append(shortDateTime(request.getUpdatedAt()));
+
+        new AlertDialog.Builder(this)
+                .setTitle("Chi tiết yêu cầu rút tiền")
+                .setMessage(detail.toString())
+                .setPositiveButton("Đóng", null)
+                .show();
     }
 
     private void renderSettlements(List<SellerSettlementResponse> settlements) {
@@ -697,6 +734,16 @@ public class SellerWalletActivity extends BaseActivity {
         return value;
     }
 
+
+    private String getYesterdayApiDate() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DAY_OF_MONTH, -1);
+        return formatApiDate(calendar.getTime());
+    }
+
+    private String emptyText(String value) {
+        return value == null || value.trim().isEmpty() ? "--" : value.trim();
+    }
     private String statusLabel(String raw) {
         String status = raw == null ? "" : raw.trim().toUpperCase(Locale.US);
         if ("PENDING".equals(status)) return "Chờ duyệt";

@@ -204,6 +204,112 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/rowWeeklyRevenue"
+            android:layout_width="match_parent"
+            android:layout_height="74dp"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/bg_seller_row"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp">
+
+            <TextView
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:background="@drawable/bg_soft_blue"
+                android:gravity="center"
+                android:text="📈"
+                android:textSize="20sp" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="12dp"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Thống kê doanh thu theo tuần"
+                    android:textColor="@color/text_primary"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="Biểu đồ doanh thu và số đơn từng tuần"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="13sp" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="›"
+                android:textColor="@color/text_hint"
+                android:textSize="28sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/rowMonthlyRevenue"
+            android:layout_width="match_parent"
+            android:layout_height="74dp"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/bg_seller_row"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp">
+
+            <TextView
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:background="@drawable/bg_soft_blue"
+                android:gravity="center"
+                android:text="📊"
+                android:textSize="20sp" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="12dp"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Thống kê doanh thu theo tháng"
+                    android:textColor="@color/text_primary"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="Biểu đồ doanh thu và số đơn từng tháng"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="13sp" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="›"
+                android:textColor="@color/text_hint"
+                android:textSize="28sp" />
+        </LinearLayout>
+
+        <LinearLayout
             android:id="@+id/rowVoucherManager"
             android:layout_width="match_parent"
             android:layout_height="64dp"
@@ -332,5 +438,7 @@
         </LinearLayout>
     </LinearLayout>
 </ScrollView>
+
+
 
 

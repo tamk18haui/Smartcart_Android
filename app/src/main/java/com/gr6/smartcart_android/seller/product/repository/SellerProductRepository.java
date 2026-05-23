@@ -31,7 +31,11 @@ public class SellerProductRepository {
     }
 
     public Call<BaseResponse<List<String>>> getBrandSuggestions(String keyword) {
-        return apiService.getBrandSuggestions(keyword);
+        return apiService.getBrandSuggestions(keyword, null);
+    }
+
+    public Call<BaseResponse<List<String>>> getBrandSuggestions(String keyword, Long categoryId) {
+        return apiService.getBrandSuggestions(keyword, categoryId);
     }
 
     public Call<BaseResponse<ProductResponse>> createProduct(ProductRequest request) {
@@ -59,7 +63,11 @@ public class SellerProductRepository {
     }
 
     public void loadBrandSuggestions(String keyword, ProductCallback<List<String>> callback) {
-        apiService.getBrandSuggestions(keyword).enqueue(wrap(callback, "Không lấy được thương hiệu"));
+        apiService.getBrandSuggestions(keyword, null).enqueue(wrap(callback, "Không lấy được thương hiệu"));
+    }
+
+    public void loadBrandSuggestions(String keyword, Long categoryId, ProductCallback<List<String>> callback) {
+        apiService.getBrandSuggestions(keyword, categoryId).enqueue(wrap(callback, "Không lấy được thương hiệu"));
     }
 
     public void submitProduct(ProductRequest request, ProductCallback<ProductResponse> callback) {

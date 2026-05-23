@@ -23,6 +23,7 @@ public class SellerRevenueChartView extends View {
     private final Paint barPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint highlightPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint textPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint orderTextPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final RectF rect = new RectF();
 
     public SellerRevenueChartView(Context context) {
@@ -44,9 +45,15 @@ public class SellerRevenueChartView extends View {
         bgPaint.setColor(ContextCompat.getColor(getContext(), R.color.seller_primary_light));
         barPaint.setColor(ContextCompat.getColor(getContext(), R.color.seller_primary));
         highlightPaint.setColor(ContextCompat.getColor(getContext(), R.color.seller_primary_dark));
+
         textPaint.setColor(ContextCompat.getColor(getContext(), R.color.text_secondary));
         textPaint.setTextSize(sp(11));
         textPaint.setTextAlign(Paint.Align.CENTER);
+
+        orderTextPaint.setColor(ContextCompat.getColor(getContext(), R.color.text_primary));
+        orderTextPaint.setTextSize(sp(10));
+        orderTextPaint.setTextAlign(Paint.Align.CENTER);
+        orderTextPaint.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
     }
 
     public void setData(List<DailyRevenueResponse> newData) {
@@ -95,6 +102,7 @@ public class SellerRevenueChartView extends View {
         for (int i = 0; i < count; i++) {
             DailyRevenueResponse item = data.get(i);
             long revenue = item == null ? 0L : item.getRevenue();
+            long orderCount = item == null ? 0L : item.getOrderCount();
             float percent = Math.max(0.04f, revenue * 1f / maxRevenue);
             float barHeight = chartHeight * percent;
             float left = startX + i * (barWidth + gap);
@@ -108,6 +116,10 @@ public class SellerRevenueChartView extends View {
             rect.set(left, topBar, right, bottomBar);
             Paint paint = i == count - 1 ? highlightPaint : barPaint;
             canvas.drawRoundRect(rect, dp(4), dp(4), paint);
+
+            String orderLabel = orderCount + " đơn";
+            float orderY = Math.max(top + dp(10), topBar - dp(6));
+            canvas.drawText(orderLabel, left + barWidth / 2f, orderY, orderTextPaint);
 
             String label = shortDate(item == null ? "" : item.getDate());
             canvas.drawText(label, left + barWidth / 2f, height - dp(6), textPaint);

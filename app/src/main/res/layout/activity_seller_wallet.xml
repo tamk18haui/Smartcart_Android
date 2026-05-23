@@ -88,26 +88,11 @@
 
                     <TextView
                         android:id="@+id/btnWithdraw"
-                        android:layout_width="0dp"
+                        android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:layout_marginEnd="8dp"
-                        android:layout_weight="1"
                         android:background="@drawable/bg_wallet_action_primary"
                         android:gravity="center"
                         android:text="💳  Rút tiền"
-                        android:textColor="@color/white"
-                        android:textSize="15sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/btnReloadWallet"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_marginStart="8dp"
-                        android:layout_weight="1"
-                        android:background="@drawable/bg_wallet_action_outline"
-                        android:gravity="center"
-                        android:text="↻  Làm mới"
                         android:textColor="@color/white"
                         android:textSize="15sp"
                         android:textStyle="bold" />
@@ -123,49 +108,45 @@
                 android:orientation="vertical"
                 android:padding="16dp">
 
-                <LinearLayout
+                <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
+                    android:ellipsize="end"
+                    android:includeFontPadding="false"
+                    android:maxLines="1"
+                    android:text="Doanh thu hôm nay"
+                    android:textColor="@color/text_primary"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
 
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
+                <TextView
+                    android:id="@+id/txtTodayRevenue"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="7dp"
+                    android:ellipsize="end"
+                    android:includeFontPadding="false"
+                    android:maxLines="1"
+                    android:text="+0đ"
+                    android:textColor="@color/success"
+                    android:textSize="22sp"
+                    android:textStyle="bold" />
 
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="Doanh thu hôm nay"
-                            android:textColor="@color/text_primary"
-                            android:textSize="18sp" />
-
-                        <TextView
-                            android:id="@+id/txtTodayRevenue"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp"
-                            android:text="0đ"
-                            android:textColor="@color/success"
-                            android:textSize="24sp"
-                            android:textStyle="bold" />
-                    </LinearLayout>
-
-                    <TextView
-                        android:id="@+id/txtRevenueOrderCount"
-                        android:layout_width="wrap_content"
-                        android:layout_height="34dp"
-                        android:background="@drawable/bg_seller_chip_soft"
-                        android:gravity="center"
-                        android:paddingStart="12dp"
-                        android:paddingEnd="12dp"
-                        android:text="0 đơn"
-                        android:textColor="@color/seller_primary"
-                        android:textSize="13sp"
-                        android:textStyle="bold" />
-                </LinearLayout>
+                <TextView
+                    android:id="@+id/txtRevenueOrderCount"
+                    android:layout_width="match_parent"
+                    android:layout_height="32dp"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/bg_seller_chip_soft"
+                    android:ellipsize="end"
+                    android:gravity="center"
+                    android:maxLines="1"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="10dp"
+                    android:text="Hôm nay 0 đơn • Hôm qua 0 đơn"
+                    android:textColor="@color/seller_primary"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
 
                 <com.gr6.smartcart_android.seller.wallet.SellerRevenueChartView
                     android:id="@+id/chartRevenue"
@@ -323,3 +304,5 @@
         </LinearLayout>
     </ScrollView>
 </LinearLayout>
+
+

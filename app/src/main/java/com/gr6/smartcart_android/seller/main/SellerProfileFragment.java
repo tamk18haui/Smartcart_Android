@@ -24,8 +24,9 @@ import com.gr6.smartcart_android.seller.shop.SellerShopInfoActivity;
 import com.gr6.smartcart_android.seller.shop.api.SellerShopApiService;
 import com.gr6.smartcart_android.seller.shop.response.SellerShopInfoResponse;
 import com.gr6.smartcart_android.seller.voucher.CreateVoucherActivity;
-import com.gr6.smartcart_android.seller.wallet.SellerWalletActivity;
 import com.gr6.smartcart_android.seller.voucher.SellerVoucherActivity;
+import com.gr6.smartcart_android.seller.wallet.SellerWalletActivity;
+import com.gr6.smartcart_android.seller.wallet.RevenueStatisticActivity;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -78,11 +79,12 @@ public class SellerProfileFragment extends Fragment {
 
     private void bindUserSession() {
         UserSession session = UserSession.getInstance(requireContext());
-        String fullName = session.getFullName();
-        String email = session.getEmail();
+        String email = cleanText(session.getEmail());
 
-        txtSellerName.setText(fullName == null || fullName.trim().isEmpty() ? "Người bán SmartCart" : fullName);
-        txtSellerEmail.setText(email == null || email.trim().isEmpty() ? "seller@smartcart.vn" : email);
+        // Dòng trên không dùng fullName nữa, vì session của seller có thể đang lưu fullName = email.
+        // Tạm hiển thị tên mặc định, sau khi API shop trả về thì loadShopInfo() sẽ set lại thành tên shop thật.
+        txtSellerName.setText("Cửa hàng SmartCart");
+        txtSellerEmail.setText(email.isEmpty() ? "seller@smartcart.vn" : email);
     }
 
     private void bindEvents(View view) {
@@ -95,6 +97,18 @@ public class SellerProfileFragment extends Fragment {
         view.findViewById(R.id.rowWallet).setOnClickListener(v ->
                 startActivity(new Intent(requireContext(), SellerWalletActivity.class))
         );
+
+        view.findViewById(R.id.rowWeeklyRevenue).setOnClickListener(v -> {
+            Intent intent = new Intent(requireContext(), RevenueStatisticActivity.class);
+            intent.putExtra(RevenueStatisticActivity.EXTRA_MODE, RevenueStatisticActivity.MODE_WEEK);
+            startActivity(intent);
+        });
+
+        view.findViewById(R.id.rowMonthlyRevenue).setOnClickListener(v -> {
+            Intent intent = new Intent(requireContext(), RevenueStatisticActivity.class);
+            intent.putExtra(RevenueStatisticActivity.EXTRA_MODE, RevenueStatisticActivity.MODE_MONTH);
+            startActivity(intent);
+        });
 
         view.findViewById(R.id.rowVoucherManager).setOnClickListener(v ->
                 startActivity(new Intent(requireContext(), SellerVoucherActivity.class))
@@ -129,7 +143,15 @@ public class SellerProfileFragment extends Fragment {
                 }
 
                 SellerShopInfoResponse shop = body.getData();
-                txtShopName.setText(shop.getShopName().trim().isEmpty() ? "Cửa hàng SmartCart" : shop.getShopName());
+                String shopName = cleanText(shop.getShopName());
+                if (shopName.isEmpty()) {
+                    shopName = "Cửa hàng SmartCart";
+                }
+
+                // Dòng lớn phía trên: tên shop.
+                // Dòng nhỏ phía dưới: email seller.
+                txtSellerName.setText(shopName);
+                txtShopName.setText(shopName);
                 txtShopStatus.setText(toVietnameseStatus(shop.getStatus()));
                 ImageLoader.loadCircle(requireContext(), shop.getLogoUrl(), imgShopAvatar);
             }
@@ -150,6 +172,10 @@ public class SellerProfileFragment extends Fragment {
         TokenManager.getInstance(requireContext()).clearAll();
         UserSession.getInstance(requireContext()).clear();
         AppNavigator.openLogin(requireContext());
+    }
+
+    private String cleanText(String value) {
+        return value == null ? "" : value.trim();
     }
 
     private String toVietnameseStatus(String status) {

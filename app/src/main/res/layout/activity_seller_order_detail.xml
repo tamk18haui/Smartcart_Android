@@ -267,26 +267,44 @@
             android:id="@+id/btnContactBuyer"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"
+            android:layout_weight="0.9"
             android:gravity="center"
-            android:text="Liên hệ người mua"
+            android:text="Liên hệ"
+            android:textSize="13sp"
             android:textStyle="bold"
             android:textColor="@color/seller_primary_dark"
             android:background="@drawable/bg_seller_button_outline" />
 
         <TextView
+            android:id="@+id/btnPrintLabel"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1.1"
+            android:layout_marginStart="8dp"
+            android:gravity="center"
+            android:text="In mã vận đơn"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:textColor="@color/seller_primary_dark"
+            android:background="@drawable/bg_seller_button_outline"
+            android:visibility="gone" />
+
+        <TextView
             android:id="@+id/btnUpdateStatus"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:layout_marginStart="10dp"
+            android:layout_weight="1.25"
+            android:layout_marginStart="8dp"
             android:gravity="center"
             android:text="Cập nhật trạng thái"
+            android:textSize="13sp"
             android:textStyle="bold"
             android:textColor="@color/seller_text_white"
             android:background="@drawable/bg_seller_button_primary" />
     </LinearLayout>
 
 </LinearLayout>
+
+
 
 

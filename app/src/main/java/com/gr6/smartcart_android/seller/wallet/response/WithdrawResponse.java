@@ -65,6 +65,30 @@ public class WithdrawResponse {
         return withdrawId;
     }
 
+    public Long getWalletId() {
+        return walletId;
+    }
+
+    public Long getSellerId() {
+        return sellerId;
+    }
+
+    public String getSellerEmail() {
+        return sellerEmail == null ? "" : sellerEmail;
+    }
+
+    public String getSellerName() {
+        return sellerName == null ? "" : sellerName;
+    }
+
+    public Long getShopId() {
+        return shopId;
+    }
+
+    public String getShopName() {
+        return shopName == null ? "" : shopName;
+    }
+
     public Long getAmount() {
         return amount == null ? 0L : amount;
     }
@@ -81,6 +105,10 @@ public class WithdrawResponse {
         return bankAccountHolder == null ? "" : bankAccountHolder;
     }
 
+    public String getSellerNote() {
+        return sellerNote == null ? "" : sellerNote;
+    }
+
     public String getStatus() {
         return status == null ? "" : status;
     }
@@ -89,7 +117,23 @@ public class WithdrawResponse {
         return adminNote == null ? "" : adminNote;
     }
 
+    public String getTransferCode() {
+        return transferCode == null ? "" : transferCode;
+    }
+
+    public String getProcessedBy() {
+        return processedBy == null ? "" : processedBy;
+    }
+
+    public String getProcessedAt() {
+        return processedAt == null ? "" : processedAt;
+    }
+
     public String getCreatedAt() {
         return createdAt == null ? "" : createdAt;
+    }
+
+    public String getUpdatedAt() {
+        return updatedAt == null ? "" : updatedAt;
     }
 }

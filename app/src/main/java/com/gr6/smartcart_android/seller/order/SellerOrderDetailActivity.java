@@ -1,6 +1,7 @@
 package com.gr6.smartcart_android.seller.order;
 
 import android.app.AlertDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.gr6.smartcart_android.R;
+import com.gr6.smartcart_android.chat.ChatRoomActivity;
 import com.gr6.smartcart_android.seller.order.response.OrderDetailResponse;
 
 import java.math.BigDecimal;
@@ -46,6 +48,7 @@ public class SellerOrderDetailActivity extends AppCompatActivity {
     private TextView txtShippingFee;
     private TextView txtTotal;
     private TextView btnContactBuyer;
+    private TextView btnPrintLabel;
     private TextView btnUpdateStatus;
 
     private final DecimalFormat moneyFormat = new DecimalFormat("#,###");
@@ -139,6 +142,7 @@ public class SellerOrderDetailActivity extends AppCompatActivity {
         txtShippingFee = findViewById(R.id.txtShippingFee);
         txtTotal = findViewById(R.id.txtTotal);
         btnContactBuyer = findViewById(R.id.btnContactBuyer);
+        btnPrintLabel = findViewById(R.id.btnPrintLabel);
         btnUpdateStatus = findViewById(R.id.btnUpdateStatus);
     }
 
@@ -157,6 +161,7 @@ public class SellerOrderDetailActivity extends AppCompatActivity {
                 && txtShippingFee != null
                 && txtTotal != null
                 && btnContactBuyer != null
+                && btnPrintLabel != null
                 && btnUpdateStatus != null
                 && findViewById(R.id.rvOrderItems) != null
                 && findViewById(R.id.btnBack) != null;
@@ -176,11 +181,9 @@ public class SellerOrderDetailActivity extends AppCompatActivity {
         View btnBack = findViewById(R.id.btnBack);
         btnBack.setOnClickListener(v -> finish());
 
-        btnContactBuyer.setOnClickListener(v -> Toast.makeText(
-                this,
-                "Chức năng chat với người mua sẽ nối sau",
-                Toast.LENGTH_SHORT
-        ).show());
+        btnContactBuyer.setOnClickListener(v -> openBuyerChat());
+
+        btnPrintLabel.setOnClickListener(v -> openShippingLabel());
 
         btnUpdateStatus.setOnClickListener(v -> {
             if (currentOrder == null) {
@@ -308,6 +311,7 @@ public class SellerOrderDetailActivity extends AppCompatActivity {
         txtTotal.setText("Tổng tiền: " + formatMoney(currentOrder.getTotalAmount()));
 
         renderTimeline(status);
+        updatePrintLabelButton(status);
         updateActionButton(status);
     }
 
@@ -361,6 +365,72 @@ public class SellerOrderDetailActivity extends AppCompatActivity {
             default:
                 return 1;
         }
+    }
+
+    private void updatePrintLabelButton(String status) {
+        if (btnPrintLabel == null) return;
+
+        boolean visible = canPrintShippingLabel(status);
+        btnPrintLabel.setVisibility(visible ? View.VISIBLE : View.GONE);
+        btnPrintLabel.setEnabled(visible);
+        btnPrintLabel.setAlpha(visible ? 1f : 0.55f);
+    }
+
+    private boolean canPrintShippingLabel(String status) {
+        String normalized = OrderStatusHelper.normalize(status);
+
+        // Chỉ in khi đơn đã xác nhận, chưa chuyển sang đang giao.
+        return "CONFIRMED".equals(normalized);
+    }
+
+    private void openBuyerChat() {
+        if (currentOrder == null) {
+            Toast.makeText(this, "Đang tải đơn hàng, vui lòng chờ", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Long buyerId = currentOrder.getBuyerId();
+        if (buyerId == null || buyerId <= 0) {
+            Toast.makeText(this, "Không tìm thấy thông tin người mua để mở chat", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Intent intent = new Intent(this, ChatRoomActivity.class);
+        intent.putExtra(ChatRoomActivity.EXTRA_PARTNER_ID, buyerId.longValue());
+        intent.putExtra(ChatRoomActivity.EXTRA_PARTNER_NAME, safeText(currentOrder.getBuyerName(), "Người mua"));
+        intent.putExtra(ChatRoomActivity.EXTRA_PARTNER_AVATAR, "");
+        startActivity(intent);
+    }
+
+    private void openShippingLabel() {
+        if (currentOrder == null) {
+            Toast.makeText(this, "Đang tải đơn hàng, vui lòng chờ", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String status = OrderStatusHelper.normalize(currentOrder.getStatus());
+        if (!canPrintShippingLabel(status)) {
+            Toast.makeText(
+                    this,
+                    "Chỉ in mã vận đơn khi đơn ở trạng thái đã xác nhận",
+                    Toast.LENGTH_SHORT
+            ).show();
+            return;
+        }
+
+        Long id = currentOrder.getId();
+        if (id == null || id <= 0) {
+            id = orderId;
+        }
+
+        if (id == null || id <= 0) {
+            Toast.makeText(this, "Không tìm thấy mã đơn hàng để in", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Intent intent = new Intent(this, ShippingLabelActivity.class);
+        intent.putExtra(ShippingLabelActivity.EXTRA_ORDER_ID, id.longValue());
+        startActivity(intent);
     }
 
     private void updateActionButton(String status) {
@@ -579,3 +649,9 @@ public class SellerOrderDetailActivity extends AppCompatActivity {
         return value;
     }
 }
+
+
+
+
+
+

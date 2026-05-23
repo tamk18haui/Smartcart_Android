@@ -13,6 +13,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 import com.gr6.smartcart_android.R;
 import com.gr6.smartcart_android.chat.ChatListActivity;
@@ -25,6 +26,8 @@ import com.gr6.smartcart_android.seller.shop.repository.SellerShopRepository;
 import com.gr6.smartcart_android.seller.shop.response.SellerShopInfoResponse;
 
 public class SellerHomeActivity extends BaseActivity {
+
+    private static final String BACK_STACK_DASHBOARD_CHILD = "seller_dashboard_child";
 
     private LinearLayout layoutChecking;
     private TextView txtCheckingMessage;
@@ -61,6 +64,18 @@ public class SellerHomeActivity extends BaseActivity {
 
         showCheckingShopScreen();
         checkShopStatus();
+    }
+
+    @Override
+    public void onBackPressed() {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        if (fragmentManager.getBackStackEntryCount() > 0) {
+            fragmentManager.popBackStack();
+            updateBottomTab(tabDashboard);
+            return;
+        }
+
+        super.onBackPressed();
     }
 
     private void initViews() {
@@ -142,17 +157,20 @@ public class SellerHomeActivity extends BaseActivity {
 
         String shopName = shop == null ? "Cửa hàng SmartCart" : shop.getSafeShopName();
 
+        clearSellerBackStack();
         replaceFragment(
                 SellerShopPendingFragment.newInstance(status, shopName, message)
         );
     }
 
     public void openDashboardTab() {
+        clearSellerBackStack();
         updateBottomTab(tabDashboard);
         replaceFragment(SellerDashboardFragment.newInstance(currentShop));
     }
 
     public void openProductsTab() {
+        clearSellerBackStack();
         updateBottomTab(tabProducts);
         replaceFragment(
                 SellerProductsFragment.newInstance(
@@ -162,23 +180,25 @@ public class SellerHomeActivity extends BaseActivity {
     }
 
     public void openOrdersTab() {
+        clearSellerBackStack();
         updateBottomTab(tabOrders);
         replaceFragment(new SellerOrdersFragment());
     }
 
     public void openProfileTab() {
+        clearSellerBackStack();
         updateBottomTab(tabProfile);
         replaceFragment(new SellerProfileFragment());
     }
 
     public void openInventoryFromDashboard() {
         updateBottomTab(tabDashboard);
-        replaceFragment(new SellerInventoryFragment());
+        replaceFragmentWithBackStack(new SellerInventoryFragment());
     }
 
     public void openLowStockInventoryFromDashboard() {
         updateBottomTab(tabDashboard);
-        replaceFragment(SellerInventoryFragment.newInstance(true));
+        replaceFragmentWithBackStack(SellerInventoryFragment.newInstance(true));
     }
 
     public void openChatList() {
@@ -190,6 +210,21 @@ public class SellerHomeActivity extends BaseActivity {
                 .beginTransaction()
                 .replace(R.id.sellerContentContainer, fragment)
                 .commit();
+    }
+
+    private void replaceFragmentWithBackStack(@NonNull Fragment fragment) {
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.sellerContentContainer, fragment)
+                .addToBackStack(BACK_STACK_DASHBOARD_CHILD)
+                .commit();
+    }
+
+    private void clearSellerBackStack() {
+        getSupportFragmentManager().popBackStack(
+                null,
+                FragmentManager.POP_BACK_STACK_INCLUSIVE
+        );
     }
 
     private void updateBottomTab(@NonNull LinearLayout selectedTab) {

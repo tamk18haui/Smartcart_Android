@@ -31,6 +31,7 @@ public class SellerOrdersFragment extends Fragment {
     private SellerOrderAdapter adapter;
 
     private EditText edtSearch;
+    private TextView chipAll;
     private TextView chipPending;
     private TextView chipConfirmed;
     private TextView chipShipping;
@@ -40,7 +41,7 @@ public class SellerOrdersFragment extends Fragment {
 
     private final List<OrderListResponse> allOrders = new ArrayList<>();
 
-    private String currentTab = "PENDING";
+    private String currentTab = "ALL";
     private boolean actionRunning = false;
 
     @Nullable
@@ -59,7 +60,7 @@ public class SellerOrdersFragment extends Fragment {
         setupEvents();
         observeViewModel();
 
-        selectTab("PENDING");
+        selectTab("ALL");
         viewModel.loadOrders("");
 
         return view;
@@ -76,6 +77,7 @@ public class SellerOrdersFragment extends Fragment {
 
     private void bindViews(@NonNull View view) {
         edtSearch = view.findViewById(R.id.edtSearchOrder);
+        chipAll = view.findViewById(R.id.chipAll);
         chipPending = view.findViewById(R.id.chipPending);
         chipConfirmed = view.findViewById(R.id.chipConfirmed);
         chipShipping = view.findViewById(R.id.chipShipping);
@@ -103,10 +105,19 @@ public class SellerOrdersFragment extends Fragment {
             public void onPrimaryAction(OrderListResponse order) {
                 handlePrimaryAction(order);
             }
+
+            @Override
+            public void onPrintShippingLabel(OrderListResponse order) {
+                openShippingLabel(order);
+            }
         });
     }
 
     private void setupEvents() {
+        if (chipAll != null) {
+            chipAll.setOnClickListener(v -> selectTab("ALL"));
+        }
+
         if (chipPending != null) {
             chipPending.setOnClickListener(v -> selectTab("PENDING"));
         }
@@ -203,9 +214,10 @@ public class SellerOrdersFragment extends Fragment {
 
     private void selectTab(String tab) {
         currentTab = tab == null || tab.trim().isEmpty()
-                ? "PENDING"
+                ? "ALL"
                 : tab.trim().toUpperCase();
 
+        setChipActive(chipAll, "ALL".equals(currentTab));
         setChipActive(chipPending, "PENDING".equals(currentTab));
         setChipActive(chipConfirmed, "CONFIRMED".equals(currentTab));
         setChipActive(chipShipping, "SHIPPING".equals(currentTab));
@@ -301,6 +313,23 @@ public class SellerOrdersFragment extends Fragment {
             startActivity(intent);
         } catch (Exception e) {
             showToast("Không mở được chi tiết đơn hàng: " + e.getMessage());
+        }
+    }
+
+    private void openShippingLabel(OrderListResponse order) {
+        if (!isAdded() || getContext() == null) return;
+
+        if (order == null || order.getId() == null || order.getId() <= 0) {
+            showToast("Không tìm thấy mã đơn hàng để in phiếu");
+            return;
+        }
+
+        try {
+            Intent intent = new Intent(requireContext(), ShippingLabelActivity.class);
+            intent.putExtra(ShippingLabelActivity.EXTRA_ORDER_ID, order.getId().longValue());
+            startActivity(intent);
+        } catch (Exception e) {
+            showToast("Không mở được phiếu giao hàng: " + e.getMessage());
         }
     }
 

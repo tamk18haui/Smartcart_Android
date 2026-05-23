@@ -23,7 +23,10 @@ public interface SellerProductApiService {
     Call<BaseResponse<List<CategoryResponse>>> getCategories();
 
     @GET("api/v1/products/brands")
-    Call<BaseResponse<List<String>>> getBrandSuggestions(@Query("keyword") String keyword);
+    Call<BaseResponse<List<String>>> getBrandSuggestions(
+            @Query("keyword") String keyword,
+            @Query("categoryId") Long categoryId
+    );
 
     @POST("api/v1/products")
     Call<BaseResponse<ProductResponse>> createProduct(@Body ProductRequest request);

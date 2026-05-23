@@ -24,6 +24,8 @@ public class SellerOrderAdapter extends RecyclerView.Adapter<SellerOrderAdapter.
         void onOrderClick(OrderListResponse order);
 
         void onPrimaryAction(OrderListResponse order);
+
+        void onPrintShippingLabel(OrderListResponse order);
     }
 
     private final List<OrderListResponse> orders = new ArrayList<>();
@@ -88,6 +90,10 @@ public class SellerOrderAdapter extends RecyclerView.Adapter<SellerOrderAdapter.
         boolean canAction = OrderStatusHelper.canSellerQuickAction(status);
         holder.btnAction.setAlpha(canAction ? 1f : 0.85f);
 
+        boolean canPrintLabel = canPrintShippingLabel(status);
+        holder.btnPrintLabel.setVisibility(canPrintLabel ? View.VISIBLE : View.GONE);
+        holder.btnPrintLabel.setText("In mã vận đơn");
+
         ImageLoader.load(
                 holder.itemView.getContext(),
                 order.getFirstProductImage(),
@@ -105,11 +111,25 @@ public class SellerOrderAdapter extends RecyclerView.Adapter<SellerOrderAdapter.
                 listener.onPrimaryAction(order);
             }
         });
+
+        holder.btnPrintLabel.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onPrintShippingLabel(order);
+            }
+        });
     }
 
     @Override
     public int getItemCount() {
         return orders.size();
+    }
+
+    private boolean canPrintShippingLabel(String status) {
+        String normalized = OrderStatusHelper.normalize(status);
+
+        // Chỉ cho in mã vận đơn khi shop đã xác nhận đơn.
+        // Từ trạng thái ĐANG GIAO trở đi thì không được in nữa.
+        return "CONFIRMED".equals(normalized);
     }
 
     private String formatMoney(BigDecimal value) {
@@ -143,6 +163,7 @@ public class SellerOrderAdapter extends RecyclerView.Adapter<SellerOrderAdapter.
         TextView txtProductName;
         TextView txtVariant;
         TextView txtTotal;
+        TextView btnPrintLabel;
         TextView btnAction;
 
         OrderViewHolder(@NonNull View itemView) {
@@ -155,7 +176,10 @@ public class SellerOrderAdapter extends RecyclerView.Adapter<SellerOrderAdapter.
             txtProductName = itemView.findViewById(R.id.txtProductName);
             txtVariant = itemView.findViewById(R.id.txtVariant);
             txtTotal = itemView.findViewById(R.id.txtTotal);
+            btnPrintLabel = itemView.findViewById(R.id.btnPrintLabel);
             btnAction = itemView.findViewById(R.id.btnAction);
         }
     }
 }
+
+

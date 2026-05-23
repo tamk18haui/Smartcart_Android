@@ -157,9 +157,7 @@ public class AddProductActivity extends BaseActivity {
                 startActivityForResult(new Intent(this, CategoryPickerActivity.class), REQ_PICK_CATEGORY)
         );
 
-        findViewById(R.id.rowBrand).setOnClickListener(v ->
-                startActivityForResult(new Intent(this, BrandPickerActivity.class), REQ_PICK_BRAND)
-        );
+        findViewById(R.id.rowBrand).setOnClickListener(v -> openBrandPicker());
 
         findViewById(R.id.rowVariants).setOnClickListener(v -> openVariantEditor());
 
@@ -254,6 +252,18 @@ public class AddProductActivity extends BaseActivity {
         }
 
         renderSelectedState();
+    }
+
+    private void openBrandPicker() {
+        if (selectedCategoryId == null || selectedCategoryId <= 0) {
+            showToast("Vui lòng chọn danh mục trước để lọc thương hiệu phù hợp");
+            return;
+        }
+
+        Intent intent = new Intent(this, BrandPickerActivity.class);
+        intent.putExtra("category_id", selectedCategoryId);
+        intent.putExtra("category_name", tvCategoryValue == null ? "" : tvCategoryValue.getText().toString());
+        startActivityForResult(intent, REQ_PICK_BRAND);
     }
 
     private void openProductImagePicker() {
@@ -447,9 +457,16 @@ public class AddProductActivity extends BaseActivity {
         }
 
         if (requestCode == REQ_PICK_CATEGORY) {
+            Long oldCategoryId = selectedCategoryId;
             selectedCategoryId = data.getLongExtra("category_id", -1L);
             if (selectedCategoryId <= 0) selectedCategoryId = null;
             tvCategoryValue.setText(data.getStringExtra("category_name"));
+
+            if (oldCategoryId == null || !oldCategoryId.equals(selectedCategoryId)) {
+                selectedBrand = null;
+                tvBrandValue.setText("Vui lòng chọn thương hiệu");
+            }
+
             renderSelectedState();
             return;
         }

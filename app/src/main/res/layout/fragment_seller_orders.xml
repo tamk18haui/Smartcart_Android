@@ -39,6 +39,11 @@
             android:orientation="horizontal">
 
             <TextView
+                android:id="@+id/chipAll"
+                style="@style/SellerOrderChip"
+                android:text="Tất cả đơn hàng" />
+
+            <TextView
                 android:id="@+id/chipPending"
                 style="@style/SellerOrderChip"
                 android:text="Chờ xác nhận" />
@@ -101,5 +106,7 @@
     </FrameLayout>
 
 </LinearLayout>
+
+
 
 
