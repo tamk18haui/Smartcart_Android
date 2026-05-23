@@ -38,7 +38,13 @@ public class ApiClient {
 
     private static Retrofit buildRetrofit(Context context) {
         HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
-        loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+
+        /*
+         * KHÔNG dùng BODY trên máy thật.
+         * BODY sẽ in toàn bộ JSON product/detail/voucher/review ra Logcat
+         * và làm máy lag rất rõ.
+         */
+        loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.NONE);
 
         OkHttpClient client = new OkHttpClient.Builder()
                 .addInterceptor(new AuthInterceptor(context))

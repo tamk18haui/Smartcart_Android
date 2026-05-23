@@ -26,14 +26,39 @@ public class OrderDetailResponse {
     @SerializedName("discountAmount")
     private BigDecimal discountAmount;
 
-    @SerializedName("paymentMethod")
+    @SerializedName(value = "paymentMethod", alternate = {
+            "payment_method",
+            "method",
+            "payMethod"
+    })
     private String paymentMethod;
 
-    @SerializedName("paymentProvider")
+    @SerializedName(value = "paymentProvider", alternate = {
+            "payment_provider",
+            "provider",
+            "payProvider"
+    })
     private String paymentProvider;
+
+    @SerializedName(value = "updatedAt", alternate = {
+            "statusUpdatedAt",
+            "processedAt",
+            "completedAt",
+            "deliveredAt"
+    })
+    private String updatedAt;
 
     @SerializedName("receiverName")
     private String receiverName;
+
+    @SerializedName(value = "receiverPhone", alternate = {
+            "receiver_phone",
+            "phone",
+            "phoneNumber",
+            "receiverPhoneNumber",
+            "shippingPhone"
+    })
+    private String receiverPhone;
 
     @SerializedName("shippingAddress")
     private String shippingAddress;
@@ -64,34 +89,7 @@ public class OrderDetailResponse {
     }
 
     public String getStatus() {
-        return status;
-    }
-
-    public String getPaymentText() {
-        String method = paymentMethod == null ? "" : paymentMethod.trim().toUpperCase();
-        String provider = paymentProvider == null ? "" : paymentProvider.trim().toUpperCase();
-
-        if ("COD".equals(method)) {
-            return "Thanh toán khi nhận hàng";
-        }
-
-        if ("ONLINE".equals(method)) {
-            if ("MOMO".equals(provider)) {
-                return "Thanh toán online - MoMo";
-            }
-
-            if ("VNPAY".equals(provider)) {
-                return "Thanh toán online - VNPay";
-            }
-
-            return "Thanh toán online";
-        }
-
-        if ("WALLET".equals(method)) {
-            return "Ví SmartCart";
-        }
-
-        return "Chưa có thông tin thanh toán";
+        return status == null ? "" : status;
     }
 
     public BigDecimal getTotalAmount() {
@@ -113,6 +111,13 @@ public class OrderDetailResponse {
         return receiverName.trim();
     }
 
+    public String getReceiverPhone() {
+        if (receiverPhone == null || receiverPhone.trim().isEmpty()) {
+            return "Chưa có số điện thoại";
+        }
+        return receiverPhone.trim();
+    }
+
     public String getShippingAddress() {
         if (shippingAddress == null || shippingAddress.trim().isEmpty()) {
             return "Chưa có địa chỉ giao hàng";
@@ -122,6 +127,10 @@ public class OrderDetailResponse {
 
     public String getCreatedAt() {
         return createdAt;
+    }
+
+    public String getUpdatedAt() {
+        return updatedAt;
     }
 
     public boolean canCancel() {
@@ -137,7 +146,103 @@ public class OrderDetailResponse {
         return getItems().size();
     }
 
+    public String getPaymentText() {
+        String method = paymentMethod == null ? "" : paymentMethod.trim().toUpperCase();
+        String provider = paymentProvider == null ? "" : paymentProvider.trim().toUpperCase();
+
+        if ("NONE".equals(provider)) {
+            provider = "";
+        }
+
+        if ("COD".equals(method)
+                || "CASH".equals(method)
+                || "CASH_ON_DELIVERY".equals(method)) {
+            return "Thanh toán khi nhận hàng";
+        }
+
+        if ("MOMO".equals(provider)) {
+            return "Thanh toán online - MoMo";
+        }
+
+        if ("VNPAY".equals(provider) || "VN_PAY".equals(provider)) {
+            return "Thanh toán online - VNPay";
+        }
+
+        if ("ONLINE".equals(method)) {
+            return "Thanh toán online";
+        }
+
+        if ("WALLET".equals(method)) {
+            return "Ví SmartCart";
+        }
+
+        return "Thanh toán khi nhận hàng";
+    }
+
+    public String getJourneyCurrentTitle() {
+        String s = status == null ? "" : status.trim().toUpperCase();
+
+        switch (s) {
+            case "PENDING_PAYMENT":
+                return "Đơn hàng đang chờ thanh toán";
+            case "PENDING":
+                return "Đơn hàng đang chờ xác nhận";
+            case "CONFIRMED":
+                return "Đơn hàng đã được xác nhận";
+            case "PREPARING":
+                return "Shop đang chuẩn bị hàng";
+            case "SHIPPING":
+                return "Đơn hàng đang giao";
+            case "DELIVERED":
+                return "Đơn hàng đã được giao";
+            case "COMPLETED":
+                return "Đơn hàng đã hoàn thành";
+            case "CANCELLED":
+                return "Đơn hàng đã bị hủy";
+            case "PAYMENT_FAILED":
+                return "Thanh toán thất bại";
+            default:
+                return "Đơn hàng đang được xử lý";
+        }
+    }
+
+    public String getJourneyCurrentDescription() {
+        String s = status == null ? "" : status.trim().toUpperCase();
+
+        switch (s) {
+            case "PENDING_PAYMENT":
+                return "Vui lòng hoàn tất thanh toán để shop xử lý đơn.";
+            case "PENDING":
+                return "SmartCart đã ghi nhận đơn hàng và đang chờ shop xác nhận.";
+            case "CONFIRMED":
+                return "Shop đã xác nhận đơn hàng của bạn.";
+            case "PREPARING":
+                return "Shop đang chuẩn bị sản phẩm để bàn giao cho đơn vị vận chuyển.";
+            case "SHIPPING":
+                return "Đơn hàng đang trên đường giao tới bạn.";
+            case "DELIVERED":
+                return "Đơn hàng đã được giao tới địa chỉ nhận hàng.";
+            case "COMPLETED":
+                return "Cảm ơn bạn đã mua sắm tại SmartCart.";
+            case "CANCELLED":
+                return "Đơn hàng đã bị hủy.";
+            case "PAYMENT_FAILED":
+                return "Giao dịch thanh toán không thành công.";
+            default:
+                return "SmartCart đã ghi nhận trạng thái hiện tại của đơn hàng.";
+        }
+    }
+
     public static class OrderItemResponse {
+
+        @SerializedName("orderItemId")
+        private Long orderItemId;
+
+        @SerializedName("productId")
+        private Long productId;
+
+        @SerializedName("variantId")
+        private Long variantId;
 
         @SerializedName("productName")
         private String productName;
@@ -153,6 +258,24 @@ public class OrderDetailResponse {
 
         @SerializedName("imageUrl")
         private String imageUrl;
+
+        @SerializedName("canReview")
+        private Boolean canReview;
+
+        @SerializedName("reviewed")
+        private Boolean reviewed;
+
+        public Long getOrderItemId() {
+            return orderItemId;
+        }
+
+        public Long getProductId() {
+            return productId;
+        }
+
+        public Long getVariantId() {
+            return variantId;
+        }
 
         public String getProductName() {
             if (productName == null || productName.trim().isEmpty()) {
@@ -183,6 +306,14 @@ public class OrderDetailResponse {
 
         public Long getLineTotal() {
             return getPriceAtPurchase() * getQuantity();
+        }
+
+        public boolean canReview() {
+            return Boolean.TRUE.equals(canReview);
+        }
+
+        public boolean reviewed() {
+            return Boolean.TRUE.equals(reviewed);
         }
     }
 }

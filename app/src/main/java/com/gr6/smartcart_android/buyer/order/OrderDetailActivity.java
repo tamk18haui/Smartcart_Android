@@ -1,5 +1,6 @@
 package com.gr6.smartcart_android.buyer.order;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
@@ -10,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.gr6.smartcart_android.R;
 import com.gr6.smartcart_android.buyer.order.response.OrderDetailResponse;
+import com.gr6.smartcart_android.buyer.review.ReviewActivity;
 import com.gr6.smartcart_android.common.base.BaseActivity;
 import com.gr6.smartcart_android.common.utils.ThemeColor;
 
@@ -41,8 +43,13 @@ public class OrderDetailActivity extends BaseActivity {
 
     private OrderDetailViewModel viewModel;
     private OrderDetailItemAdapter adapter;
-
+    private TextView txtReceiverPhone;
     private Long shopOrderId;
+
+    private TextView txtJourneyCurrentTitle;
+    private TextView txtJourneyCurrentDesc;
+    private TextView txtJourneyCurrentTime;
+    private TextView txtJourneyCreatedTime;
 
     private final NumberFormat moneyFormat =
             NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
@@ -88,19 +95,55 @@ public class OrderDetailActivity extends BaseActivity {
         btnCancelOrder = findViewById(R.id.btnCancelOrder);
         txtEmpty = findViewById(R.id.txtEmpty);
         txtPaymentMethod = findViewById(R.id.txtPaymentMethod);
+        txtReceiverPhone = findViewById(R.id.txtReceiverPhone);
 
         layoutContent = findViewById(R.id.layoutContent);
         layoutEmpty = findViewById(R.id.layoutEmpty);
         rcvItems = findViewById(R.id.rcvItems);
+
+        txtJourneyCurrentTitle = findViewById(R.id.txtJourneyCurrentTitle);
+        txtJourneyCurrentDesc = findViewById(R.id.txtJourneyCurrentDesc);
+        txtJourneyCurrentTime = findViewById(R.id.txtJourneyCurrentTime);
+        txtJourneyCreatedTime = findViewById(R.id.txtJourneyCreatedTime);
     }
 
     private void setupRecyclerView() {
         adapter = new OrderDetailItemAdapter();
 
+        // Khi bấm nút Đánh giá ở từng sản phẩm
+        adapter.setOnReviewClickListener(this::openReview);
+
         rcvItems.setLayoutManager(new LinearLayoutManager(this));
         rcvItems.setAdapter(adapter);
         rcvItems.setNestedScrollingEnabled(false);
     }
+    private void openReview(OrderDetailResponse.OrderItemResponse item) {
+        if (item == null || item.getOrderItemId() == null) {
+            showToast("Không tìm thấy sản phẩm trong đơn hàng");
+            return;
+        }
+
+        Intent intent = new Intent(this, ReviewActivity.class);
+        intent.putExtra(ReviewActivity.EXTRA_ORDER_ITEM_ID, item.getOrderItemId());
+        intent.putExtra(ReviewActivity.EXTRA_PRODUCT_NAME, item.getProductName());
+        intent.putExtra(ReviewActivity.EXTRA_PRODUCT_IMAGE, item.getImageUrl());
+
+        startActivityForResult(intent, 2001);
+    }
+    @Override
+    protected void onActivityResult(
+            int requestCode,
+            int resultCode,
+            Intent data
+    ) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == 2001 && resultCode == RESULT_OK) {
+            viewModel.loadOrderDetail(shopOrderId);
+        }
+    }
+
+
 
     private void initEvents() {
         findViewById(R.id.imgBack).setOnClickListener(v -> finish());
@@ -144,8 +187,10 @@ public class OrderDetailActivity extends BaseActivity {
         txtCreatedAt.setText(formatDate(detail.getCreatedAt()));
 
         txtReceiverName.setText(detail.getReceiverName());
+        txtReceiverPhone.setText(detail.getReceiverPhone());
         txtShippingAddress.setText(detail.getShippingAddress());
         txtPaymentMethod.setText(detail.getPaymentText());
+        bindJourney(detail);
 
         txtItemCount.setText(detail.getItemCount() + " sản phẩm");
         txtShippingFee.setText("Phí vận chuyển: " + formatMoney(detail.getShippingFee()));
@@ -214,5 +259,18 @@ public class OrderDetailActivity extends BaseActivity {
             default:
                 return status;
         }
+    }
+    private void bindJourney(OrderDetailResponse detail) {
+        txtJourneyCurrentTitle.setText(detail.getJourneyCurrentTitle());
+        txtJourneyCurrentDesc.setText(detail.getJourneyCurrentDescription());
+
+        String currentTime = detail.getUpdatedAt();
+
+        if (currentTime == null || currentTime.trim().isEmpty()) {
+            currentTime = detail.getCreatedAt();
+        }
+
+        txtJourneyCurrentTime.setText(formatDate(currentTime));
+        txtJourneyCreatedTime.setText(formatDate(detail.getCreatedAt()));
     }
 }

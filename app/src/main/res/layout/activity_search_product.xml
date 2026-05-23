@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/rootSearch"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    android:fitsSystemWindows="true">
+
+    <!-- HEADER -->
+    <LinearLayout
+        android:id="@+id/layoutHeader"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_search_header"
+        android:elevation="4dp"
+        android:gravity="center_vertical"
+        android:minHeight="64dp"
+        android:orientation="horizontal"
+        android:paddingHorizontal="8dp"
+        android:paddingVertical="10dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <!-- Nút Back -->
+        <ImageView
+            android:id="@+id/btnBack"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
+            android:padding="12dp"
+            android:src="@drawable/ic_back"
+            app:tint="@color/brand_primary" />
+
+        <!-- Khung tìm kiếm -->
+        <LinearLayout
+            android:id="@+id/layoutSearchBox"
+            android:layout_width="0dp"
+            android:layout_height="44dp"
+            android:layout_marginHorizontal="8dp"
+            android:layout_weight="1"
+            android:background="@drawable/bg_search_input_like_smartcart"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="12dp">
+
+            <!-- Đã đổi sang ImageView với ic_search -->
+            <ImageView
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:layout_gravity="center_vertical"
+                android:src="@drawable/ic_search"
+                app:tint="@color/text_secondary" />
+
+            <EditText
+                android:id="@+id/edtSearch"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginHorizontal="8dp"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:hint="Tìm kiếm sản phẩm"
+                android:imeOptions="actionSearch"
+                android:inputType="text"
+                android:singleLine="true"
+                android:textColor="@color/text_primary"
+                android:textColorHint="@color/text_secondary"
+                android:textSize="15sp" />
+
+            <TextView
+                android:id="@+id/btnClear"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:text="×"
+                android:textColor="@color/text_secondary"
+                android:textSize="24sp" />
+
+        </LinearLayout>
+
+        <!-- Nút Lọc -->
+        <ImageView
+            android:id="@+id/btnFilter"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:background="@drawable/bg_search_filter_button"
+            android:clickable="true"
+            android:focusable="true"
+            android:padding="10dp"
+            android:src="@drawable/ic_filter"
+            app:tint="@color/brand_primary" />
+
+    </LinearLayout>
+
+    <!-- TABS SẮP XẾP -->
+    <LinearLayout
+        android:id="@+id/layoutSortTabs"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:background="@color/surface"
+        android:elevation="2dp"
+        android:orientation="horizontal"
+        android:weightSum="4"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/layoutHeader">
+
+        <TextView
+            android:id="@+id/tabRelevance"
+            style="@style/SearchSortTab"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?attr/selectableItemBackground"
+            android:gravity="center"
+            android:text="Liên quan" />
+
+        <TextView
+            android:id="@+id/tabLatest"
+            style="@style/SearchSortTab"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?attr/selectableItemBackground"
+            android:gravity="center"
+            android:text="Mới nhất" />
+
+        <TextView
+            android:id="@+id/tabTopSales"
+            style="@style/SearchSortTab"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?attr/selectableItemBackground"
+            android:gravity="center"
+            android:text="Bán chạy" />
+
+        <TextView
+            android:id="@+id/tabPrice"
+            style="@style/SearchSortTab"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?attr/selectableItemBackground"
+            android:gravity="center"
+            android:text="Giá" />
+
+    </LinearLayout>
+
+    <!-- DANH SÁCH & TRẠNG THÁI TRỐNG -->
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefresh"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/layoutSortTabs">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rcvSearchProducts"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:paddingHorizontal="8dp"
+                android:paddingTop="8dp"
+                android:paddingBottom="80dp" />
+
+            <!-- Có thể đổi nốt icon trống ở đây nếu bạn muốn, hiện vẫn đang dùng chữ ⌕ -->
+            <LinearLayout
+                android:id="@+id/layoutEmpty"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="24dp">
+
+                <ImageView
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:background="@drawable/bg_empty_search_icon"
+                    android:padding="20dp"
+                    android:src="@drawable/ic_search"
+                    app:tint="@color/brand_primary" />
+
+                <TextView
+                    android:id="@+id/txtEmpty"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:gravity="center"
+                    android:text="Nhập từ khóa để tìm kiếm sản phẩm"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="16sp" />
+            </LinearLayout>
+        </FrameLayout>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

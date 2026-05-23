@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/layoutFilterRoot"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_filter_dialog"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <!-- HEADER: Tiêu đề & Nút Đóng -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/txtFilterTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Bộ lọc tìm kiếm"
+            android:textColor="@color/text_primary"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <!-- Thay ký tự "x" thường thành ký tự "✕" thanh thoát hơn và thêm hiệu ứng chạm -->
+        <TextView
+            android:id="@+id/btnCloseFilter"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:text="✕"
+            android:textColor="@color/text_secondary"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <!-- PHẦN 1: DANH MỤC -->
+    <TextView
+        android:id="@+id/txtCategoryTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="Danh mục"
+        android:textColor="@color/text_primary"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/txtCategoryHint"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="Chọn một danh mục để thu hẹp kết quả"
+        android:textColor="@color/text_secondary"
+        android:textSize="13sp" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rcvFilterCategories"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:clipToPadding="false"
+        android:nestedScrollingEnabled="false"
+        android:overScrollMode="never" />
+
+    <!-- PHẦN 2: KHOẢNG GIÁ -->
+    <TextView
+        android:id="@+id/txtPriceTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="Khoảng giá"
+        android:textColor="@color/text_primary"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:weightSum="2">
+
+        <!-- Ô nhập Giá Từ -->
+        <EditText
+            android:id="@+id/edtMinPrice"
+            android:layout_width="0dp"
+            android:layout_height="44dp"
+            android:layout_weight="1"
+            android:background="@drawable/bg_filter_input"
+            android:gravity="center"
+            android:hint="TỐI THIỂU"
+            android:imeOptions="actionNext"
+            android:inputType="number"
+            android:paddingHorizontal="12dp"
+            android:singleLine="true"
+            android:textColor="@color/text_primary"
+            android:textColorHint="@color/text_secondary"
+            android:textSize="14sp" />
+
+        <!-- Dấu gạch ngang phân cách -->
+        <View
+            android:layout_width="16dp"
+            android:layout_height="1.5dp"
+            android:layout_marginHorizontal="12dp"
+            android:background="@color/text_secondary" />
+
+        <!-- Ô nhập Giá Đến -->
+        <EditText
+            android:id="@+id/edtMaxPrice"
+            android:layout_width="0dp"
+            android:layout_height="44dp"
+            android:layout_weight="1"
+            android:background="@drawable/bg_filter_input"
+            android:gravity="center"
+            android:hint="TỐI ĐA"
+            android:imeOptions="actionDone"
+            android:inputType="number"
+            android:paddingHorizontal="12dp"
+            android:singleLine="true"
+            android:textColor="@color/text_primary"
+            android:textColorHint="@color/text_secondary"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+    <!-- NÚT HÀNH ĐỘNG -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginTop="32dp"
+        android:orientation="horizontal">
+
+        <!-- Nút Thiết lập lại (Xóa lọc) -->
+        <TextView
+            android:id="@+id/btnResetFilter"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginEnd="6dp"
+            android:layout_weight="1"
+            android:background="@drawable/bg_filter_button_outline"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground"
+            android:gravity="center"
+            android:text="Thiết lập lại"
+            android:textColor="@color/text_primary"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
+        <!-- Nút Áp dụng -->
+        <TextView
+            android:id="@+id/btnApplyFilter"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="6dp"
+            android:layout_weight="1"
+            android:background="@drawable/bg_filter_button_primary"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground"
+            android:gravity="center"
+            android:text="Áp dụng"
+            android:textColor="@color/surface"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+</LinearLayout>

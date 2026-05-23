@@ -16,7 +16,6 @@
         android:layout_height="80dp"
         android:scaleType="centerCrop"
         android:src="@drawable/ic_cart"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Small"
@@ -40,19 +39,37 @@
 
     <TextView
         android:id="@+id/txtVariantSku"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="6dp"
+        android:layout_marginEnd="12dp"
         android:background="@drawable/bg_address_default_badge"
+        android:ellipsize="end"
+        android:maxLines="1"
         android:paddingHorizontal="8dp"
         android:paddingVertical="3dp"
-        android:maxLines="1"
-        android:ellipsize="end"
         android:text="Phân loại: Đen, XL"
         android:textColor="@color/text_secondary"
         android:textSize="12sp"
+        app:layout_constraintEnd_toStartOf="@id/layoutPriceQuantity"
         app:layout_constraintStart_toStartOf="@id/txtProductName"
         app:layout_constraintTop_toBottomOf="@id/txtProductName" />
+
+    <TextView
+        android:id="@+id/btnReview"
+        android:layout_width="wrap_content"
+        android:layout_height="32dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/bg_role_unselected"
+        android:gravity="center"
+        android:paddingHorizontal="14dp"
+        android:text="Đánh giá"
+        android:textColor="@color/brand_primary"
+        android:textSize="13sp"
+        android:textStyle="bold"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="@id/txtProductName"
+        app:layout_constraintTop_toBottomOf="@id/txtVariantSku" />
 
     <LinearLayout
         android:id="@+id/layoutPriceQuantity"
@@ -60,7 +77,6 @@
         android:layout_height="wrap_content"
         android:gravity="end"
         android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="@id/imgProduct"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/imgProduct">
 
@@ -85,12 +101,14 @@
     </LinearLayout>
 
     <View
+        android:id="@+id/dividerProduct"
         android:layout_width="0dp"
         android:layout_height="1dp"
+        android:layout_marginTop="12dp"
         android:background="@color/border"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@id/txtProductName" />
+        app:layout_constraintStart_toStartOf="@id/txtProductName"
+        app:layout_constraintTop_toBottomOf="@id/btnReview" />
 
     <TextView
         android:id="@+id/txtLineTotal"

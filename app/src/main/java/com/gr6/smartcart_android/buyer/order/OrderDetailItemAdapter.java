@@ -18,11 +18,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * Adapter item sản phẩm trong chi tiết đơn hàng.
+ *
+ * Thêm nút:
+ * - Đánh giá: khi canReview = true
+ * - Đã đánh giá: khi reviewed = true
+ */
 public class OrderDetailItemAdapter extends RecyclerView.Adapter<OrderDetailItemAdapter.ItemViewHolder> {
 
     private final List<OrderDetailResponse.OrderItemResponse> items = new ArrayList<>();
     private final NumberFormat moneyFormat =
             NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
+
+    private OnReviewClickListener reviewClickListener;
 
     public void setData(List<OrderDetailResponse.OrderItemResponse> data) {
         items.clear();
@@ -32,6 +41,10 @@ public class OrderDetailItemAdapter extends RecyclerView.Adapter<OrderDetailItem
         }
 
         notifyDataSetChanged();
+    }
+
+    public void setOnReviewClickListener(OnReviewClickListener listener) {
+        this.reviewClickListener = listener;
     }
 
     @NonNull
@@ -67,6 +80,7 @@ public class OrderDetailItemAdapter extends RecyclerView.Adapter<OrderDetailItem
         private final TextView txtQuantity;
         private final TextView txtPrice;
         private final TextView txtLineTotal;
+        private final TextView btnReview;
 
         public ItemViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -77,6 +91,7 @@ public class OrderDetailItemAdapter extends RecyclerView.Adapter<OrderDetailItem
             txtQuantity = itemView.findViewById(R.id.txtQuantity);
             txtPrice = itemView.findViewById(R.id.txtPrice);
             txtLineTotal = itemView.findViewById(R.id.txtLineTotal);
+            btnReview = itemView.findViewById(R.id.btnReview);
         }
 
         void bind(OrderDetailResponse.OrderItemResponse item) {
@@ -93,11 +108,42 @@ public class OrderDetailItemAdapter extends RecyclerView.Adapter<OrderDetailItem
             } else {
                 ImageLoader.load(itemView.getContext(), item.getImageUrl(), imgProduct);
             }
+
+            bindReviewButton(item);
+        }
+
+        private void bindReviewButton(OrderDetailResponse.OrderItemResponse item) {
+            if (btnReview == null) return;
+
+            btnReview.setEnabled(true);
+            btnReview.setAlpha(1f);
+
+            if (item.canReview()) {
+                btnReview.setVisibility(View.VISIBLE);
+                btnReview.setText("Đánh giá");
+            } else if (item.reviewed()) {
+                btnReview.setVisibility(View.VISIBLE);
+                btnReview.setText("Đã đánh giá");
+                btnReview.setEnabled(false);
+                btnReview.setAlpha(0.55f);
+            } else {
+                btnReview.setVisibility(View.GONE);
+            }
+
+            btnReview.setOnClickListener(v -> {
+                if (reviewClickListener != null && item.canReview()) {
+                    reviewClickListener.onReviewClick(item);
+                }
+            });
         }
 
         private String formatMoney(Long value) {
             if (value == null) value = 0L;
             return moneyFormat.format(value);
         }
+    }
+
+    public interface OnReviewClickListener {
+        void onReviewClick(OrderDetailResponse.OrderItemResponse item);
     }
 }

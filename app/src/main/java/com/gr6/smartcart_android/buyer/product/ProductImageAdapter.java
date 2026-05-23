@@ -24,7 +24,19 @@ public class ProductImageAdapter extends RecyclerView.Adapter<ProductImageAdapte
         if (data != null) {
             for (String url : data) {
                 if (url != null && !url.trim().isEmpty()) {
-                    images.add(url.trim());
+                    String cleanUrl = url.trim();
+
+                    if (!images.contains(cleanUrl)) {
+                        images.add(cleanUrl);
+                    }
+
+                    /*
+                     * Trang chi tiết chỉ nên render tối đa 6 ảnh.
+                     * Nếu backend trả quá nhiều ảnh, ViewPager2 sẽ nặng.
+                     */
+                    if (images.size() == 6) {
+                        break;
+                    }
                 }
             }
         }
@@ -63,8 +75,18 @@ public class ProductImageAdapter extends RecyclerView.Adapter<ProductImageAdapte
         if (imageUrl == null || imageUrl.trim().isEmpty()) {
             holder.imgProduct.setImageResource(R.drawable.bg_image_placeholder);
         } else {
-            ImageLoader.load(holder.itemView.getContext(), imageUrl, holder.imgProduct);
+            ImageLoader.loadProductBanner(
+                    holder.itemView.getContext(),
+                    imageUrl,
+                    holder.imgProduct
+            );
         }
+    }
+
+    @Override
+    public void onViewRecycled(@NonNull ImageViewHolder holder) {
+        super.onViewRecycled(holder);
+        ImageLoader.clear(holder.itemView.getContext(), holder.imgProduct);
     }
 
     @Override

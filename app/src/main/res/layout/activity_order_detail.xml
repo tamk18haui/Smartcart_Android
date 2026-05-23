@@ -12,6 +12,8 @@
         android:layout_height="64dp"
         android:background="@color/surface"
         android:elevation="4dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
@@ -64,6 +66,8 @@
         android:layout_height="0dp"
         android:fillViewport="true"
         android:overScrollMode="never"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@id/layoutBottomActions"
         app:layout_constraintTop_toBottomOf="@id/layoutHeader">
 
@@ -187,59 +191,71 @@
                 app:cardBackgroundColor="@color/surface"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="0dp"
-                app:cardMaxElevation="0dp"> <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp">
+                app:cardMaxElevation="0dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
+                    android:orientation="vertical"
+                    android:padding="16dp">
 
-                    <ImageView
-                        android:layout_width="28dp"
-                        android:layout_height="28dp"
-                        android:background="@drawable/bg_location_empty_icon"
-                        android:padding="6dp"
-                        android:src="@drawable/ic_location_on"
-                        app:tint="@color/brand_primary" />
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
+                            android:background="@drawable/bg_location_empty_icon"
+                            android:padding="6dp"
+                            android:src="@drawable/ic_location_on"
+                            app:tint="@color/brand_primary" />
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="10dp"
+                            android:layout_weight="1"
+                            android:text="Địa chỉ nhận hàng"
+                            android:textColor="@color/text_primary"
+                            android:textSize="15sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
 
                     <TextView
-                        android:layout_width="0dp"
+                        android:id="@+id/txtReceiverName"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="10dp"
-                        android:layout_weight="1"
-                        android:text="Địa chỉ nhận hàng"
+                        android:layout_marginStart="38dp"
+                        android:layout_marginTop="10dp"
+                        android:text="Người nhận"
                         android:textColor="@color/text_primary"
-                        android:textSize="15sp"
+                        android:textSize="14sp"
                         android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/txtReceiverPhone"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="38dp"
+                        android:layout_marginTop="4dp"
+                        android:text="0987654321"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="14sp" />
+
+                    <TextView
+                        android:id="@+id/txtShippingAddress"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="38dp"
+                        android:layout_marginTop="4dp"
+                        android:lineSpacingExtra="4dp"
+                        android:text="Địa chỉ giao hàng chi tiết"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="13sp" />
                 </LinearLayout>
-
-                <TextView
-                    android:id="@+id/txtReceiverName"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="38dp"
-                    android:layout_marginTop="10dp"
-                    android:text="Người nhận | 0987654321"
-                    android:textColor="@color/text_primary"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/txtShippingAddress"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="38dp"
-                    android:layout_marginTop="4dp"
-                    android:lineSpacingExtra="4dp"
-                    android:text="Địa chỉ giao hàng chi tiết"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="13sp" />
-            </LinearLayout>
             </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView
@@ -307,6 +323,7 @@
                                 android:orientation="vertical">
 
                                 <TextView
+                                    android:id="@+id/txtJourneyCurrentTitle"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:text="Đơn hàng đang được xử lý"
@@ -315,12 +332,22 @@
                                     android:textStyle="bold" />
 
                                 <TextView
+                                    android:id="@+id/txtJourneyCurrentDesc"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:layout_marginTop="4dp"
                                     android:text="SmartCart đã ghi nhận trạng thái đơn hàng hiện tại."
                                     android:textColor="@color/text_secondary"
                                     android:textSize="13sp" />
+
+                                <TextView
+                                    android:id="@+id/txtJourneyCurrentTime"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="4dp"
+                                    android:text="Không rõ thời gian"
+                                    android:textColor="@color/text_hint"
+                                    android:textSize="12sp" />
                             </LinearLayout>
                         </LinearLayout>
 
@@ -340,29 +367,40 @@
                                 android:layout_height="12dp"
                                 android:layout_marginStart="6dp"
                                 android:layout_marginTop="6dp"
-                                android:background="@drawable/bg_address_default_badge" /> <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="20dp"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
+                                android:background="@drawable/bg_address_default_badge" />
 
-                            <TextView
-                                android:layout_width="match_parent"
+                            <LinearLayout
+                                android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                android:text="Đơn hàng đã được tạo"
-                                android:textColor="@color/text_primary"
-                                android:textSize="14sp"
-                                android:textStyle="bold" />
+                                android:layout_marginStart="20dp"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
 
-                            <TextView
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="4dp"
-                                android:text="Thông tin chi tiết được hiển thị bên dưới."
-                                android:textColor="@color/text_secondary"
-                                android:textSize="13sp" />
-                        </LinearLayout>
+                                <TextView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:text="Đơn hàng đã được tạo"
+                                    android:textColor="@color/text_primary"
+                                    android:textSize="14sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="4dp"
+                                    android:text="Thông tin đơn hàng đã được lưu trên SmartCart."
+                                    android:textColor="@color/text_secondary"
+                                    android:textSize="13sp" />
+
+                                <TextView
+                                    android:id="@+id/txtJourneyCreatedTime"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="4dp"
+                                    android:text="Không rõ thời gian"
+                                    android:textColor="@color/text_hint"
+                                    android:textSize="12sp" />
+                            </LinearLayout>
                         </LinearLayout>
                     </LinearLayout>
                 </LinearLayout>
@@ -585,6 +623,8 @@
         android:orientation="horizontal"
         android:paddingHorizontal="16dp"
         android:paddingVertical="12dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent">
 
         <TextView
@@ -629,6 +669,8 @@
         android:orientation="vertical"
         android:padding="32dp"
         android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 

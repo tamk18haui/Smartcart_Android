@@ -16,6 +16,7 @@ import com.gr6.smartcart_android.auth.response.LoginResponse;
 import com.gr6.smartcart_android.common.base.BaseActivity;
 import com.gr6.smartcart_android.common.storage.TokenManager;
 import com.gr6.smartcart_android.common.storage.UserSession;
+import com.gr6.smartcart_android.common.utils.AuthGuard;
 import com.gr6.smartcart_android.common.utils.ThemeColor;
 import com.gr6.smartcart_android.common.utils.Validator;
 import com.gr6.smartcart_android.navigation.RoleRouterActivity;
@@ -161,6 +162,22 @@ public class LoginActivity extends BaseActivity {
         android.util.Log.d("LOGIN_USER_ID", "Saved userId = " + user.getUserId());
 
         showToast("Đăng nhập thành công");
+
+        String nextActivity = getIntent().getStringExtra(AuthGuard.EXTRA_NEXT_ACTIVITY);
+
+        if (nextActivity != null && !nextActivity.trim().isEmpty()) {
+            try {
+                Class<?> clazz = Class.forName(nextActivity);
+
+                Intent intent = new Intent(this, clazz);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+                finish();
+                return;
+            } catch (Exception e) {
+                android.util.Log.e("LOGIN_NEXT", "Không mở được màn sau đăng nhập: " + nextActivity, e);
+            }
+        }
 
         Intent intent = new Intent(this, RoleRouterActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

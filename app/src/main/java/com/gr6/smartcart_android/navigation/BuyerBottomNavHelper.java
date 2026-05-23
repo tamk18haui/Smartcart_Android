@@ -15,6 +15,7 @@ import com.gr6.smartcart_android.R;
 import com.gr6.smartcart_android.buyer.account.AccountActivity;
 import com.gr6.smartcart_android.buyer.main.BuyerMainActivity;
 import com.gr6.smartcart_android.buyer.notification.NotificationActivity;
+import com.gr6.smartcart_android.common.utils.AuthGuard;
 
 public class BuyerBottomNavHelper {
 
@@ -62,6 +63,8 @@ public class BuyerBottomNavHelper {
             navNotification.setOnClickListener(v -> {
                 if (activeTab == TAB_NOTIFICATION) return;
 
+                if (!AuthGuard.requireLogin(activity, NotificationActivity.class)) return;
+
                 Intent intent = new Intent(activity, NotificationActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
                 activity.startActivity(intent);
@@ -72,6 +75,8 @@ public class BuyerBottomNavHelper {
         if (navAccount != null) {
             navAccount.setOnClickListener(v -> {
                 if (activeTab == TAB_ACCOUNT) return;
+
+                if (!AuthGuard.requireLogin(activity, AccountActivity.class)) return;
 
                 Intent intent = new Intent(activity, AccountActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);

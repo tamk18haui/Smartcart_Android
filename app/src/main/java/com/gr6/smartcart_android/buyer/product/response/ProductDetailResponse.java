@@ -398,59 +398,109 @@ public class ProductDetailResponse {
         @SerializedName("reviewId")
         private Long reviewId;
 
-        @SerializedName("id")
-        private Long id;
-
         @SerializedName("rating")
-        private Double rating;
+        private Integer rating;
 
         @SerializedName("comment")
         private String comment;
 
+        @SerializedName("imageUrls")
+        private List<String> imageUrls;
+
+        @SerializedName("videoUrl")
+        private String videoUrl;
+
         @SerializedName("userName")
         private String userName;
 
-        @SerializedName("fullName")
-        private String fullName;
+        @SerializedName("buyerName")
+        private String buyerName;
 
-        @SerializedName("imageUrl")
-        private String imageUrl;
+        @SerializedName("buyerAvatarUrl")
+        private String buyerAvatarUrl;
+
+        @SerializedName("sellerReply")
+        private String sellerReply;
 
         @SerializedName("createdAt")
         private String createdAt;
 
+        @SerializedName("repliedAt")
+        private String repliedAt;
+
         public Long getReviewId() {
-            if (reviewId != null) return reviewId;
-            return id;
+            return reviewId;
         }
 
-        public double getRating() {
-            if (rating == null) return 0.0;
+        public int getRating() {
+            if (rating == null) return 0;
+            if (rating < 0) return 0;
+            if (rating > 5) return 5;
             return rating;
         }
 
         public String getComment() {
             if (comment == null || comment.trim().isEmpty()) {
-                return "Người dùng chưa để lại bình luận.";
+                return "Người mua chưa để lại nhận xét.";
             }
-            return comment;
+            return comment.trim();
+        }
+
+        public List<String> getImageUrls() {
+            List<String> result = new ArrayList<>();
+
+            if (imageUrls == null) return result;
+
+            for (String url : imageUrls) {
+                if (url == null || url.trim().isEmpty()) continue;
+                result.add(url.trim());
+
+                if (result.size() == 4) break;
+            }
+
+            return result;
+        }
+
+        public String getVideoUrl() {
+            return videoUrl == null ? "" : videoUrl.trim();
         }
 
         public String getUserName() {
-            if (userName != null && !userName.trim().isEmpty()) return userName;
-            if (fullName != null && !fullName.trim().isEmpty()) return fullName;
-            return "Người mua SmartCart";
+            if (userName != null && !userName.trim().isEmpty()) {
+                return userName.trim();
+            }
+
+            if (buyerName != null && !buyerName.trim().isEmpty()) {
+                return buyerName.trim();
+            }
+
+            return "Người dùng SmartCart";
         }
 
-        public String getImageUrl() {
-            return imageUrl;
+        public String getBuyerAvatarUrl() {
+            return buyerAvatarUrl == null ? "" : buyerAvatarUrl.trim();
+        }
+
+        public String getSellerReply() {
+            return sellerReply == null ? "" : sellerReply.trim();
         }
 
         public String getCreatedAt() {
-            return createdAt;
+            return createdAt == null ? "" : createdAt.trim();
+        }
+
+        public String getRepliedAt() {
+            return repliedAt == null ? "" : repliedAt.trim();
+        }
+
+        public boolean hasSellerReply() {
+            return !getSellerReply().isEmpty();
+        }
+
+        public boolean hasVideo() {
+            return !getVideoUrl().isEmpty();
         }
     }
-
     public static class ShopVoucherDTO {
 
         private Long voucherId;

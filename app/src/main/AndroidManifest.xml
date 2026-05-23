@@ -34,6 +34,13 @@
             android:name=".buyer.order.OrderDetailActivity"
             android:exported="false" />
 
+        <activity
+            android:name=".buyer.review.ReviewActivity"
+            android:exported="false" />
+        <activity
+            android:name=".buyer.search.SearchProductActivity"
+            android:exported="false" />
+
         <!-- SELLER -->
         <activity
             android:name=".seller.main.SellerHomeActivity"

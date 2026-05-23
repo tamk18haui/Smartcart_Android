@@ -8,6 +8,7 @@ public class SearchProductRequest {
     private Long categoryId;
     private BigDecimal minPrice;
     private BigDecimal maxPrice;
+    private String sortBy;
 
     public SearchProductRequest() {
     }
@@ -16,23 +17,53 @@ public class SearchProductRequest {
             String keyword,
             Long categoryId,
             BigDecimal minPrice,
-            BigDecimal maxPrice
+            BigDecimal maxPrice,
+            String sortBy
     ) {
-        this.keyword = keyword;
+        this.keyword = keyword == null ? "" : keyword.trim();
         this.categoryId = categoryId;
         this.minPrice = minPrice;
         this.maxPrice = maxPrice;
+        this.sortBy = sortBy == null ? "relevance" : sortBy;
     }
 
     public static SearchProductRequest empty() {
-        return new SearchProductRequest("", null, null, null);
+        return new SearchProductRequest(
+                "",
+                null,
+                null,
+                null,
+                "newest"
+        );
     }
 
     public static SearchProductRequest ofKeywordAndCategory(
             String keyword,
             Long categoryId
     ) {
-        return new SearchProductRequest(keyword, categoryId, null, null);
+        return new SearchProductRequest(
+                keyword == null ? "" : keyword.trim(),
+                categoryId,
+                null,
+                null,
+                "newest"
+        );
+    }
+
+    public static SearchProductRequest forSearchScreen(
+            String keyword,
+            Long categoryId,
+            BigDecimal minPrice,
+            BigDecimal maxPrice,
+            String sortBy
+    ) {
+        return new SearchProductRequest(
+                keyword,
+                categoryId,
+                minPrice,
+                maxPrice,
+                sortBy
+        );
     }
 
     public String getKeyword() {
@@ -49,5 +80,9 @@ public class SearchProductRequest {
 
     public BigDecimal getMaxPrice() {
         return maxPrice;
+    }
+
+    public String getSortBy() {
+        return sortBy;
     }
 }

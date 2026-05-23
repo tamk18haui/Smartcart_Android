@@ -249,7 +249,7 @@ public class ProductDetailActivity extends BaseActivity {
         bindStats();
         bindImages();
         bindShop();
-        bindReviews();
+        bindReviews(productDetail);
 
         if (!productDetail.getVouchers().isEmpty()) {
             bindVouchers(productDetail.getVouchers());
@@ -386,42 +386,55 @@ public class ProductDetailActivity extends BaseActivity {
         );
     }
 
-    private void bindReviews() {
+    private void bindReviews(ProductDetailResponse detail) {
         layoutReviews.removeAllViews();
 
-        List<ProductDetailResponse.ReviewDTO> reviews = productDetail.getReviews();
+        List<ProductDetailResponse.ReviewDTO> reviews = detail.getReviews();
+        int reviewCount = detail.getReviewCount();
+        double averageRating = detail.getAverageRating();
 
-        if (reviews.isEmpty()) {
-            txtReviewSummary.setText("Chưa có đánh giá");
-            txtReviewCount.setText("0 đánh giá");
+        txtReviewSummary.setText("Đánh giá sản phẩm");
 
+        txtReviewCount.setText(
+                String.format(
+                        Locale.getDefault(),
+                        "%.1f/5 • %d đánh giá",
+                        averageRating,
+                        reviewCount
+                )
+        );
+
+        if (reviews == null || reviews.isEmpty()) {
             TextView empty = createText(
                     "Sản phẩm này chưa có đánh giá nào.",
                     14,
                     R.color.text_secondary,
                     Typeface.NORMAL
             );
-            empty.setPadding(0, dp(12), 0, 0);
-            layoutReviews.addView(empty);
+
+            LinearLayout.LayoutParams emptyParams = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+            );
+            emptyParams.topMargin = dp(10);
+
+            layoutReviews.addView(empty, emptyParams);
             return;
         }
 
-        double avg = productDetail.getDisplayRating();
-        txtReviewSummary.setText(String.format(Locale.getDefault(), "%.1f/5.0", avg));
-        txtReviewCount.setText(productDetail.getReviewCount() + " đánh giá");
+        int limit = Math.min(reviews.size(), 5);
 
-        int max = Math.min(reviews.size(), 3);
-
-        for (int i = 0; i < max; i++) {
+        for (int i = 0; i < limit; i++) {
             addReviewItem(reviews.get(i));
         }
     }
-
     private void addReviewItem(ProductDetailResponse.ReviewDTO review) {
+        if (review == null) return;
+
         LinearLayout card = new LinearLayout(this);
         card.setOrientation(LinearLayout.VERTICAL);
-        card.setBackgroundResource(R.drawable.bg_review_item);
         card.setPadding(dp(14), dp(12), dp(14), dp(12));
+        card.setBackgroundResource(R.drawable.bg_review_item);
 
         LinearLayout.LayoutParams cardParams = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
@@ -433,7 +446,14 @@ public class ProductDetailActivity extends BaseActivity {
         LinearLayout top = new LinearLayout(this);
         top.setOrientation(LinearLayout.HORIZONTAL);
         top.setGravity(Gravity.CENTER_VERTICAL);
-        card.addView(top);
+
+        card.addView(
+                top,
+                new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                )
+        );
 
         TextView name = createText(
                 review.getUserName(),
@@ -450,7 +470,7 @@ public class ProductDetailActivity extends BaseActivity {
         top.addView(name, nameParams);
 
         TextView rating = createText(
-                "★ " + String.format(Locale.getDefault(), "%.1f", review.getRating()),
+                buildStars(review.getRating()) + "  " + review.getRating() + "/5",
                 13,
                 R.color.warning,
                 Typeface.BOLD
@@ -471,8 +491,119 @@ public class ProductDetailActivity extends BaseActivity {
         );
         commentParams.topMargin = dp(8);
         card.addView(comment, commentParams);
+
+        addReviewImages(card, review.getImageUrls());
+        addReviewVideo(card, review.getVideoUrl());
+        addSellerReply(card, review.getSellerReply());
     }
 
+    private String buildStars(int rating) {
+        StringBuilder builder = new StringBuilder();
+
+        int safeRating = Math.max(0, Math.min(5, rating));
+
+        for (int i = 1; i <= 5; i++) {
+            builder.append(i <= safeRating ? "★" : "☆");
+        }
+
+        return builder.toString();
+    }
+
+    private void addReviewImages(
+            LinearLayout parent,
+            List<String> imageUrls
+    ) {
+        if (imageUrls == null || imageUrls.isEmpty()) return;
+
+        HorizontalScrollView scrollView = new HorizontalScrollView(this);
+        scrollView.setHorizontalScrollBarEnabled(false);
+
+        LinearLayout imageRow = new LinearLayout(this);
+        imageRow.setOrientation(LinearLayout.HORIZONTAL);
+
+        scrollView.addView(
+                imageRow,
+                new HorizontalScrollView.LayoutParams(
+                        HorizontalScrollView.LayoutParams.WRAP_CONTENT,
+                        HorizontalScrollView.LayoutParams.WRAP_CONTENT
+                )
+        );
+
+        for (String url : imageUrls) {
+            if (url == null || url.trim().isEmpty()) continue;
+
+            ImageView imageView = new ImageView(this);
+            imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            imageView.setBackgroundResource(R.drawable.bg_image_placeholder);
+
+            LinearLayout.LayoutParams imageParams = new LinearLayout.LayoutParams(
+                    dp(72),
+                    dp(72)
+            );
+            imageParams.rightMargin = dp(8);
+
+            imageRow.addView(imageView, imageParams);
+
+            ImageLoader.load(this, url.trim(), imageView);
+        }
+
+        LinearLayout.LayoutParams scrollParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        scrollParams.topMargin = dp(10);
+
+        parent.addView(scrollView, scrollParams);
+    }
+
+    private void addReviewVideo(
+            LinearLayout parent,
+            String videoUrl
+    ) {
+        if (videoUrl == null || videoUrl.trim().isEmpty()) return;
+
+        TextView video = createText(
+                "Video đánh giá: " + videoUrl.trim(),
+                13,
+                R.color.brand_primary,
+                Typeface.NORMAL
+        );
+        video.setSingleLine(true);
+        video.setEllipsize(TextUtils.TruncateAt.END);
+
+        LinearLayout.LayoutParams videoParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        videoParams.topMargin = dp(8);
+
+        parent.addView(video, videoParams);
+    }
+
+    private void addSellerReply(
+            LinearLayout parent,
+            String sellerReply
+    ) {
+        if (sellerReply == null || sellerReply.trim().isEmpty()) return;
+
+        TextView reply = createText(
+                "Phản hồi của shop: " + sellerReply.trim(),
+                13,
+                R.color.text_secondary,
+                Typeface.ITALIC
+        );
+        reply.setLineSpacing(dp(3), 1f);
+        reply.setPadding(dp(10), dp(8), dp(10), dp(8));
+        reply.setBackgroundResource(R.drawable.bg_review_reply);
+
+        LinearLayout.LayoutParams replyParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        replyParams.topMargin = dp(10);
+
+        parent.addView(reply, replyParams);
+    }
     private void showVariantBottomSheet() {
         if (productDetail == null) return;
 

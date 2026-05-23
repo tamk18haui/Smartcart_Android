@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="4dp"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackground"
+    app:cardBackgroundColor="@color/surface"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="2dp"
+    app:cardMaxElevation="3dp"
+    app:cardPreventCornerOverlap="false">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="12dp">
+
+        <!-- HÌNH ẢNH SẢN PHẨM -->
+        <ImageView
+            android:id="@+id/imgProduct"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:scaleType="centerCrop"
+            android:background="@color/surface_soft"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:background="@drawable/bg_product_image_shadow"
+            app:layout_constraintBottom_toBottomOf="@id/imgProduct"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <!-- TÊN SẢN PHẨM -->
+        <TextView
+            android:id="@+id/txtName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="8dp"
+            android:layout_marginTop="8dp"
+            android:ellipsize="end"
+            android:lineSpacingExtra="3dp"
+            android:maxLines="2"
+            android:minLines="2"
+            android:textColor="@color/text_primary"
+            android:textSize="13sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/imgProduct" />
+
+        <!-- GIÁ SẢN PHẨM -->
+        <TextView
+            android:id="@+id/txtPrice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="6dp"
+            android:textColor="@color/price_red"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/txtName" />
+
+        <!-- NGÔI SAO ĐÁNH GIÁ (Tách riêng ImageView để dễ dàng chỉnh kích thước) -->
+        <ImageView
+            android:id="@+id/imgStar"
+            android:layout_width="12dp"
+            android:layout_height="12dp"
+            android:layout_marginStart="8dp"
+            android:src="@drawable/ic_star"
+            app:tint="#FFC107"
+            app:layout_constraintBottom_toBottomOf="@id/txtMeta"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/txtMeta" />
+
+        <!-- LƯỢT BÁN / ĐÁNH GIÁ (Phần chữ) -->
+        <TextView
+            android:id="@+id/txtMeta"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="8dp"
+            android:ellipsize="end"
+            android:singleLine="true"
+            android:textColor="@color/text_secondary"
+            android:textSize="11sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/imgStar"
+            app:layout_constraintTop_toBottomOf="@id/txtPrice" />
+
+        <!-- ICON THƯƠNG HIỆU / SHOP (Chữ S) -->
+        <TextView
+            android:id="@+id/iconShopBadge"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="6dp"
+            android:background="@drawable/bg_shop_dot"
+            android:gravity="center"
+            android:text="S"
+            android:textColor="@color/surface"
+            android:textSize="9sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/txtMeta" />
+
+        <!-- TÊN SHOP -->
+        <TextView
+            android:id="@+id/txtShopName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:layout_marginEnd="8dp"
+            android:ellipsize="end"
+            android:singleLine="true"
+            android:textColor="@color/text_secondary"
+            android:textSize="11sp"
+            app:layout_constraintBottom_toBottomOf="@id/iconShopBadge"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/iconShopBadge"
+            app:layout_constraintTop_toTopOf="@id/iconShopBadge" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.cardview.widget.CardView>

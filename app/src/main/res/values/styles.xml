@@ -14,5 +14,15 @@
         <item name="android:background">@drawable/bg_seller_chip_soft</item>
         <item name="android:textColor">@color/seller_text_primary</item>
     </style>
+    <style name="SearchSortTab">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:textColor">@color/text_secondary</item>
+        <item name="android:fontFamily">sans</item>
+        <item name="android:background">@drawable/bg_search_tab_inactive</item>
+    </style>
 
 </resources>

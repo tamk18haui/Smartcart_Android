@@ -3,8 +3,6 @@ package com.gr6.smartcart_android.buyer.main;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.View;
 import android.view.Window;
 import android.widget.EditText;
@@ -20,18 +18,19 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.gr6.smartcart_android.R;
+import com.gr6.smartcart_android.buyer.cart.CartActivity;
 import com.gr6.smartcart_android.buyer.main.response.HomeCategoryResponse;
 import com.gr6.smartcart_android.buyer.main.response.HomeProductResponse;
+import com.gr6.smartcart_android.buyer.product.ProductDetailActivity;
+import com.gr6.smartcart_android.buyer.search.SearchProductActivity;
 import com.gr6.smartcart_android.chat.ChatListActivity;
 import com.gr6.smartcart_android.common.base.BaseActivity;
 import com.gr6.smartcart_android.common.storage.UserSession;
+import com.gr6.smartcart_android.common.utils.AuthGuard;
 import com.gr6.smartcart_android.common.utils.ThemeColor;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-
 import com.gr6.smartcart_android.navigation.BuyerBottomNavHelper;
+
+import java.util.List;
 
 public class BuyerMainActivity extends BaseActivity {
 
@@ -46,40 +45,56 @@ public class BuyerMainActivity extends BaseActivity {
     private TextView txtEmpty;
     private TextView txtProductCount;
     private NestedScrollView nestedHome;
+
     private BuyerHomeViewModel viewModel;
     private CategoryHomeAdapter categoryAdapter;
     private ProductHomeAdapter productAdapter;
-    private final List<HomeProductResponse> originalProducts = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_buyer_main);
 
-        ThemeColor.applyBrandStatusBar(this);
-        ThemeColor.applyWhiteNavigationBar(this);
-        Window window = getWindow();
-
-// Tô màu thanh pin/sóng giống màu header
-        window.setStatusBarColor(ContextCompat.getColor(this, R.color.brand_primary));
-
-// Nếu nền status bar là màu đậm thì icon pin/sóng phải màu trắng
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            int flags = window.getDecorView().getSystemUiVisibility();
-            flags &= ~View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
-            window.getDecorView().setSystemUiVisibility(flags);
-        }
+        setupSystemBars();
 
         viewModel = new ViewModelProvider(this).get(BuyerHomeViewModel.class);
 
         initViews();
         setupRecyclerViews();
         initEvents();
-        BuyerBottomNavHelper.setup(this, BuyerBottomNavHelper.TAB_HOME);
         observeHome();
+
+        BuyerBottomNavHelper.setup(this, BuyerBottomNavHelper.TAB_HOME);
 
         viewModel.loadHome();
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        // Không giữ text search ở trang chủ.
+        // Search thật xử lý ở SearchProductActivity.
+        if (edtSearch != null) {
+            edtSearch.setText("");
+            edtSearch.clearFocus();
+        }
+    }
+
+    private void setupSystemBars() {
+        ThemeColor.applyBrandStatusBar(this);
+        ThemeColor.applyWhiteNavigationBar(this);
+
+        Window window = getWindow();
+        window.setStatusBarColor(ContextCompat.getColor(this, R.color.brand_primary));
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            int flags = window.getDecorView().getSystemUiVisibility();
+            flags &= ~View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+            window.getDecorView().setSystemUiVisibility(flags);
+        }
+    }
+
     private void initViews() {
         swipeRefresh = findViewById(R.id.swipeRefresh);
         rcvCategories = findViewById(R.id.rcvCategories);
@@ -93,11 +108,21 @@ public class BuyerMainActivity extends BaseActivity {
         txtProductCount = findViewById(R.id.txtProductCount);
         nestedHome = findViewById(R.id.nestedHome);
 
+        // Ô search ở trang chủ chỉ dùng để mở màn search riêng.
+        edtSearch.setFocusable(false);
+        edtSearch.setFocusableInTouchMode(false);
+        edtSearch.setCursorVisible(false);
+
+        bindUserGreeting();
+    }
+
+    private void bindUserGreeting() {
         String fullName = UserSession.getInstance(this).getFullName();
+
         if (fullName == null || fullName.trim().isEmpty()) {
             txtUserName.setText("Xin chào bạn 👋");
         } else {
-            txtUserName.setText("Xin chào, " + fullName);
+            txtUserName.setText("Xin chào, " + fullName.trim());
         }
     }
 
@@ -118,14 +143,22 @@ public class BuyerMainActivity extends BaseActivity {
 
     private void initEvents() {
         swipeRefresh.setColorSchemeResources(R.color.brand_primary);
-        swipeRefresh.setOnRefreshListener(() -> viewModel.refreshHome());
+        swipeRefresh.setOnRefreshListener(() -> {
+            edtSearch.setText("");
+            edtSearch.clearFocus();
+            viewModel.refreshHome();
+        });
 
         imgCart.setOnClickListener(v -> {
-            Intent intent = new Intent(this, com.gr6.smartcart_android.buyer.cart.CartActivity.class);
+            if (!AuthGuard.requireLogin(this, CartActivity.class)) return;
+
+            Intent intent = new Intent(this, CartActivity.class);
             startActivity(intent);
         });
 
         imgMessage.setOnClickListener(v -> {
+            if (!AuthGuard.requireLogin(this, ChatListActivity.class)) return;
+
             Intent intent = new Intent(this, ChatListActivity.class);
             startActivity(intent);
         });
@@ -140,69 +173,45 @@ public class BuyerMainActivity extends BaseActivity {
         });
 
         productAdapter.setOnProductClickListener(product -> {
-            if (product.getProductId() == null) {
+            if (product == null || product.getProductId() == null) {
                 showToast("Không tìm thấy sản phẩm");
                 return;
             }
 
-            Intent intent = new Intent(this, com.gr6.smartcart_android.buyer.product.ProductDetailActivity.class);
-            intent.putExtra(
-                    com.gr6.smartcart_android.buyer.product.ProductDetailActivity.EXTRA_PRODUCT_ID,
-                    product.getProductId()
-            );
+            Intent intent = new Intent(this, ProductDetailActivity.class);
+            intent.putExtra(ProductDetailActivity.EXTRA_PRODUCT_ID, product.getProductId());
             startActivity(intent);
         });
 
-        edtSearch.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(
-                    CharSequence s,
-                    int start,
-                    int count,
-                    int after
-            ) {
-            }
-
-            @Override
-            public void onTextChanged(
-                    CharSequence s,
-                    int start,
-                    int before,
-                    int count
-            ) {
-                viewModel.searchProducts(s == null ? "" : s.toString());
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-            }
-        });
+        edtSearch.setOnClickListener(v -> openSearchScreen());
 
         setupLoadMoreScroll();
     }
+
     private void setupLoadMoreScroll() {
-        int nestedHomeId = getResources().getIdentifier(
-                "nestedHome",
-                "id",
-                getPackageName()
+        if (nestedHome == null) return;
+
+        nestedHome.setOnScrollChangeListener(
+                (NestedScrollView.OnScrollChangeListener) (
+                        v,
+                        scrollX,
+                        scrollY,
+                        oldScrollX,
+                        oldScrollY
+                ) -> {
+                    View child = v.getChildAt(0);
+
+                    if (child == null) return;
+
+                    int diff = child.getBottom() - (v.getHeight() + scrollY);
+
+                    if (diff <= dp(120)) {
+                        viewModel.loadMoreProducts();
+                    }
+                }
         );
-
-        if (nestedHomeId == 0) {
-            return;
-        }
-
-        View nestedHome = findViewById(nestedHomeId);
-
-        if (nestedHome == null) {
-            return;
-        }
-
-        nestedHome.setOnScrollChangeListener((v, scrollX, scrollY, oldScrollX, oldScrollY) -> {
-            if (!v.canScrollVertically(1)) {
-                viewModel.loadMoreProducts();
-            }
-        });
     }
+
     private void observeHome() {
         viewModel.getHomeState().observe(this, state -> {
             if (state == null) return;
@@ -217,9 +226,19 @@ public class BuyerMainActivity extends BaseActivity {
 
             if (state.isSuccess()) {
                 bindHomeData(state.getCategories(), state.getProducts());
-            } else {
-                txtEmpty.setVisibility(View.VISIBLE);
-                txtEmpty.setText(state.getMessage());
+                return;
+            }
+
+            txtEmpty.setVisibility(View.VISIBLE);
+            txtEmpty.setText(
+                    state.getMessage() == null
+                            ? "Không tải được sản phẩm"
+                            : state.getMessage()
+            );
+
+            updateProductCount(0);
+
+            if (state.getMessage() != null) {
                 showLongToast(state.getMessage());
             }
         });
@@ -230,17 +249,12 @@ public class BuyerMainActivity extends BaseActivity {
             List<HomeProductResponse> products
     ) {
         categoryAdapter.setData(categories);
+        productAdapter.setData(products);
 
-        originalProducts.clear();
+        int count = products == null ? 0 : products.size();
+        updateProductCount(count);
 
-        if (products != null) {
-            originalProducts.addAll(products);
-        }
-
-        productAdapter.setData(originalProducts);
-        updateProductCount(originalProducts.size());
-
-        if (originalProducts.isEmpty()) {
+        if (count == 0) {
             txtEmpty.setVisibility(View.VISIBLE);
             txtEmpty.setText("Chưa có sản phẩm nào");
         } else {
@@ -248,61 +262,18 @@ public class BuyerMainActivity extends BaseActivity {
         }
     }
 
-    private void filterByKeyword(String keyword) {
-        String query = keyword == null ? "" : keyword.trim().toLowerCase(Locale.ROOT);
+    private void openSearchScreen() {
+        Intent intent = new Intent(this, SearchProductActivity.class);
 
-        if (query.isEmpty()) {
-            productAdapter.setData(originalProducts);
-            updateProductCount(originalProducts.size());
-            txtEmpty.setVisibility(originalProducts.isEmpty() ? View.VISIBLE : View.GONE);
-            return;
-        }
+        // Không truyền keyword sang màn search.
+        // Đúng luồng: mở màn search trống -> người dùng nhập -> mới gọi API.
+        startActivity(intent);
 
-        List<HomeProductResponse> filtered = new ArrayList<>();
-
-        for (HomeProductResponse product : originalProducts) {
-            String name = product.getProductName().toLowerCase(Locale.ROOT);
-            String shopName = product.getShopName().toLowerCase(Locale.ROOT);
-
-            if (name.contains(query) || shopName.contains(query)) {
-                filtered.add(product);
-            }
-        }
-
-        productAdapter.setData(filtered);
-        updateProductCount(filtered.size());
-
-        txtEmpty.setVisibility(filtered.isEmpty() ? View.VISIBLE : View.GONE);
-        txtEmpty.setText("Không tìm thấy sản phẩm phù hợp");
-    }
-
-    private void filterByCategory(HomeCategoryResponse category) {
-        if (category == null || category.getCategoryId() == null) {
-            return;
-        }
-
-        List<HomeProductResponse> filtered = new ArrayList<>();
-
-        for (HomeProductResponse product : originalProducts) {
-            if (category.getCategoryId().equals(product.getCategoryId())) {
-                filtered.add(product);
-            }
-        }
-
-        productAdapter.setData(filtered);
-        updateProductCount(filtered.size());
-
-        if (filtered.isEmpty()) {
-            txtEmpty.setVisibility(View.VISIBLE);
-            txtEmpty.setText("Danh mục này chưa có sản phẩm");
-        } else {
-            txtEmpty.setVisibility(View.GONE);
-        }
-
-        showToast(category.getCategoryName());
+        edtSearch.clearFocus();
     }
 
     private void updateProductCount(int count) {
         txtProductCount.setText(count + " sản phẩm");
     }
+
 }
