@@ -10,7 +10,7 @@ import com.gr6.smartcart_android.R;
 import com.gr6.smartcart_android.common.base.BaseActivity;
 import com.gr6.smartcart_android.common.base.BaseResponse;
 import com.gr6.smartcart_android.common.utils.ThemeColor;
-import com.gr6.smartcart_android.seller.repository.SellerProductRepository;
+import com.gr6.smartcart_android.seller.product.repository.SellerProductRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -109,3 +109,5 @@ public class BrandPickerActivity extends BaseActivity {
         finish();
     }
 }
+
+

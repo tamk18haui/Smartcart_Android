@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.gr6.smartcart_android.R;
 import com.gr6.smartcart_android.common.utils.ImageLoader;
-import com.gr6.smartcart_android.seller.inventory.model.InventoryVariantItem;
+import com.gr6.smartcart_android.seller.inventory.response.InventoryVariantItem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -76,3 +76,5 @@ public class LowStockAdapter extends RecyclerView.Adapter<LowStockAdapter.LowSto
         }
     }
 }
+
+

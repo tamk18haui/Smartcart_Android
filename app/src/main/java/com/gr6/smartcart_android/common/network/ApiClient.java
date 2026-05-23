@@ -52,10 +52,29 @@ public class ApiClient {
                 .setLenient()
                 .create();
 
+        String baseUrl = normalizeBaseUrl(Constants.BASE_URL);
+
         return new Retrofit.Builder()
-                .baseUrl(Constants.BASE_URL)
+                .baseUrl(baseUrl)
                 .client(client)
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .build();
+    }
+
+    private static String normalizeBaseUrl(String rawBaseUrl) {
+        String baseUrl = rawBaseUrl == null ? "" : rawBaseUrl.trim();
+
+        // Xóa toàn bộ khoảng trắng để tránh lỗi kiểu: "http:// 172.20.10.3:8080/"
+        baseUrl = baseUrl.replaceAll("\\s+", "");
+
+        if (baseUrl.isEmpty()) {
+            baseUrl = "http://192.168.2.8:8080/";
+        }
+
+        if (!baseUrl.endsWith("/")) {
+            baseUrl = baseUrl + "/";
+        }
+
+        return baseUrl;
     }
 }

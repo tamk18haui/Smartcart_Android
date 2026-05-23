@@ -15,25 +15,21 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.gr6.smartcart_android.R;
-import com.gr6.smartcart_android.common.base.BaseResponse;
-import com.gr6.smartcart_android.seller.order.model.OrderListResponse;
-import com.gr6.smartcart_android.seller.order.repository.SellerOrderRepository;
+import com.gr6.smartcart_android.seller.order.response.OrderListResponse;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-
 public class SellerOrdersFragment extends Fragment {
 
-    private SellerOrderRepository repository;
+    private SellerOrderViewModel viewModel;
     private SellerOrderAdapter adapter;
+
     private EditText edtSearch;
     private TextView chipPending;
     private TextView chipConfirmed;
@@ -43,25 +39,42 @@ public class SellerOrdersFragment extends Fragment {
     private View layoutEmpty;
 
     private final List<OrderListResponse> allOrders = new ArrayList<>();
+
     private String currentTab = "PENDING";
+    private boolean actionRunning = false;
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(
+            @NonNull LayoutInflater inflater,
+            @Nullable ViewGroup container,
+            @Nullable Bundle savedInstanceState
+    ) {
         View view = inflater.inflate(R.layout.fragment_seller_orders, container, false);
 
-        repository = new SellerOrderRepository(requireContext());
+        viewModel = new ViewModelProvider(this).get(SellerOrderViewModel.class);
 
         bindViews(view);
         setupRecyclerView(view);
         setupEvents();
+        observeViewModel();
 
-        loadOrders("");
+        selectTab("PENDING");
+        viewModel.loadOrders("");
 
         return view;
     }
 
-    private void bindViews(View view) {
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        if (viewModel != null) {
+            viewModel.loadOrders(getSearchKeyword());
+        }
+    }
+
+    private void bindViews(@NonNull View view) {
         edtSearch = view.findViewById(R.id.edtSearchOrder);
         chipPending = view.findViewById(R.id.chipPending);
         chipConfirmed = view.findViewById(R.id.chipConfirmed);
@@ -71,11 +84,14 @@ public class SellerOrdersFragment extends Fragment {
         layoutEmpty = view.findViewById(R.id.layoutEmpty);
     }
 
-    private void setupRecyclerView(View view) {
+    private void setupRecyclerView(@NonNull View view) {
         RecyclerView recyclerView = view.findViewById(R.id.rvOrders);
+
         adapter = new SellerOrderAdapter();
+
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         recyclerView.setAdapter(adapter);
+        recyclerView.setHasFixedSize(false);
 
         adapter.setListener(new SellerOrderAdapter.OnOrderClickListener() {
             @Override
@@ -85,78 +101,117 @@ public class SellerOrdersFragment extends Fragment {
 
             @Override
             public void onPrimaryAction(OrderListResponse order) {
-                String nextStatus = OrderStatusHelper.nextStatus(order.getStatus());
-                if (nextStatus.isEmpty()) {
-                    openDetail(order);
-                    return;
-                }
-                openDetail(order);
+                handlePrimaryAction(order);
             }
         });
     }
 
     private void setupEvents() {
-        chipPending.setOnClickListener(v -> selectTab("PENDING"));
-        chipConfirmed.setOnClickListener(v -> selectTab("CONFIRMED"));
-        chipShipping.setOnClickListener(v -> selectTab("SHIPPING"));
-        chipCompleted.setOnClickListener(v -> selectTab("COMPLETED"));
-        chipCancelled.setOnClickListener(v -> selectTab("CANCELLED"));
+        if (chipPending != null) {
+            chipPending.setOnClickListener(v -> selectTab("PENDING"));
+        }
 
-        edtSearch.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+        if (chipConfirmed != null) {
+            chipConfirmed.setOnClickListener(v -> selectTab("CONFIRMED"));
+        }
+
+        if (chipShipping != null) {
+            chipShipping.setOnClickListener(v -> selectTab("SHIPPING"));
+        }
+
+        if (chipCompleted != null) {
+            chipCompleted.setOnClickListener(v -> selectTab("COMPLETED"));
+        }
+
+        if (chipCancelled != null) {
+            chipCancelled.setOnClickListener(v -> selectTab("CANCELLED"));
+        }
+
+        if (edtSearch != null) {
+            edtSearch.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    if (viewModel != null) {
+                        viewModel.loadOrders(s == null ? "" : s.toString().trim());
+                    }
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                }
+            });
+        }
+    }
+
+    private void observeViewModel() {
+        viewModel.getOrderListState().observe(getViewLifecycleOwner(), state -> {
+            if (state == null) return;
+
+            if (state.isLoading()) {
+                if (layoutEmpty != null) {
+                    layoutEmpty.setVisibility(View.GONE);
+                }
+                return;
             }
 
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                loadOrders(s == null ? "" : s.toString().trim());
+            if (state.isError()) {
+                showToast(state.getMessage());
+
+                allOrders.clear();
+                applyFilter();
+                return;
             }
 
-            @Override
-            public void afterTextChanged(Editable s) {
+            if (state.isSuccess()) {
+                allOrders.clear();
+
+                if (state.getOrders() != null) {
+                    allOrders.addAll(state.getOrders());
+                }
+
+                applyFilter();
             }
         });
 
-        selectTab("PENDING");
-    }
+        viewModel.getActionState().observe(getViewLifecycleOwner(), state -> {
+            if (state == null || state.isIdle()) return;
 
-    private void loadOrders(String keyword) {
-        repository.getOrders(keyword).enqueue(new Callback<BaseResponse<List<OrderListResponse>>>() {
-            @Override
-            public void onResponse(@NonNull Call<BaseResponse<List<OrderListResponse>>> call,
-                                   @NonNull Response<BaseResponse<List<OrderListResponse>>> response) {
-                BaseResponse<List<OrderListResponse>> body = response.body();
-                if (!response.isSuccessful() || body == null || !body.isSuccess()) {
-                    showToast(body == null ? "Không lấy được danh sách đơn hàng" : body.getSafeMessage());
-                    allOrders.clear();
-                    applyFilter();
-                    return;
-                }
-
-                allOrders.clear();
-                if (body.getData() != null) {
-                    allOrders.addAll(body.getData());
-                }
-
-                applyFilter();
+            if (state.isLoading()) {
+                actionRunning = true;
+                return;
             }
 
-            @Override
-            public void onFailure(@NonNull Call<BaseResponse<List<OrderListResponse>>> call, @NonNull Throwable t) {
-                showToast("Không kết nối được server: " + t.getMessage());
-                allOrders.clear();
-                applyFilter();
+            actionRunning = false;
+
+            if (state.isError()) {
+                showToast(state.getMessage());
+                viewModel.resetActionState();
+                return;
+            }
+
+            if (state.isSuccess()) {
+                showToast(state.getMessage());
+                viewModel.resetActionState();
+                viewModel.loadOrders(getSearchKeyword());
             }
         });
     }
 
     private void selectTab(String tab) {
-        currentTab = tab;
-        setChipActive(chipPending, "PENDING".equals(tab));
-        setChipActive(chipConfirmed, "CONFIRMED".equals(tab));
-        setChipActive(chipShipping, "SHIPPING".equals(tab));
-        setChipActive(chipCompleted, "COMPLETED".equals(tab));
-        setChipActive(chipCancelled, "CANCELLED".equals(tab));
+        currentTab = tab == null || tab.trim().isEmpty()
+                ? "PENDING"
+                : tab.trim().toUpperCase();
+
+        setChipActive(chipPending, "PENDING".equals(currentTab));
+        setChipActive(chipConfirmed, "CONFIRMED".equals(currentTab));
+        setChipActive(chipShipping, "SHIPPING".equals(currentTab));
+        setChipActive(chipCompleted, "COMPLETED".equals(currentTab));
+        setChipActive(chipCancelled, "CANCELLED".equals(currentTab));
+
         applyFilter();
     }
 
@@ -166,39 +221,106 @@ public class SellerOrdersFragment extends Fragment {
         chip.setSelected(active);
 
         int textColor = ContextCompat.getColor(
-                requireContext(),
+                chip.getContext(),
                 active ? R.color.text_white : R.color.text_primary
         );
 
         chip.setTextColor(textColor);
 
         chip.setBackgroundResource(
-                active ? R.drawable.bg_seller_button_primary : R.drawable.bg_seller_chip_soft
+                active
+                        ? R.drawable.bg_seller_button_primary
+                        : R.drawable.bg_seller_chip_soft
         );
     }
+
     private void applyFilter() {
         List<OrderListResponse> filtered = new ArrayList<>();
+
         for (OrderListResponse order : allOrders) {
+            if (order == null) continue;
+
             if (OrderStatusHelper.belongsToTab(order.getStatus(), currentTab)) {
                 filtered.add(order);
             }
         }
-        adapter.submitList(filtered);
+
+        if (adapter != null) {
+            adapter.submitList(filtered);
+        }
+
         if (layoutEmpty != null) {
             layoutEmpty.setVisibility(filtered.isEmpty() ? View.VISIBLE : View.GONE);
         }
     }
 
+    private void handlePrimaryAction(OrderListResponse order) {
+        if (!isAdded() || getContext() == null) return;
+
+        if (actionRunning) {
+            showToast("Đang xử lý đơn hàng, vui lòng chờ");
+            return;
+        }
+
+        if (order == null || order.getId() == null || order.getId() <= 0) {
+            showToast("Không tìm thấy mã đơn hàng");
+            return;
+        }
+
+        String currentStatus = OrderStatusHelper.normalize(order.getStatus());
+        String nextStatus = OrderStatusHelper.nextStatus(currentStatus);
+
+        if (nextStatus == null || nextStatus.trim().isEmpty()) {
+            openDetail(order);
+            return;
+        }
+
+        viewModel.updateStatus(order.getId(), nextStatus, "");
+    }
+
     private void openDetail(OrderListResponse order) {
-        if (order == null || order.getId() == null) return;
-        Intent intent = new Intent(requireContext(), SellerOrderDetailActivity.class);
-        intent.putExtra(SellerOrderDetailActivity.EXTRA_ORDER_ID, order.getId());
-        startActivity(intent);
+        if (!isAdded() || getContext() == null) {
+            return;
+        }
+
+        if (order == null) {
+            showToast("Không tìm thấy đơn hàng");
+            return;
+        }
+
+        Long orderId = order.getId();
+
+        if (orderId == null || orderId <= 0) {
+            showToast("Không tìm thấy mã đơn hàng");
+            return;
+        }
+
+        try {
+            Intent intent = new Intent(requireContext(), SellerOrderDetailActivity.class);
+            intent.putExtra(SellerOrderDetailActivity.EXTRA_ORDER_ID, orderId.longValue());
+            startActivity(intent);
+        } catch (Exception e) {
+            showToast("Không mở được chi tiết đơn hàng: " + e.getMessage());
+        }
+    }
+
+    private String getSearchKeyword() {
+        if (edtSearch == null || edtSearch.getText() == null) {
+            return "";
+        }
+
+        return edtSearch.getText().toString().trim();
     }
 
     private void showToast(String message) {
-        if (getContext() != null) {
-            Toast.makeText(getContext(), message == null ? "Có lỗi xảy ra" : message, Toast.LENGTH_SHORT).show();
-        }
+        if (getContext() == null) return;
+
+        Toast.makeText(
+                getContext(),
+                message == null || message.trim().isEmpty()
+                        ? "Có lỗi xảy ra"
+                        : message,
+                Toast.LENGTH_SHORT
+        ).show();
     }
 }

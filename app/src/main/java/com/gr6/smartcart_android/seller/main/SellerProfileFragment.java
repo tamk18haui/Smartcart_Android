@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -17,11 +18,13 @@ import com.gr6.smartcart_android.common.base.BaseResponse;
 import com.gr6.smartcart_android.common.network.ApiClient;
 import com.gr6.smartcart_android.common.storage.TokenManager;
 import com.gr6.smartcart_android.common.storage.UserSession;
+import com.gr6.smartcart_android.common.utils.ImageLoader;
 import com.gr6.smartcart_android.navigation.AppNavigator;
-import com.gr6.smartcart_android.seller.api.SellerCatalogApiService;
-import com.gr6.smartcart_android.seller.model.SellerShopInfoResponse;
 import com.gr6.smartcart_android.seller.shop.SellerShopInfoActivity;
+import com.gr6.smartcart_android.seller.shop.api.SellerShopApiService;
+import com.gr6.smartcart_android.seller.shop.response.SellerShopInfoResponse;
 import com.gr6.smartcart_android.seller.voucher.CreateVoucherActivity;
+import com.gr6.smartcart_android.seller.wallet.SellerWalletActivity;
 import com.gr6.smartcart_android.seller.voucher.SellerVoucherActivity;
 
 import retrofit2.Call;
@@ -30,12 +33,13 @@ import retrofit2.Response;
 
 public class SellerProfileFragment extends Fragment {
 
+    private ImageView imgShopAvatar;
     private TextView txtSellerName;
     private TextView txtSellerEmail;
     private TextView txtShopStatus;
     private TextView txtShopName;
 
-    private SellerCatalogApiService sellerApiService;
+    private SellerShopApiService sellerApiService;
 
     @Nullable
     @Override
@@ -46,7 +50,7 @@ public class SellerProfileFragment extends Fragment {
     ) {
         View view = inflater.inflate(R.layout.fragment_seller_profile, container, false);
 
-        sellerApiService = ApiClient.createService(requireContext(), SellerCatalogApiService.class);
+        sellerApiService = ApiClient.createService(requireContext(), SellerShopApiService.class);
 
         bindViews(view);
         bindUserSession();
@@ -65,6 +69,7 @@ public class SellerProfileFragment extends Fragment {
     }
 
     private void bindViews(View view) {
+        imgShopAvatar = view.findViewById(R.id.imgShopAvatar);
         txtSellerName = view.findViewById(R.id.txtSellerName);
         txtSellerEmail = view.findViewById(R.id.txtSellerEmail);
         txtShopStatus = view.findViewById(R.id.txtShopStatus);
@@ -81,8 +86,14 @@ public class SellerProfileFragment extends Fragment {
     }
 
     private void bindEvents(View view) {
-        view.findViewById(R.id.rowShopInfo).setOnClickListener(v ->
-                startActivity(new Intent(requireContext(), SellerShopInfoActivity.class))
+        View.OnClickListener openShopInfo = v ->
+                startActivity(new Intent(requireContext(), SellerShopInfoActivity.class));
+
+        imgShopAvatar.setOnClickListener(openShopInfo);
+        view.findViewById(R.id.rowShopInfo).setOnClickListener(openShopInfo);
+
+        view.findViewById(R.id.rowWallet).setOnClickListener(v ->
+                startActivity(new Intent(requireContext(), SellerWalletActivity.class))
         );
 
         view.findViewById(R.id.rowVoucherManager).setOnClickListener(v ->
@@ -107,16 +118,20 @@ public class SellerProfileFragment extends Fragment {
                     @NonNull Call<BaseResponse<SellerShopInfoResponse>> call,
                     @NonNull Response<BaseResponse<SellerShopInfoResponse>> response
             ) {
+                if (!isAdded()) return;
+
                 BaseResponse<SellerShopInfoResponse> body = response.body();
                 if (!response.isSuccessful() || body == null || !body.isSuccess() || body.getData() == null) {
                     txtShopName.setText("Chưa lấy được thông tin shop");
                     txtShopStatus.setText("CHƯA XÁC ĐỊNH");
+                    ImageLoader.loadCircle(requireContext(), "", imgShopAvatar);
                     return;
                 }
 
                 SellerShopInfoResponse shop = body.getData();
                 txtShopName.setText(shop.getShopName().trim().isEmpty() ? "Cửa hàng SmartCart" : shop.getShopName());
                 txtShopStatus.setText(toVietnameseStatus(shop.getStatus()));
+                ImageLoader.loadCircle(requireContext(), shop.getLogoUrl(), imgShopAvatar);
             }
 
             @Override
@@ -124,6 +139,7 @@ public class SellerProfileFragment extends Fragment {
                     @NonNull Call<BaseResponse<SellerShopInfoResponse>> call,
                     @NonNull Throwable t
             ) {
+                if (!isAdded()) return;
                 txtShopName.setText("Không kết nối được server");
                 txtShopStatus.setText("LỖI KẾT NỐI");
             }
@@ -146,3 +162,5 @@ public class SellerProfileFragment extends Fragment {
         return normalized;
     }
 }
+
+

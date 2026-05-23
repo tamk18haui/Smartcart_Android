@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.gr6.smartcart_android.R;
+import com.gr6.smartcart_android.seller.inventory.response.InventoryItemResponse;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -107,3 +108,5 @@ public class InventoryAdapter extends RecyclerView.Adapter<InventoryAdapter.Inve
         return value.trim();
     }
 }
+
+

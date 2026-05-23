@@ -1,8 +1,8 @@
 package com.gr6.smartcart_android.seller.voucher.api;
 
 import com.gr6.smartcart_android.common.base.BaseResponse;
-import com.gr6.smartcart_android.seller.voucher.model.VoucherRequest;
-import com.gr6.smartcart_android.seller.voucher.model.VoucherResponse;
+import com.gr6.smartcart_android.seller.voucher.request.VoucherRequest;
+import com.gr6.smartcart_android.seller.voucher.response.VoucherResponse;
 
 import java.util.List;
 
@@ -36,5 +36,7 @@ public interface SellerVoucherApiService {
     @DELETE("api/v2/seller/vouchers/{voucherId}")
     Call<BaseResponse<Object>> deactivateVoucher(@Path("voucherId") Long voucherId);
 }
+
+
 
 

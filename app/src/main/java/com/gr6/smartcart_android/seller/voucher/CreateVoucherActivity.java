@@ -17,8 +17,8 @@ import com.gr6.smartcart_android.common.base.BaseResponse;
 import com.gr6.smartcart_android.common.network.ApiClient;
 import com.gr6.smartcart_android.seller.utils.ApiErrorUtils;
 import com.gr6.smartcart_android.seller.voucher.api.SellerVoucherApiService;
-import com.gr6.smartcart_android.seller.voucher.model.VoucherRequest;
-import com.gr6.smartcart_android.seller.voucher.model.VoucherResponse;
+import com.gr6.smartcart_android.seller.voucher.request.VoucherRequest;
+import com.gr6.smartcart_android.seller.voucher.response.VoucherResponse;
 
 import java.text.NumberFormat;
 import java.text.ParseException;
@@ -40,6 +40,7 @@ public class CreateVoucherActivity extends BaseActivity {
     public static final String EXTRA_MIN_ORDER_VALUE = "extra_min_order_value";
     public static final String EXTRA_MAX_DISCOUNT_AMOUNT = "extra_max_discount_amount";
     public static final String EXTRA_USAGE_LIMIT = "extra_usage_limit";
+    public static final String EXTRA_USED_COUNT = "extra_used_count";
     public static final String EXTRA_START_DATE = "extra_start_date";
     public static final String EXTRA_END_DATE = "extra_end_date";
 
@@ -49,19 +50,25 @@ public class CreateVoucherActivity extends BaseActivity {
     private EditText edtMaxDiscount;
     private EditText edtMinOrder;
     private EditText edtUsageLimit;
+
     private TextView txtStartDate;
     private TextView txtEndDate;
     private TextView txtPreviewTitle;
     private TextView txtPreviewSubtitle;
+
     private Button btnFixed;
     private Button btnPercent;
     private Button btnSave;
 
     private SellerVoucherApiService apiService;
+
     private String discountType = "FIXED";
     private String startDateValue;
     private String endDateValue;
     private Long editingVoucherId;
+    private int editingUsedCount = 0;
+
+    private boolean syncingUi = false;
 
     private final SimpleDateFormat apiDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US);
     private final SimpleDateFormat displayDateFormat = new SimpleDateFormat("MM/dd/yyyy", Locale.US);
@@ -87,10 +94,12 @@ public class CreateVoucherActivity extends BaseActivity {
         edtMaxDiscount = findViewById(R.id.edtMaxDiscount);
         edtMinOrder = findViewById(R.id.edtMinOrder);
         edtUsageLimit = findViewById(R.id.edtUsageLimit);
+
         txtStartDate = findViewById(R.id.txtStartDate);
         txtEndDate = findViewById(R.id.txtEndDate);
         txtPreviewTitle = findViewById(R.id.txtPreviewTitle);
         txtPreviewSubtitle = findViewById(R.id.txtPreviewSubtitle);
+
         btnFixed = findViewById(R.id.btnFixed);
         btnPercent = findViewById(R.id.btnPercent);
         btnSave = findViewById(R.id.btnSave);
@@ -123,7 +132,9 @@ public class CreateVoucherActivity extends BaseActivity {
         TextWatcher watcher = new SimpleTextWatcher() {
             @Override
             public void afterTextChanged(Editable s) {
-                refreshPreview();
+                if (!syncingUi) {
+                    refreshPreview();
+                }
             }
         };
 
@@ -136,6 +147,7 @@ public class CreateVoucherActivity extends BaseActivity {
 
     private void readEditDataIfAny() {
         editingVoucherId = null;
+
         if (getIntent() == null || !getIntent().hasExtra(EXTRA_VOUCHER_ID)) {
             return;
         }
@@ -146,44 +158,88 @@ public class CreateVoucherActivity extends BaseActivity {
             return;
         }
 
-        TextView txtTitle = findViewById(R.id.txtScreenTitle);
-        txtTitle.setText("Sửa Voucher");
+        syncingUi = true;
 
-        edtCode.setText(getIntent().getStringExtra(EXTRA_CODE));
+        try {
+            TextView txtTitle = findViewById(R.id.txtScreenTitle);
+            txtTitle.setText("Chi tiết / Sửa Voucher");
+            btnSave.setText("Cập nhật Voucher");
+
+            editingUsedCount = getIntent().getIntExtra(EXTRA_USED_COUNT, 0);
+
+            String extraCode = getIntent().getStringExtra(EXTRA_CODE);
+            edtCode.setText(extraCode == null ? "" : extraCode);
+            edtProgramName.setText(extraCode == null ? "" : "Voucher " + extraCode);
+            edtCode.setEnabled(false);
+
+            String extraType = getIntent().getStringExtra(EXTRA_DISCOUNT_TYPE);
+            if ("PERCENT".equalsIgnoreCase(extraType)) {
+                discountType = "PERCENT";
+            } else {
+                discountType = "FIXED";
+            }
+
+            long discountValue = getIntent().getLongExtra(EXTRA_DISCOUNT_VALUE, 0L);
+            long minOrderValue = getIntent().getLongExtra(EXTRA_MIN_ORDER_VALUE, 0L);
+            long maxDiscountAmount = getIntent().getLongExtra(EXTRA_MAX_DISCOUNT_AMOUNT, 0L);
+            int usageLimit = getIntent().getIntExtra(EXTRA_USAGE_LIMIT, 1);
+
+            if (discountValue > 0) {
+                edtDiscountValue.setText(String.valueOf(discountValue));
+            }
+
+            if (minOrderValue > 0) {
+                edtMinOrder.setText(String.valueOf(minOrderValue));
+            }
+
+            if (maxDiscountAmount > 0) {
+                edtMaxDiscount.setText(String.valueOf(maxDiscountAmount));
+            }
+
+            edtUsageLimit.setText(String.valueOf(Math.max(usageLimit, 1)));
+
+            String extraStartDate = getIntent().getStringExtra(EXTRA_START_DATE);
+            String extraEndDate = getIntent().getStringExtra(EXTRA_END_DATE);
+
+            Date start = parseAnyDate(extraStartDate);
+            Date end = parseAnyDate(extraEndDate);
+
+            if (start != null) {
+                startDateValue = apiDateFormat.format(start);
+                txtStartDate.setText(displayDateFormat.format(start));
+            }
+
+            if (end != null) {
+                endDateValue = apiDateFormat.format(end);
+                txtEndDate.setText(displayDateFormat.format(end));
+            }
+        } finally {
+            syncingUi = false;
+        }
+
+        applyUsedVoucherEditLock();
+    }
+
+    private void applyUsedVoucherEditLock() {
+        if (editingVoucherId == null || editingUsedCount <= 0) {
+            return;
+        }
+
         edtCode.setEnabled(false);
+        btnFixed.setEnabled(false);
+        btnPercent.setEnabled(false);
+        edtDiscountValue.setEnabled(false);
+        edtMaxDiscount.setEnabled(false);
+        edtMinOrder.setEnabled(false);
 
-        String extraType = getIntent().getStringExtra(EXTRA_DISCOUNT_TYPE);
-        if ("PERCENT".equalsIgnoreCase(extraType)) {
-            discountType = "PERCENT";
-        } else {
-            discountType = "FIXED";
-        }
+        edtCode.setAlpha(0.65f);
+        btnFixed.setAlpha(0.65f);
+        btnPercent.setAlpha(0.65f);
+        edtDiscountValue.setAlpha(0.65f);
+        edtMaxDiscount.setAlpha(0.65f);
+        edtMinOrder.setAlpha(0.65f);
 
-        long discountValue = getIntent().getLongExtra(EXTRA_DISCOUNT_VALUE, 0L);
-        long minOrderValue = getIntent().getLongExtra(EXTRA_MIN_ORDER_VALUE, 0L);
-        long maxDiscountAmount = getIntent().getLongExtra(EXTRA_MAX_DISCOUNT_AMOUNT, 0L);
-        int usageLimit = getIntent().getIntExtra(EXTRA_USAGE_LIMIT, 1);
-
-        if (discountValue > 0) edtDiscountValue.setText(String.valueOf(discountValue));
-        if (minOrderValue > 0) edtMinOrder.setText(String.valueOf(minOrderValue));
-        if (maxDiscountAmount > 0) edtMaxDiscount.setText(String.valueOf(maxDiscountAmount));
-        edtUsageLimit.setText(String.valueOf(Math.max(usageLimit, 1)));
-
-        String extraStartDate = getIntent().getStringExtra(EXTRA_START_DATE);
-        String extraEndDate = getIntent().getStringExtra(EXTRA_END_DATE);
-
-        Date start = parseAnyDate(extraStartDate);
-        Date end = parseAnyDate(extraEndDate);
-
-        if (start != null) {
-            startDateValue = apiDateFormat.format(start);
-            txtStartDate.setText(displayDateFormat.format(start));
-        }
-
-        if (end != null) {
-            endDateValue = apiDateFormat.format(end);
-            txtEndDate.setText(displayDateFormat.format(end));
-        }
+        showToast("Voucher đã có lượt dùng, chỉ nên cập nhật số lượng và thời gian.");
     }
 
     private void refreshDiscountTypeUi() {
@@ -192,18 +248,20 @@ public class CreateVoucherActivity extends BaseActivity {
         btnFixed.setSelected(isFixed);
         btnPercent.setSelected(!isFixed);
 
-        btnFixed.setTextColor(isFixed ? getColorCompat(android.R.color.white) : getColorFromHex("#8B2F13"));
-        btnPercent.setTextColor(!isFixed ? getColorCompat(android.R.color.white) : getColorFromHex("#8B2F13"));
+        btnFixed.setTextColor(isFixed ? getColorCompat(android.R.color.white) : getColorFromHex("#2563EB"));
+        btnPercent.setTextColor(!isFixed ? getColorCompat(android.R.color.white) : getColorFromHex("#2563EB"));
 
-        btnFixed.setBackgroundResource(isFixed ? R.drawable.bg_button_orange_round : R.drawable.bg_input_border);
-        btnPercent.setBackgroundResource(!isFixed ? R.drawable.bg_button_orange_round : R.drawable.bg_input_border);
+        btnFixed.setBackgroundResource(isFixed ? R.drawable.bg_button_blue_round : R.drawable.bg_input_border);
+        btnPercent.setBackgroundResource(!isFixed ? R.drawable.bg_button_blue_round : R.drawable.bg_input_border);
 
         edtMaxDiscount.setEnabled(!isFixed);
         edtMaxDiscount.setAlpha(isFixed ? 0.45f : 1f);
 
-        if (isFixed) {
-            edtMaxDiscount.setText(edtDiscountValue.getText().toString().trim());
-        }
+        /*
+         * Không setText edtMaxDiscount ở đây.
+         * Với voucher FIXED, khi submit sẽ tự gán maxDiscountAmount = discountValue.
+         * Nếu setText trong TextWatcher sẽ gây vòng lặp và crash.
+         */
     }
 
     private void showDatePicker(boolean isStart) {
@@ -373,26 +431,29 @@ public class CreateVoucherActivity extends BaseActivity {
             code = "SMARTCART OFF";
         }
 
-        String title;
-        if ("PERCENT".equals(discountType)) {
-            title = "Giảm " + (discountValue > 0 ? discountValue : 10) + "%";
-            if (maxDiscount > 0) {
-                title += " tối đa " + formatMoney(maxDiscount);
-            }
+        if (discountValue <= 0) {
+            txtPreviewTitle.setVisibility(View.GONE);
         } else {
-            title = "Giảm " + formatMoney(discountValue > 0 ? discountValue : 50000);
+            txtPreviewTitle.setVisibility(View.VISIBLE);
+
+            String title;
+            if ("PERCENT".equals(discountType)) {
+                title = "Giảm " + discountValue + "%";
+                if (maxDiscount > 0) {
+                    title += " tối đa " + formatMoney(maxDiscount);
+                }
+            } else {
+                title = "Giảm " + formatMoney(discountValue);
+            }
+
+            txtPreviewTitle.setText(title);
         }
 
         String subtitle = minOrder > 0
                 ? "Đơn tối thiểu " + formatMoney(minOrder)
                 : "Không yêu cầu đơn tối thiểu";
 
-        txtPreviewTitle.setText(title);
         txtPreviewSubtitle.setText(subtitle);
-
-        if ("FIXED".equals(discountType) && edtMaxDiscount.isEnabled()) {
-            edtMaxDiscount.setText(edtDiscountValue.getText().toString().trim());
-        }
     }
 
     private Date parseAnyDate(String value) {
@@ -424,6 +485,7 @@ public class CreateVoucherActivity extends BaseActivity {
 
     private long parseLong(String value) {
         if (value == null || value.trim().isEmpty()) return 0L;
+
         try {
             return Long.parseLong(value.trim().replace(".", "").replace(",", ""));
         } catch (Exception e) {
@@ -433,7 +495,7 @@ public class CreateVoucherActivity extends BaseActivity {
 
     private String formatMoney(long amount) {
         NumberFormat formatter = NumberFormat.getInstance(new Locale("vi", "VN"));
-        return "đ" + formatter.format(amount);
+        return formatter.format(amount) + "đ";
     }
 
     private int getColorCompat(int colorRes) {
@@ -457,5 +519,3 @@ public class CreateVoucherActivity extends BaseActivity {
         }
     }
 }
-
-

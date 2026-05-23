@@ -11,7 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.gr6.smartcart_android.R;
-import com.gr6.smartcart_android.seller.inventory.model.InventoryHistoryItem;
+import com.gr6.smartcart_android.seller.inventory.response.InventoryHistoryItem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -91,3 +91,5 @@ public class StockHistoryAdapter extends RecyclerView.Adapter<StockHistoryAdapte
         }
     }
 }
+
+

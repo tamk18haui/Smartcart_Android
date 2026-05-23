@@ -16,7 +16,7 @@ import com.gr6.smartcart_android.R;
 import com.gr6.smartcart_android.common.base.BaseActivity;
 import com.gr6.smartcart_android.common.utils.ThemeColor;
 import com.gr6.smartcart_android.seller.cloudinary.CloudinaryUploader;
-import com.gr6.smartcart_android.seller.model.ProductVariantRequest;
+import com.gr6.smartcart_android.seller.product.request.ProductVariantRequest;
 
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
@@ -422,3 +422,5 @@ public class VariantEditorActivity extends BaseActivity {
         String imageUrl;
     }
 }
+
+

@@ -27,7 +27,7 @@ import com.gr6.smartcart_android.common.base.BaseResponse;
 import com.gr6.smartcart_android.common.network.ApiClient;
 import com.gr6.smartcart_android.seller.utils.ApiErrorUtils;
 import com.gr6.smartcart_android.seller.voucher.api.SellerVoucherApiService;
-import com.gr6.smartcart_android.seller.voucher.model.VoucherResponse;
+import com.gr6.smartcart_android.seller.voucher.response.VoucherResponse;
 
 import java.text.NumberFormat;
 import java.text.ParseException;
@@ -48,12 +48,12 @@ public class SellerVoucherFragment extends Fragment {
     private static final String FILTER_UPCOMING = "UPCOMING";
     private static final String FILTER_ENDED = "ENDED";
 
-    private static final int COLOR_BLUE = Color.rgb(82, 101, 158);
-    private static final int COLOR_ORANGE = Color.rgb(255, 102, 0);
-    private static final int COLOR_TEXT_PRIMARY = Color.rgb(35, 24, 21);
-    private static final int COLOR_TEXT_SECONDARY = Color.rgb(122, 91, 83);
-    private static final int COLOR_BACKGROUND = Color.rgb(248, 248, 250);
-    private static final int COLOR_BORDER = Color.rgb(234, 224, 220);
+    private static final int COLOR_PRIMARY = Color.rgb(37, 99, 235);          // #2563EB
+    private static final int COLOR_PRIMARY_DARK = Color.rgb(29, 78, 216);     // #1D4ED8
+    private static final int COLOR_PRIMARY_LIGHT = Color.rgb(219, 234, 254);  // #DBEAFE
+    private static final int COLOR_TEXT_PRIMARY = Color.rgb(15, 23, 42);      // #0F172A
+    private static final int COLOR_TEXT_SECONDARY = Color.rgb(100, 116, 139); // #64748B
+    private static final int COLOR_BORDER = Color.rgb(226, 232, 240);         // #E2E8F0
 
     private LinearLayout voucherContainer;
     private LinearLayout emptyLayout;
@@ -199,7 +199,7 @@ public class SellerVoucherFragment extends Fragment {
     }
 
     private void styleTab(TextView tab, boolean selected) {
-        tab.setTextColor(selected ? COLOR_ORANGE : COLOR_TEXT_PRIMARY);
+        tab.setTextColor(selected ? COLOR_PRIMARY : COLOR_TEXT_PRIMARY);
         tab.setTypeface(Typeface.DEFAULT, selected ? Typeface.BOLD : Typeface.NORMAL);
         tab.setBackgroundColor(Color.TRANSPARENT);
     }
@@ -268,7 +268,7 @@ public class SellerVoucherFragment extends Fragment {
         left.setOrientation(LinearLayout.VERTICAL);
         left.setGravity(Gravity.CENTER);
         left.setPadding(dp(8), dp(8), dp(8), dp(8));
-        left.setBackground(leftVoucherBackground(isPercent(voucher) ? COLOR_BLUE : COLOR_ORANGE));
+        left.setBackground(leftVoucherBackground(COLOR_PRIMARY));
         root.addView(left, new LinearLayout.LayoutParams(dp(140), ViewGroup.LayoutParams.MATCH_PARENT));
 
         TextView leftIcon = new TextView(requireContext());
@@ -280,7 +280,7 @@ public class SellerVoucherFragment extends Fragment {
         left.addView(leftIcon);
 
         TextView leftLabel = new TextView(requireContext());
-        leftLabel.setText(isPercent(voucher) ? "PREMIUM" : "SMARTCART");
+        leftLabel.setText("SMARTCART");
         leftLabel.setTextColor(Color.WHITE);
         leftLabel.setTextSize(15);
         leftLabel.setGravity(Gravity.CENTER);
@@ -314,9 +314,10 @@ public class SellerVoucherFragment extends Fragment {
         txtStatus.setTextSize(12);
         txtStatus.setGravity(Gravity.CENTER);
         txtStatus.setPadding(dp(12), dp(5), dp(12), dp(5));
-        txtStatus.setTextColor(getDisplayStatus(voucher) == VoucherDisplayStatus.ONGOING ? Color.rgb(15, 115, 55) : Color.rgb(92, 84, 80));
+        VoucherDisplayStatus displayStatus = getDisplayStatus(voucher);
+        txtStatus.setTextColor(displayStatus == VoucherDisplayStatus.ONGOING ? COLOR_PRIMARY_DARK : COLOR_TEXT_SECONDARY);
         txtStatus.setBackground(cardBackground(
-                getDisplayStatus(voucher) == VoucherDisplayStatus.ONGOING ? Color.rgb(74, 210, 112) : Color.rgb(230, 230, 230),
+                displayStatus == VoucherDisplayStatus.ONGOING ? COLOR_PRIMARY_LIGHT : Color.rgb(241, 245, 249),
                 28,
                 Color.TRANSPARENT
         ));
@@ -432,6 +433,7 @@ public class SellerVoucherFragment extends Fragment {
         intent.putExtra(CreateVoucherActivity.EXTRA_MIN_ORDER_VALUE, voucher.safeMinOrderValue());
         intent.putExtra(CreateVoucherActivity.EXTRA_MAX_DISCOUNT_AMOUNT, voucher.safeMaxDiscountAmount());
         intent.putExtra(CreateVoucherActivity.EXTRA_USAGE_LIMIT, voucher.safeUsageLimit());
+        intent.putExtra(CreateVoucherActivity.EXTRA_USED_COUNT, voucher.safeUsedCount());
         intent.putExtra(CreateVoucherActivity.EXTRA_START_DATE, voucher.getStartDate());
         intent.putExtra(CreateVoucherActivity.EXTRA_END_DATE, voucher.getEndDate());
         startActivity(intent);
@@ -590,5 +592,9 @@ public class SellerVoucherFragment extends Fragment {
         ENDED
     }
 }
+
+
+
+
 
 
