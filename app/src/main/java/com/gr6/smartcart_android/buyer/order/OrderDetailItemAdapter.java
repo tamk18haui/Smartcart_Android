@@ -7,6 +7,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.gr6.smartcart_android.R;
@@ -18,13 +19,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-/**
- * Adapter item sản phẩm trong chi tiết đơn hàng.
- *
- * Thêm nút:
- * - Đánh giá: khi canReview = true
- * - Đã đánh giá: khi reviewed = true
- */
 public class OrderDetailItemAdapter extends RecyclerView.Adapter<OrderDetailItemAdapter.ItemViewHolder> {
 
     private final List<OrderDetailResponse.OrderItemResponse> items = new ArrayList<>();
@@ -115,26 +109,36 @@ public class OrderDetailItemAdapter extends RecyclerView.Adapter<OrderDetailItem
         private void bindReviewButton(OrderDetailResponse.OrderItemResponse item) {
             if (btnReview == null) return;
 
-            btnReview.setEnabled(true);
+            btnReview.setVisibility(View.GONE);
+            btnReview.setEnabled(false);
             btnReview.setAlpha(1f);
+            btnReview.setOnClickListener(null);
+
+            if (item.isReviewed()) {
+                btnReview.setVisibility(View.VISIBLE);
+                btnReview.setText("Đã đánh giá");
+                btnReview.setEnabled(false);
+                btnReview.setAlpha(0.75f);
+                btnReview.setTextColor(
+                        ContextCompat.getColor(itemView.getContext(), R.color.review_disabled_text)
+                );
+                btnReview.setBackgroundResource(R.drawable.bg_review_disabled);
+                return;
+            }
 
             if (item.canReview()) {
                 btnReview.setVisibility(View.VISIBLE);
                 btnReview.setText("Đánh giá");
-            } else if (item.reviewed()) {
-                btnReview.setVisibility(View.VISIBLE);
-                btnReview.setText("Đã đánh giá");
-                btnReview.setEnabled(false);
-                btnReview.setAlpha(0.55f);
-            } else {
-                btnReview.setVisibility(View.GONE);
-            }
+                btnReview.setEnabled(true);
+                btnReview.setAlpha(1f);
+                btnReview.setBackgroundResource(R.drawable.bg_role_unselected);
 
-            btnReview.setOnClickListener(v -> {
-                if (reviewClickListener != null && item.canReview()) {
-                    reviewClickListener.onReviewClick(item);
-                }
-            });
+                btnReview.setOnClickListener(v -> {
+                    if (reviewClickListener != null) {
+                        reviewClickListener.onReviewClick(item);
+                    }
+                });
+            }
         }
 
         private String formatMoney(Long value) {

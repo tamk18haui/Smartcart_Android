@@ -188,6 +188,7 @@
              ========================================== -->
         <!-- Sắp xếp thứ tự: Phụ (Trái) -> Chính (Phải) -->
         <LinearLayout
+            android:id="@+id/layoutActions"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_vertical|end"
@@ -197,7 +198,6 @@
             android:paddingEnd="14dp"
             android:paddingBottom="12dp">
 
-            <!-- Hủy Đơn: Để bên trái nhất vì là hành động mang tính phá hủy (Destructive) -->
             <TextView
                 android:id="@+id/btnCancelOrder"
                 android:layout_width="wrap_content"
@@ -205,50 +205,86 @@
                 android:background="@drawable/bg_profile_input"
                 android:clickable="true"
                 android:focusable="true"
-                android:fontFamily="sans-serif-medium"
                 android:foreground="?attr/selectableItemBackground"
                 android:gravity="center"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp"
                 android:text="Hủy đơn"
                 android:textColor="@color/danger"
-                android:textSize="13sp" />
+                android:textSize="13sp"
+                android:visibility="gone" />
 
-            <!-- Chi Tiết: Hành động trung tính -->
             <TextView
-                android:id="@+id/btnDetail"
+                android:id="@+id/btnCompleteOrder"
                 android:layout_width="wrap_content"
                 android:layout_height="36dp"
-                android:layout_marginStart="10dp"
-                android:background="@drawable/bg_profile_input"
+                android:layout_marginStart="8dp"
+                android:background="@drawable/bg_button_gradient"
                 android:clickable="true"
                 android:focusable="true"
-                android:fontFamily="sans-serif-medium"
                 android:foreground="?attr/selectableItemBackground"
                 android:gravity="center"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:text="Chi tiết"
-                android:textColor="@color/text_primary"
-                android:textSize="13sp" />
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp"
+                android:text="Đơn hàng hoàn thành"
+                android:textColor="@color/white"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                android:visibility="gone" />
 
-            <!-- Mua Lại: Hành động chính, nổi bật nhất -->
+            <TextView
+                android:id="@+id/btnPayAgain"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:layout_marginStart="8dp"
+                android:background="@drawable/bg_button_gradient"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground"
+                android:gravity="center"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp"
+                android:text="Thanh toán lại"
+                android:textColor="@color/white"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/btnReview"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:layout_marginStart="8dp"
+                android:background="@drawable/bg_role_unselected"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground"
+                android:gravity="center"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp"
+                android:text="Đánh giá"
+                android:textColor="@color/brand_primary"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                android:visibility="gone" />
+
             <TextView
                 android:id="@+id/btnBuyAgain"
                 android:layout_width="wrap_content"
                 android:layout_height="36dp"
-                android:layout_marginStart="10dp"
-                android:background="@drawable/bg_bottom_nav_selected"
+                android:layout_marginStart="8dp"
+                android:background="@drawable/bg_button_gradient"
                 android:clickable="true"
                 android:focusable="true"
-                android:fontFamily="sans-serif-medium"
                 android:foreground="?attr/selectableItemBackground"
                 android:gravity="center"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp"
                 android:text="Mua lại"
-                android:textColor="@color/brand_primary"
-                android:textSize="13sp" />
+                android:textColor="@color/white"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                android:visibility="gone" />
 
         </LinearLayout>
 

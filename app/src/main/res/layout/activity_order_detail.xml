@@ -628,6 +628,7 @@
         app:layout_constraintBottom_toBottomOf="parent">
 
         <TextView
+            android:id="@+id/btnBuyAgain"
             android:layout_width="0dp"
             android:layout_height="46dp"
             android:layout_marginEnd="8dp"
@@ -640,7 +641,26 @@
             android:text="Mua lại"
             android:textColor="@color/brand_primary"
             android:textSize="14sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/btnCompleteOrder"
+            android:layout_width="0dp"
+            android:layout_height="46dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            android:background="@drawable/bg_button_gradient"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground"
+            android:gravity="center"
+            android:text="Đơn hàng hoàn thành"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:visibility="gone" />
 
         <TextView
             android:id="@+id/btnCancelOrder"
@@ -658,6 +678,7 @@
             android:textSize="14sp"
             android:textStyle="bold"
             android:visibility="gone" />
+
     </LinearLayout>
 
     <LinearLayout

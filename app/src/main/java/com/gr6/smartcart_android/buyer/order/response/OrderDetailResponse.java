@@ -11,6 +11,9 @@ public class OrderDetailResponse {
     @SerializedName("shopOrderId")
     private Long shopOrderId;
 
+    @SerializedName("shopId")
+    private Long shopId;
+
     @SerializedName("shopName")
     private String shopName;
 
@@ -33,12 +36,21 @@ public class OrderDetailResponse {
     })
     private String paymentMethod;
 
+
     @SerializedName(value = "paymentProvider", alternate = {
             "payment_provider",
             "provider",
             "payProvider"
     })
     private String paymentProvider;
+
+    @SerializedName(value = "paymentStatus", alternate = {
+            "payment_status",
+            "payStatus",
+            "transactionStatus",
+            "transaction_status"
+    })
+    private String paymentStatus;
 
     @SerializedName(value = "updatedAt", alternate = {
             "statusUpdatedAt",
@@ -86,6 +98,9 @@ public class OrderDetailResponse {
             return "SmartCart Shop";
         }
         return shopName.trim();
+    }
+    public Long getShopId() {
+        return shopId;
     }
 
     public String getStatus() {
@@ -138,12 +153,17 @@ public class OrderDetailResponse {
     }
 
     public List<OrderItemResponse> getItems() {
-        if (items == null) return new ArrayList<>();
-        return items;
+        return items == null ? new ArrayList<>() : items;
     }
 
     public int getItemCount() {
-        return getItems().size();
+        int count = 0;
+
+        for (OrderItemResponse item : getItems()) {
+            count += item.getQuantity();
+        }
+
+        return count;
     }
 
     public String getPaymentText() {
@@ -152,6 +172,16 @@ public class OrderDetailResponse {
 
         if ("NONE".equals(provider)) {
             provider = "";
+        }
+
+        boolean online =
+                "ONLINE".equals(method)
+                        || "MOMO".equals(provider)
+                        || "VNPAY".equals(provider)
+                        || "VN_PAY".equals(provider);
+
+        if (online && isPaid()) {
+            return "Đã thanh toán - " + getDeliveryStatusText();
         }
 
         if ("COD".equals(method)
@@ -179,8 +209,56 @@ public class OrderDetailResponse {
         return "Thanh toán khi nhận hàng";
     }
 
+    public boolean isPaid() {
+        String ps = paymentStatus == null ? "" : paymentStatus.trim().toUpperCase();
+
+        return "COMPLETED".equals(ps)
+                || "SUCCESS".equals(ps)
+                || "PAID".equals(ps);
+    }
+
+    public boolean isDelivered() {
+        return "DELIVERED".equalsIgnoreCase(getStatus());
+    }
+
+    public boolean isCompleted() {
+        return "COMPLETED".equalsIgnoreCase(getStatus());
+    }
+
+    public boolean isCancelled() {
+        return "CANCELLED".equalsIgnoreCase(getStatus())
+                || "PAYMENT_FAILED".equalsIgnoreCase(getStatus());
+    }
+
+    public String getDeliveryStatusText() {
+        String s = getStatus() == null ? "" : getStatus().trim().toUpperCase();
+
+        switch (s) {
+            case "PENDING_PAYMENT":
+                return "Chờ thanh toán";
+            case "PENDING":
+                return "Chờ xác nhận";
+            case "CONFIRMED":
+                return "Đã xác nhận";
+            case "PREPARING":
+                return "Đang chuẩn bị hàng";
+            case "SHIPPING":
+                return "Đang giao hàng";
+            case "DELIVERED":
+                return "Đã giao hàng";
+            case "COMPLETED":
+                return "Hoàn thành";
+            case "CANCELLED":
+                return "Đã hủy";
+            case "PAYMENT_FAILED":
+                return "Thanh toán thất bại";
+            default:
+                return "Đang xử lý";
+        }
+    }
+
     public String getJourneyCurrentTitle() {
-        String s = status == null ? "" : status.trim().toUpperCase();
+        String s = getStatus() == null ? "" : getStatus().trim().toUpperCase();
 
         switch (s) {
             case "PENDING_PAYMENT":
@@ -188,11 +266,11 @@ public class OrderDetailResponse {
             case "PENDING":
                 return "Đơn hàng đang chờ xác nhận";
             case "CONFIRMED":
-                return "Đơn hàng đã được xác nhận";
+                return "Shop đã xác nhận đơn hàng";
             case "PREPARING":
                 return "Shop đang chuẩn bị hàng";
             case "SHIPPING":
-                return "Đơn hàng đang giao";
+                return "Đơn hàng đang được giao";
             case "DELIVERED":
                 return "Đơn hàng đã được giao";
             case "COMPLETED":
@@ -202,34 +280,24 @@ public class OrderDetailResponse {
             case "PAYMENT_FAILED":
                 return "Thanh toán thất bại";
             default:
-                return "Đơn hàng đang được xử lý";
+                return "Đơn hàng đang xử lý";
         }
     }
 
     public String getJourneyCurrentDescription() {
-        String s = status == null ? "" : status.trim().toUpperCase();
+        String s = getStatus() == null ? "" : getStatus().trim().toUpperCase();
 
         switch (s) {
-            case "PENDING_PAYMENT":
-                return "Vui lòng hoàn tất thanh toán để shop xử lý đơn.";
-            case "PENDING":
-                return "SmartCart đã ghi nhận đơn hàng và đang chờ shop xác nhận.";
-            case "CONFIRMED":
-                return "Shop đã xác nhận đơn hàng của bạn.";
-            case "PREPARING":
-                return "Shop đang chuẩn bị sản phẩm để bàn giao cho đơn vị vận chuyển.";
-            case "SHIPPING":
-                return "Đơn hàng đang trên đường giao tới bạn.";
             case "DELIVERED":
-                return "Đơn hàng đã được giao tới địa chỉ nhận hàng.";
+                return "Bạn có thể xác nhận hoàn thành đơn hàng nếu đã nhận đủ sản phẩm.";
             case "COMPLETED":
-                return "Cảm ơn bạn đã mua sắm tại SmartCart.";
+                return "Cảm ơn bạn đã mua hàng tại SmartCart.";
             case "CANCELLED":
-                return "Đơn hàng đã bị hủy.";
+                return "Đơn hàng này đã bị hủy.";
             case "PAYMENT_FAILED":
-                return "Giao dịch thanh toán không thành công.";
+                return "Thanh toán không thành công, vui lòng tạo đơn mới nếu cần.";
             default:
-                return "SmartCart đã ghi nhận trạng thái hiện tại của đơn hàng.";
+                return "SmartCart sẽ cập nhật trạng thái đơn hàng khi có thay đổi.";
         }
     }
 
@@ -279,40 +347,35 @@ public class OrderDetailResponse {
 
         public String getProductName() {
             if (productName == null || productName.trim().isEmpty()) {
-                return "Sản phẩm SmartCart";
+                return "Sản phẩm";
             }
             return productName.trim();
         }
 
         public String getVariantSku() {
-            if (variantSku == null || variantSku.trim().isEmpty()) {
-                return "Phân loại mặc định";
-            }
-            return variantSku.trim();
+            return variantSku == null ? "" : variantSku;
         }
 
-        public Integer getQuantity() {
+        public int getQuantity() {
             return quantity == null ? 0 : quantity;
         }
 
-        public Long getPriceAtPurchase() {
+        public long getPriceAtPurchase() {
             return priceAtPurchase == null ? 0L : priceAtPurchase;
+        }
+        public long getLineTotal() {
+            return getPriceAtPurchase() * getQuantity();
         }
 
         public String getImageUrl() {
-            if (imageUrl == null) return "";
-            return imageUrl.trim();
-        }
-
-        public Long getLineTotal() {
-            return getPriceAtPurchase() * getQuantity();
+            return imageUrl;
         }
 
         public boolean canReview() {
             return Boolean.TRUE.equals(canReview);
         }
 
-        public boolean reviewed() {
+        public boolean isReviewed() {
             return Boolean.TRUE.equals(reviewed);
         }
     }

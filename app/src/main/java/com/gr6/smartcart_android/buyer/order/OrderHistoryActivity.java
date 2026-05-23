@@ -1,35 +1,43 @@
 package com.gr6.smartcart_android.buyer.order;
 
+import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.GradientDrawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.google.gson.Gson;
 import com.gr6.smartcart_android.R;
+import com.gr6.smartcart_android.buyer.checkout.CheckoutActivity;
+import com.gr6.smartcart_android.buyer.checkout.CheckoutSelectedShop;
 import com.gr6.smartcart_android.buyer.order.response.OrderHistoryResponse;
+import com.gr6.smartcart_android.buyer.product.repository.ProductRepository;
+import com.gr6.smartcart_android.buyer.product.repository.ProductRepository.ActionCallback;
+import com.gr6.smartcart_android.buyer.review.ReviewActivity;
 import com.gr6.smartcart_android.common.base.BaseActivity;
 import com.gr6.smartcart_android.common.utils.ThemeColor;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
-import android.view.LayoutInflater;
-import android.view.Window;
-import android.view.WindowManager;
-import androidx.appcompat.app.AlertDialog;
 
 public class OrderHistoryActivity extends BaseActivity {
 
@@ -38,6 +46,7 @@ public class OrderHistoryActivity extends BaseActivity {
     private static final String TAB_SHIPPING = "SHIPPING";
     private static final String TAB_COMPLETED = "COMPLETED_GROUP";
     private static final String TAB_CANCELLED = "CANCELLED_GROUP";
+    private ProductRepository productRepository;
 
     private ImageView imgBack;
     private EditText edtSearchOrder;
@@ -70,15 +79,156 @@ public class OrderHistoryActivity extends BaseActivity {
         ThemeColor.applyWhiteNavigationBar(this);
 
         viewModel = new ViewModelProvider(this).get(OrderHistoryViewModel.class);
+        productRepository = new ProductRepository(this);
 
         initViews();          // BẮT BUỘC PHẢI CÓ DÒNG NÀY
         initRecyclerView();
         initEvents();
         observeOrderHistory();
         observeCancelOrder();
+        observeCompleteOrder();
+        observeRetryPayment();
 
         viewModel.loadOrderHistory();
     }
+
+    private void observeCompleteOrder() {
+        viewModel.getCompleteState().observe(this, state -> {
+            if (state == null) return;
+
+            if (state.isLoading()) {
+                showLoading();
+                return;
+            }
+
+            hideLoading();
+
+            if (state.isSuccess()) {
+                showToast("Đã xác nhận hoàn thành đơn hàng");
+                viewModel.loadOrderHistory();
+            } else {
+                showLongToast(state.getMessage());
+            }
+        });
+    }
+
+    private void observeRetryPayment() {
+        viewModel.getRetryPaymentState().observe(this, response -> {
+            if (response == null) return;
+
+            String paymentUrl = response.getPaymentUrl();
+
+            if (paymentUrl == null || paymentUrl.trim().isEmpty()) {
+                showToast("Không có link thanh toán");
+                return;
+            }
+
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(paymentUrl.trim()));
+            startActivity(intent);
+        });
+
+        viewModel.getRetryPaymentErrorState().observe(this, message -> {
+            if (message == null || message.trim().isEmpty()) return;
+            showLongToast(message);
+        });
+    }
+
+    private void buyAgain(OrderHistoryUiModel order) {
+        if (order == null || order.getItems() == null || order.getItems().isEmpty()) {
+            showToast("Đơn hàng không có sản phẩm để mua lại");
+            return;
+        }
+
+        showLoading();
+        addOrderItemsToCartThenCheckout(order, 0);
+    }
+
+    private void addOrderItemsToCartThenCheckout(OrderHistoryUiModel order, int index) {
+        if (index >= order.getItems().size()) {
+            hideLoading();
+            openCheckoutForBuyAgain(order);
+            return;
+        }
+
+        OrderHistoryUiModel.OrderItemUiModel item = order.getItems().get(index);
+
+        if (item == null || item.getVariantId() == null || item.getVariantId() <= 0) {
+            addOrderItemsToCartThenCheckout(order, index + 1);
+            return;
+        }
+
+        int quantity = item.getQuantity() <= 0 ? 1 : item.getQuantity();
+
+        productRepository.addToCart(item.getVariantId(), quantity, new ActionCallback() {
+            @Override
+            public void onSuccess(String message) {
+                addOrderItemsToCartThenCheckout(order, index + 1);
+            }
+
+            @Override
+            public void onError(String message) {
+                hideLoading();
+                showLongToast("Không thể mua lại sản phẩm: " + item.getProductName() + "\n" + message);
+            }
+        });
+    }
+
+    private void openCheckoutForBuyAgain(OrderHistoryUiModel order) {
+        List<CheckoutSelectedShop> selectedShops = buildCheckoutSelectedShops(order);
+
+        if (selectedShops.isEmpty()) {
+            showToast("Không có sản phẩm hợp lệ để mua lại");
+            return;
+        }
+
+        String selectedShopsJson = new Gson().toJson(selectedShops);
+
+        Intent intent = new Intent(this, CheckoutActivity.class);
+        intent.putExtra("checkout_source", CheckoutActivity.SOURCE_FROM_CART);
+        intent.putExtra("selected_shops_json", selectedShopsJson);
+        startActivity(intent);
+    }
+
+    private List<CheckoutSelectedShop> buildCheckoutSelectedShops(OrderHistoryUiModel order) {
+        List<CheckoutSelectedShop> result = new ArrayList<>();
+
+        if (order == null || order.getItems() == null || order.getItems().isEmpty()) {
+            return result;
+        }
+
+        Long shopId = order.getShopId();
+        if (shopId == null || shopId <= 0) {
+            return result;
+        }
+
+        List<CheckoutSelectedShop.CheckoutSelectedItem> items = new ArrayList<>();
+
+        for (OrderHistoryUiModel.OrderItemUiModel item : order.getItems()) {
+            if (item == null || item.getVariantId() == null) continue;
+
+            items.add(new CheckoutSelectedShop.CheckoutSelectedItem(
+                    item.getVariantId(),
+                    item.getProductId(),
+                    item.getProductName(),
+                    item.getVariantSku(),
+                    item.getImageUrl(),
+                    (double) item.getPriceAtPurchase(),
+                    item.getQuantity() <= 0 ? 1 : item.getQuantity()
+            ));
+        }
+
+        if (!items.isEmpty()) {
+            result.add(new CheckoutSelectedShop(
+                    order.getShopId(),
+                    order.getShopName(),
+                    null,
+                    items
+            ));
+        }
+
+        return result;
+    }
+
     private void initViews() {
         imgBack = findViewById(R.id.imgBack);
         edtSearchOrder = findViewById(R.id.edtSearchOrder);
@@ -97,10 +247,113 @@ public class OrderHistoryActivity extends BaseActivity {
 
     private void initRecyclerView() {
         adapter = new OrderHistoryAdapter(this);
-        adapter.setOnOrderActionListener(this::showCancelDialog);
+
+        adapter.setOnOrderActionListener(new OrderHistoryAdapter.OnOrderActionListener() {
+            @Override
+            public void onOrderClick(OrderHistoryUiModel order) {
+                openOrderDetail(order);
+            }
+
+            @Override
+            public void onCancelClick(OrderHistoryUiModel order) {
+                showCancelDialog(order);
+            }
+
+            @Override
+            public void onReviewClick(OrderHistoryUiModel order) {
+                openReviewFromHistory(order);
+            }
+
+            @Override
+            public void onBuyAgainClick(OrderHistoryUiModel order) {
+                buyAgain(order);
+            }
+
+            @Override
+            public void onCompleteClick(OrderHistoryUiModel order) {
+                if (order == null || order.getShopOrderId() == null) {
+                    showToast("Đơn hàng không hợp lệ");
+                    return;
+                }
+
+                viewModel.completeOrder(order.getShopOrderId());
+            }
+
+            @Override
+            public void onPayAgainClick(OrderHistoryUiModel order) {
+                if (order == null || order.getShopOrderId() == null) {
+                    showToast("Đơn hàng không hợp lệ");
+                    return;
+                }
+
+                viewModel.retryPayment(order.getShopOrderId());
+            }
+        });
 
         rcvOrders.setLayoutManager(new LinearLayoutManager(this));
         rcvOrders.setAdapter(adapter);
+    }
+
+    private void openReviewFromHistory(OrderHistoryUiModel order) {
+        if (order == null || order.getItems() == null || order.getItems().isEmpty()) {
+            showToast("Đơn hàng không có sản phẩm để đánh giá");
+            return;
+        }
+
+        if (order.isAllReviewed()) {
+            showToast("Đơn hàng này đã được đánh giá");
+            return;
+        }
+
+        ArrayList<ReviewActivity.ReviewItemArg> reviewItems = new ArrayList<>();
+
+        for (OrderHistoryUiModel.OrderItemUiModel item : order.getItems()) {
+            if (item == null
+                    || item.getOrderItemId() == null
+                    || item.getOrderItemId() <= 0
+                    || item.isReviewed()) {
+                continue;
+            }
+
+            reviewItems.add(new ReviewActivity.ReviewItemArg(
+                    item.getOrderItemId(),
+                    item.getProductName(),
+                    item.getImageUrl(),
+                    item.getVariantSku(),
+                    false
+            ));
+        }
+
+        if (reviewItems.isEmpty()) {
+            showToast("Tất cả sản phẩm trong đơn này đã được đánh giá");
+            viewModel.loadOrderHistory();
+            return;
+        }
+
+        Intent intent = new Intent(this, ReviewActivity.class);
+
+        if (reviewItems.size() == 1) {
+            ReviewActivity.ReviewItemArg item = reviewItems.get(0);
+
+            intent.putExtra(ReviewActivity.EXTRA_ORDER_ITEM_ID, item.getOrderItemId());
+            intent.putExtra(ReviewActivity.EXTRA_PRODUCT_NAME, item.getProductName());
+            intent.putExtra(ReviewActivity.EXTRA_PRODUCT_IMAGE, item.getProductImage());
+        } else {
+            String json = new Gson().toJson(reviewItems);
+            intent.putExtra(ReviewActivity.EXTRA_REVIEW_ITEMS_JSON, json);
+        }
+
+        startActivityForResult(intent, 2001);
+    }
+    private void openOrderDetail(OrderHistoryUiModel order) {
+        if (order == null || order.getShopOrderId() == null || order.getShopOrderId() <= 0) {
+            showToast("Không tìm thấy mã đơn hàng");
+            return;
+        }
+
+        Intent intent = new Intent(this, OrderDetailActivity.class);
+        intent.putExtra(OrderDetailActivity.EXTRA_SHOP_ORDER_ID, order.getShopOrderId());
+        startActivity(intent);
     }
     private void showCancelDialog(OrderHistoryUiModel order) {
         if (order == null || order.getShopOrderId() == null) {
@@ -345,7 +598,9 @@ public class OrderHistoryActivity extends BaseActivity {
                     item.getVariantSku(),
                     item.getQuantity(),
                     item.getPriceAtPurchase(),
-                    item.getImageUrl()
+                    item.getImageUrl(),
+                    item.canReview(),
+                    item.isReviewed()
             ));
         }
 

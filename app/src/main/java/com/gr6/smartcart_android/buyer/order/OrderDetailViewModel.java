@@ -14,6 +14,7 @@ public class OrderDetailViewModel extends AndroidViewModel {
 
     private final OrderRepository repository;
     private final MutableLiveData<OrderDetailState> detailState = new MutableLiveData<>();
+    private final MutableLiveData<OrderActionState> completeState = new MutableLiveData<>();
 
     public OrderDetailViewModel(@NonNull Application application) {
         super(application);
@@ -22,6 +23,10 @@ public class OrderDetailViewModel extends AndroidViewModel {
 
     public LiveData<OrderDetailState> getDetailState() {
         return detailState;
+    }
+
+    public LiveData<OrderActionState> getCompleteState() {
+        return completeState;
     }
 
     public void loadOrderDetail(Long shopOrderId) {
@@ -41,6 +46,27 @@ public class OrderDetailViewModel extends AndroidViewModel {
             @Override
             public void onError(String message) {
                 detailState.postValue(OrderDetailState.error(message));
+            }
+        });
+    }
+
+    public void completeOrder(Long shopOrderId) {
+        if (shopOrderId == null || shopOrderId <= 0) {
+            completeState.setValue(OrderActionState.error("Không tìm thấy mã đơn hàng"));
+            return;
+        }
+
+        completeState.setValue(OrderActionState.loading());
+
+        repository.completeOrder(shopOrderId, new OrderRepository.SimpleCallback() {
+            @Override
+            public void onSuccess(String message) {
+                completeState.postValue(OrderActionState.success(message));
+            }
+
+            @Override
+            public void onError(String message) {
+                completeState.postValue(OrderActionState.error(message));
             }
         });
     }

@@ -1,5 +1,6 @@
 package com.gr6.smartcart_android.buyer.order.api;
 
+import com.gr6.smartcart_android.buyer.checkout.response.CheckoutOrderResponse;
 import com.gr6.smartcart_android.buyer.order.request.CancelOrderRequest;
 import com.gr6.smartcart_android.buyer.order.response.OrderDetailResponse;
 import com.gr6.smartcart_android.buyer.order.response.OrderHistoryResponse;
@@ -27,5 +28,15 @@ public interface OrderApiService {
     Call<BaseResponse<String>> cancelOrder(
             @Path("shopOrderId") Long shopOrderId,
             @Body CancelOrderRequest request
+    );
+
+    @POST("api/v2/orders/tracking/{shopOrderId}/complete")
+    Call<BaseResponse<String>> completeOrder(
+            @Path("shopOrderId") Long shopOrderId
+    );
+
+    @POST("api/v2/orders/tracking/{shopOrderId}/repay")
+    Call<BaseResponse<CheckoutOrderResponse>> retryPayment(
+            @Path("shopOrderId") Long shopOrderId
     );
 }

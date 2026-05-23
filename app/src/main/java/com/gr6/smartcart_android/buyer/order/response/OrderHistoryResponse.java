@@ -51,11 +51,12 @@ public class OrderHistoryResponse {
         if (shopName == null || shopName.trim().isEmpty()) {
             return "SmartCart Shop";
         }
-        return shopName;
+
+        return shopName.trim();
     }
 
     public String getStatus() {
-        return status;
+        return status == null ? "" : status.trim().toUpperCase();
     }
 
     public BigDecimal getTotalAmount() {
@@ -68,7 +69,7 @@ public class OrderHistoryResponse {
 
     public boolean canCancel() {
         if (canCancel != null) return canCancel;
-        return "PENDING".equals(status);
+        return "PENDING".equalsIgnoreCase(getStatus());
     }
 
     public List<OrderItemResponse> getItems() {
@@ -102,6 +103,12 @@ public class OrderHistoryResponse {
         @SerializedName("imageUrl")
         private String imageUrl;
 
+        @SerializedName("canReview")
+        private Boolean canReview;
+
+        @SerializedName("reviewed")
+        private Boolean reviewed;
+
         public Long getOrderItemId() {
             return orderItemId;
         }
@@ -118,26 +125,40 @@ public class OrderHistoryResponse {
             if (productName == null || productName.trim().isEmpty()) {
                 return "Sản phẩm SmartCart";
             }
-            return productName;
+
+            return productName.trim();
         }
 
         public String getVariantSku() {
             if (variantSku == null || variantSku.trim().isEmpty()) {
-                return "Phân loại";
+                return "";
             }
-            return variantSku;
+
+            return variantSku.trim();
         }
 
-        public Integer getQuantity() {
-            return quantity == null ? 1 : quantity;
+        public int getQuantity() {
+            return quantity == null || quantity <= 0 ? 1 : quantity;
         }
 
-        public Long getPriceAtPurchase() {
+        public long getPriceAtPurchase() {
             return priceAtPurchase == null ? 0L : priceAtPurchase;
         }
 
         public String getImageUrl() {
             return imageUrl == null ? "" : imageUrl;
+        }
+
+        public boolean canReview() {
+            return Boolean.TRUE.equals(canReview);
+        }
+
+        public boolean isReviewed() {
+            return Boolean.TRUE.equals(reviewed);
+        }
+
+        public boolean reviewed() {
+            return isReviewed();
         }
     }
 }

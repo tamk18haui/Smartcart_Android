@@ -4,6 +4,7 @@ import android.content.Context;
 
 import androidx.annotation.NonNull;
 
+import com.gr6.smartcart_android.buyer.checkout.response.CheckoutOrderResponse;
 import com.gr6.smartcart_android.buyer.order.api.OrderApiService;
 import com.gr6.smartcart_android.buyer.order.request.CancelOrderRequest;
 import com.gr6.smartcart_android.buyer.order.response.OrderDetailResponse;
@@ -78,7 +79,7 @@ public class OrderRepository {
                     @NonNull Response<BaseResponse<OrderDetailResponse>> response
             ) {
                 if (!response.isSuccessful()) {
-                    callback.onError("Lấy chi tiết đơn hàng thất bại. Mã lỗi: " + response.code());
+                    callback.onError("Không lấy được chi tiết đơn hàng. Mã lỗi: " + response.code());
                     return;
                 }
 
@@ -91,11 +92,6 @@ public class OrderRepository {
 
                 if (!body.isSuccess()) {
                     callback.onError(body.getSafeMessage());
-                    return;
-                }
-
-                if (body.getData() == null) {
-                    callback.onError("Không có dữ liệu chi tiết đơn hàng");
                     return;
                 }
 
@@ -149,6 +145,99 @@ public class OrderRepository {
             @Override
             public void onFailure(
                     @NonNull Call<BaseResponse<String>> call,
+                    @NonNull Throwable t
+            ) {
+                callback.onError("Không kết nối được server: " + t.getMessage());
+            }
+        });
+    }
+
+    public void completeOrder(Long shopOrderId, SimpleCallback callback) {
+        if (shopOrderId == null || shopOrderId <= 0) {
+            callback.onError("shopOrderId không hợp lệ");
+            return;
+        }
+
+        apiService.completeOrder(shopOrderId).enqueue(new Callback<BaseResponse<String>>() {
+            @Override
+            public void onResponse(
+                    @NonNull Call<BaseResponse<String>> call,
+                    @NonNull Response<BaseResponse<String>> response
+            ) {
+                if (!response.isSuccessful()) {
+                    callback.onError("Không hoàn thành được đơn hàng. Mã lỗi: " + response.code());
+                    return;
+                }
+
+                BaseResponse<String> body = response.body();
+
+                if (body == null) {
+                    callback.onError("Server không trả dữ liệu");
+                    return;
+                }
+
+                if (!body.isSuccess()) {
+                    callback.onError(body.getSafeMessage());
+                    return;
+                }
+
+                callback.onSuccess(body.getSafeMessage());
+            }
+
+            @Override
+            public void onFailure(
+                    @NonNull Call<BaseResponse<String>> call,
+                    @NonNull Throwable t
+            ) {
+                callback.onError("Không kết nối được server: " + t.getMessage());
+            }
+        });
+    }
+
+    public void retryPayment(
+            Long shopOrderId,
+            OrderCallback<CheckoutOrderResponse> callback
+    ) {
+        if (shopOrderId == null || shopOrderId <= 0) {
+            callback.onError("shopOrderId không hợp lệ");
+            return;
+        }
+
+        apiService.retryPayment(shopOrderId).enqueue(new Callback<BaseResponse<CheckoutOrderResponse>>() {
+            @Override
+            public void onResponse(
+                    @NonNull Call<BaseResponse<CheckoutOrderResponse>> call,
+                    @NonNull Response<BaseResponse<CheckoutOrderResponse>> response
+            ) {
+                if (!response.isSuccessful()) {
+                    callback.onError("Không tạo lại thanh toán. Mã lỗi: " + response.code());
+                    return;
+                }
+
+                BaseResponse<CheckoutOrderResponse> body = response.body();
+
+                if (body == null) {
+                    callback.onError("Server không trả dữ liệu");
+                    return;
+                }
+
+                if (!body.isSuccess()) {
+                    callback.onError(body.getSafeMessage());
+                    return;
+                }
+
+                if (body.getData() == null || body.getData().getPaymentUrl() == null
+                        || body.getData().getPaymentUrl().trim().isEmpty()) {
+                    callback.onError("Server chưa trả link thanh toán");
+                    return;
+                }
+
+                callback.onSuccess(body.getData(), body.getSafeMessage());
+            }
+
+            @Override
+            public void onFailure(
+                    @NonNull Call<BaseResponse<CheckoutOrderResponse>> call,
                     @NonNull Throwable t
             ) {
                 callback.onError("Không kết nối được server: " + t.getMessage());

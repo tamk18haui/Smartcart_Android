@@ -170,4 +170,8 @@
     <color name="seller_warning_light">#FFFBEB</color>
     <color name="seller_danger">#F43F5E</color>
     <color name="seller_danger_light">#FFF1F2</color>
+    <!-- Review disabled / reviewed state -->
+    <color name="review_disabled_bg">#F8FAFC</color>
+    <color name="review_disabled_border">#CBD5E1</color>
+    <color name="review_disabled_text">#4B5563</color>
 </resources>

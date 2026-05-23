@@ -1,7 +1,7 @@
 package com.gr6.smartcart_android.buyer.order;
 
 import android.content.Context;
-import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,10 +9,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.gr6.smartcart_android.R;
@@ -22,11 +20,22 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import androidx.core.content.ContextCompat;
 
 public class OrderHistoryAdapter extends RecyclerView.Adapter<OrderHistoryAdapter.OrderVH> {
 
     public interface OnOrderActionListener {
+        void onOrderClick(OrderHistoryUiModel order);
+
         void onCancelClick(OrderHistoryUiModel order);
+
+        void onReviewClick(OrderHistoryUiModel order);
+
+        void onBuyAgainClick(OrderHistoryUiModel order);
+
+        void onCompleteClick(OrderHistoryUiModel order);
+
+        void onPayAgainClick(OrderHistoryUiModel order);
     }
 
     private final Context context;
@@ -43,9 +52,11 @@ public class OrderHistoryAdapter extends RecyclerView.Adapter<OrderHistoryAdapte
 
     public void submitList(List<OrderHistoryUiModel> newOrders) {
         orders.clear();
+
         if (newOrders != null) {
             orders.addAll(newOrders);
         }
+
         notifyDataSetChanged();
     }
 
@@ -54,6 +65,7 @@ public class OrderHistoryAdapter extends RecyclerView.Adapter<OrderHistoryAdapte
     public OrderVH onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context)
                 .inflate(R.layout.item_order_history, parent, false);
+
         return new OrderVH(view);
     }
 
@@ -61,10 +73,7 @@ public class OrderHistoryAdapter extends RecyclerView.Adapter<OrderHistoryAdapte
     public void onBindViewHolder(@NonNull OrderVH holder, int position) {
         OrderHistoryUiModel order = orders.get(position);
 
-        holder.txtOrderCode.setText(
-                "Order #" + safeId(order.getOrderId()) + " · Shop #" + safeId(order.getShopId())
-        );
-
+        holder.txtOrderCode.setText("SC-" + safeId(order.getShopOrderId()));
         holder.txtShopName.setText(order.getShopName());
         holder.txtCreatedAt.setText("Đặt lúc " + order.getCreatedAt());
 
@@ -81,26 +90,13 @@ public class OrderHistoryAdapter extends RecyclerView.Adapter<OrderHistoryAdapte
         applyStatusStyle(holder.txtStatus, order.getStatus());
 
         bindItems(holder.layoutItems, order.getItems());
-        bindCancelButton(holder.btnCancelOrder, order);
+        bindButtons(holder, order);
 
-        holder.btnDetail.setOnClickListener(v -> {
-            if (order.getShopOrderId() == null || order.getShopOrderId() <= 0) {
-                Toast.makeText(context, "Không tìm thấy mã đơn hàng", Toast.LENGTH_SHORT).show();
-                return;
+        holder.itemView.setOnClickListener(v -> {
+            if (actionListener != null) {
+                actionListener.onOrderClick(order);
             }
-
-            Intent intent = new Intent(context, OrderDetailActivity.class);
-            intent.putExtra(OrderDetailActivity.EXTRA_SHOP_ORDER_ID, order.getShopOrderId());
-            context.startActivity(intent);
         });
-
-        holder.btnBuyAgain.setOnClickListener(v ->
-                Toast.makeText(
-                        context,
-                        "Mua lại orderId = " + order.getOrderId(),
-                        Toast.LENGTH_SHORT
-                ).show()
-        );
     }
 
     @Override
@@ -108,32 +104,88 @@ public class OrderHistoryAdapter extends RecyclerView.Adapter<OrderHistoryAdapte
         return orders.size();
     }
 
-    private void bindCancelButton(TextView button, OrderHistoryUiModel order) {
+    private void bindButtons(OrderVH holder, OrderHistoryUiModel order) {
+        String status = normalizeStatus(order.getStatus());
+
         boolean canCancel = order.canCancel();
+        boolean canComplete = "DELIVERED".equals(status);
+        boolean canPayAgain = "PENDING_PAYMENT".equals(status);
+        boolean completed = "COMPLETED".equals(status);
 
-        button.setEnabled(canCancel);
-        button.setAlpha(canCancel ? 1f : 0.42f);
+        boolean canBuyAgain = "COMPLETED".equals(status)
+                || "CANCELLED".equals(status)
+                || "PAYMENT_FAILED".equals(status);
 
-        GradientDrawable drawable = new GradientDrawable();
-        drawable.setCornerRadius(dp(999));
+        holder.btnCancelOrder.setVisibility(canCancel ? View.VISIBLE : View.GONE);
+        holder.btnCompleteOrder.setVisibility(canComplete ? View.VISIBLE : View.GONE);
+        holder.btnPayAgain.setVisibility(canPayAgain ? View.VISIBLE : View.GONE);
+        holder.btnBuyAgain.setVisibility(canBuyAgain ? View.VISIBLE : View.GONE);
 
-        if (canCancel) {
-            drawable.setColor(ContextCompat.getColor(context, R.color.danger_light));
-            drawable.setStroke(dp(1), ContextCompat.getColor(context, R.color.danger));
-            button.setTextColor(ContextCompat.getColor(context, R.color.danger));
-        } else {
-            drawable.setColor(ContextCompat.getColor(context, R.color.surface_soft));
-            drawable.setStroke(dp(1), ContextCompat.getColor(context, R.color.border));
-            button.setTextColor(ContextCompat.getColor(context, R.color.text_secondary));
-        }
+        bindReviewButton(holder, order, completed);
 
-        button.setBackground(drawable);
-
-        button.setOnClickListener(v -> {
-            if (!order.canCancel()) return;
-
+        holder.btnCancelOrder.setOnClickListener(v -> {
             if (actionListener != null) {
                 actionListener.onCancelClick(order);
+            }
+        });
+
+        holder.btnCompleteOrder.setOnClickListener(v -> {
+            if (actionListener != null) {
+                actionListener.onCompleteClick(order);
+            }
+        });
+
+        holder.btnPayAgain.setOnClickListener(v -> {
+            if (actionListener != null) {
+                actionListener.onPayAgainClick(order);
+            }
+        });
+
+        holder.btnBuyAgain.setOnClickListener(v -> {
+            if (actionListener != null) {
+                actionListener.onBuyAgainClick(order);
+            }
+        });
+    }
+
+    private void bindReviewButton(
+            OrderVH holder,
+            OrderHistoryUiModel order,
+            boolean completed
+    ) {
+        holder.btnReview.setVisibility(View.GONE);
+        holder.btnReview.setEnabled(false);
+        holder.btnReview.setAlpha(1f);
+        holder.btnReview.setOnClickListener(null);
+
+        if (!completed) {
+            return;
+        }
+
+        boolean allReviewed = order.isAllReviewed();
+
+        if (allReviewed) {
+            holder.btnReview.setVisibility(View.VISIBLE);
+            holder.btnReview.setText("Đã đánh giá");
+            holder.btnReview.setEnabled(false);
+            holder.btnReview.setAlpha(0.75f);
+            holder.btnReview.setTextColor(
+                    ContextCompat.getColor(context, R.color.review_disabled_text)
+            );
+            holder.btnReview.setBackgroundResource(R.drawable.bg_review_disabled);
+            return;
+        }
+
+        holder.btnReview.setVisibility(View.VISIBLE);
+        holder.btnReview.setText("Đánh giá");
+        holder.btnReview.setEnabled(true);
+        holder.btnReview.setAlpha(1f);
+        holder.btnReview.setTextColor(Color.parseColor("#EE4D2D"));
+        holder.btnReview.setBackgroundResource(R.drawable.bg_role_unselected);
+
+        holder.btnReview.setOnClickListener(v -> {
+            if (actionListener != null) {
+                actionListener.onReviewClick(order);
             }
         });
     }
@@ -154,6 +206,8 @@ public class OrderHistoryAdapter extends RecyclerView.Adapter<OrderHistoryAdapte
         LayoutInflater inflater = LayoutInflater.from(context);
 
         for (OrderHistoryUiModel.OrderItemUiModel item : items) {
+            if (item == null) continue;
+
             View row = inflater.inflate(
                     R.layout.item_order_history_product,
                     layoutItems,
@@ -167,7 +221,14 @@ public class OrderHistoryAdapter extends RecyclerView.Adapter<OrderHistoryAdapte
             TextView txtQuantity = row.findViewById(R.id.txtQuantity);
 
             txtProductName.setText(item.getProductName());
-            txtVariantSku.setText(item.getVariantSku());
+
+            if (item.getVariantSku() == null || item.getVariantSku().trim().isEmpty()) {
+                txtVariantSku.setVisibility(View.GONE);
+            } else {
+                txtVariantSku.setVisibility(View.VISIBLE);
+                txtVariantSku.setText(item.getVariantSku());
+            }
+
             txtItemPrice.setText(formatVnd(item.getPriceAtPurchase()));
             txtQuantity.setText("x" + item.getQuantity());
 
@@ -186,10 +247,12 @@ public class OrderHistoryAdapter extends RecyclerView.Adapter<OrderHistoryAdapte
         return formatter.format(value) + "đ";
     }
 
-    private String getDisplayStatus(String status) {
-        if (status == null) return "Không rõ";
+    private String normalizeStatus(String status) {
+        return status == null ? "" : status.trim().toUpperCase();
+    }
 
-        switch (status) {
+    private String getDisplayStatus(String status) {
+        switch (normalizeStatus(status)) {
             case "PENDING_PAYMENT":
                 return "Chờ thanh toán";
             case "PENDING":
@@ -201,6 +264,7 @@ public class OrderHistoryAdapter extends RecyclerView.Adapter<OrderHistoryAdapte
             case "SHIPPING":
                 return "Đang giao";
             case "DELIVERED":
+                return "Đã giao";
             case "COMPLETED":
                 return "Hoàn thành";
             case "CANCELLED":
@@ -208,26 +272,28 @@ public class OrderHistoryAdapter extends RecyclerView.Adapter<OrderHistoryAdapte
             case "PAYMENT_FAILED":
                 return "Thanh toán lỗi";
             default:
-                return status;
+                return "Không rõ";
         }
     }
 
     private void applyStatusStyle(TextView textView, String status) {
+        String s = normalizeStatus(status);
+
         int bgColor;
         int textColor;
 
-        if ("COMPLETED".equals(status) || "DELIVERED".equals(status)) {
-            bgColor = ContextCompat.getColor(context, R.color.success_light);
-            textColor = ContextCompat.getColor(context, R.color.success);
-        } else if ("CANCELLED".equals(status) || "PAYMENT_FAILED".equals(status)) {
-            bgColor = ContextCompat.getColor(context, R.color.danger_light);
-            textColor = ContextCompat.getColor(context, R.color.danger);
-        } else if ("SHIPPING".equals(status)) {
-            bgColor = ContextCompat.getColor(context, R.color.warning_light);
-            textColor = ContextCompat.getColor(context, R.color.warning);
+        if ("COMPLETED".equals(s) || "DELIVERED".equals(s)) {
+            bgColor = Color.parseColor("#E8F8EF");
+            textColor = Color.parseColor("#16A34A");
+        } else if ("CANCELLED".equals(s) || "PAYMENT_FAILED".equals(s)) {
+            bgColor = Color.parseColor("#FEECEC");
+            textColor = Color.parseColor("#DC2626");
+        } else if ("SHIPPING".equals(s)) {
+            bgColor = Color.parseColor("#FFF7E6");
+            textColor = Color.parseColor("#D97706");
         } else {
-            bgColor = ContextCompat.getColor(context, R.color.brand_primary_light);
-            textColor = ContextCompat.getColor(context, R.color.brand_primary);
+            bgColor = Color.parseColor("#FFF1ED");
+            textColor = Color.parseColor("#EE4D2D");
         }
 
         GradientDrawable drawable = new GradientDrawable();
@@ -250,9 +316,13 @@ public class OrderHistoryAdapter extends RecyclerView.Adapter<OrderHistoryAdapte
         TextView txtCreatedAt;
         TextView txtProductSummary;
         TextView txtTotalAmount;
-        TextView btnDetail;
-        TextView btnBuyAgain;
+
         TextView btnCancelOrder;
+        TextView btnCompleteOrder;
+        TextView btnPayAgain;
+        TextView btnReview;
+        TextView btnBuyAgain;
+
         LinearLayout layoutItems;
 
         public OrderVH(@NonNull View itemView) {
@@ -264,9 +334,13 @@ public class OrderHistoryAdapter extends RecyclerView.Adapter<OrderHistoryAdapte
             txtCreatedAt = itemView.findViewById(R.id.txtCreatedAt);
             txtProductSummary = itemView.findViewById(R.id.txtProductSummary);
             txtTotalAmount = itemView.findViewById(R.id.txtTotalAmount);
-            btnDetail = itemView.findViewById(R.id.btnDetail);
-            btnBuyAgain = itemView.findViewById(R.id.btnBuyAgain);
+
             btnCancelOrder = itemView.findViewById(R.id.btnCancelOrder);
+            btnCompleteOrder = itemView.findViewById(R.id.btnCompleteOrder);
+            btnPayAgain = itemView.findViewById(R.id.btnPayAgain);
+            btnReview = itemView.findViewById(R.id.btnReview);
+            btnBuyAgain = itemView.findViewById(R.id.btnBuyAgain);
+
             layoutItems = itemView.findViewById(R.id.layoutItems);
         }
     }

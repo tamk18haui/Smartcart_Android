@@ -80,6 +80,11 @@
             android:exported="false" />
 
         <activity
+            android:name=".buyer.review.ReviewActivity"
+            android:exported="false"/>
+
+
+        <activity
             android:name=".buyer.checkout.CheckoutActivity"
             android:exported="false" />
 

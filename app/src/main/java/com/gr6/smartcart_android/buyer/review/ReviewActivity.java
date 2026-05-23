@@ -21,22 +21,18 @@ import com.gr6.smartcart_android.common.utils.ThemeColor;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Màn hình đánh giá sản phẩm.
- *
- * Chức năng:
- * - Chọn 1 đến 5 sao
- * - Nhập nội dung đánh giá
- * - Chọn tối đa 4 ảnh
- * - Chọn tối đa 1 video
- * - Upload ảnh/video lên Cloudinary
- * - Gửi review lên backend bằng API /api/v1/reviews
- */
 public class ReviewActivity extends BaseActivity {
 
     public static final String EXTRA_ORDER_ITEM_ID = "order_item_id";
     public static final String EXTRA_PRODUCT_NAME = "product_name";
     public static final String EXTRA_PRODUCT_IMAGE = "product_image";
+    public static final String EXTRA_REVIEW_ITEMS_JSON = "review_items_json";
+
+    private LinearLayout layoutReviewProductPicker;
+    private androidx.recyclerview.widget.RecyclerView rcvReviewProducts;
+    private ReviewProductPickerAdapter productPickerAdapter;
+
+    private final List<ReviewItemArg> reviewItems = new ArrayList<>();
 
     private ImageView imgBack;
     private ImageView imgProduct;
@@ -89,8 +85,12 @@ public class ReviewActivity extends BaseActivity {
         cloudinaryRepository = new CloudinaryRepository();
 
         setupMediaPickers();
-        readIntent();
+
+        // Phải initViews trước readIntent
+        // Vì readIntent có thể gọi selectFirstUnreviewedItem -> resetReviewForm -> updateStars
         initViews();
+
+        readIntent();
         bindData();
         initEvents();
         observeData();
@@ -101,9 +101,6 @@ public class ReviewActivity extends BaseActivity {
         updateSubmitState();
     }
 
-    /**
-     * Đăng ký picker chọn nhiều ảnh và picker chọn 1 video.
-     */
     private void setupMediaPickers() {
         pickImagesLauncher = registerForActivityResult(
                 new ActivityResultContracts.GetMultipleContents(),
@@ -143,11 +140,53 @@ public class ReviewActivity extends BaseActivity {
     }
 
     private void readIntent() {
-        long id = getIntent().getLongExtra(EXTRA_ORDER_ITEM_ID, -1L);
-        orderItemId = id <= 0 ? null : id;
+        String itemsJson = getIntent().getStringExtra(EXTRA_REVIEW_ITEMS_JSON);
 
-        productName = getIntent().getStringExtra(EXTRA_PRODUCT_NAME);
-        productImage = getIntent().getStringExtra(EXTRA_PRODUCT_IMAGE);
+        if (itemsJson != null && !itemsJson.trim().isEmpty()) {
+            try {
+                java.lang.reflect.Type type =
+                        new com.google.gson.reflect.TypeToken<List<ReviewItemArg>>() {}.getType();
+
+                List<ReviewItemArg> data = new com.google.gson.Gson().fromJson(itemsJson, type);
+
+                reviewItems.clear();
+
+                if (data != null) {
+                    for (ReviewItemArg item : data) {
+                        if (item != null
+                                && item.getOrderItemId() != null
+                                && item.getOrderItemId() > 0) {
+                            reviewItems.add(item);
+                        }
+                    }
+                }
+
+            } catch (Exception e) {
+                reviewItems.clear();
+            }
+        }
+
+        if (reviewItems.isEmpty()) {
+            long id = getIntent().getLongExtra(EXTRA_ORDER_ITEM_ID, -1L);
+
+            orderItemId = id <= 0 ? null : id;
+            productName = getIntent().getStringExtra(EXTRA_PRODUCT_NAME);
+            productImage = getIntent().getStringExtra(EXTRA_PRODUCT_IMAGE);
+
+            if (orderItemId != null) {
+                reviewItems.add(new ReviewItemArg(
+                        orderItemId,
+                        productName,
+                        productImage,
+                        "",
+                        false
+                ));
+            }
+
+            return;
+        }
+
+        selectFirstUnreviewedItem();
     }
 
     private void initViews() {
@@ -170,20 +209,67 @@ public class ReviewActivity extends BaseActivity {
         txtVideoStatus = findViewById(R.id.txtVideoStatus);
         btnRemoveVideo = findViewById(R.id.btnRemoveVideo);
         btnSubmitReview = findViewById(R.id.btnSubmitReview);
+
+        layoutReviewProductPicker = findViewById(R.id.layoutReviewProductPicker);
+        rcvReviewProducts = findViewById(R.id.rcvReviewProducts);
     }
 
     private void bindData() {
-        txtProductName.setText(
-                productName == null || productName.trim().isEmpty()
-                        ? "Sản phẩm SmartCart"
-                        : productName.trim()
-        );
+        renderSelectedProduct();
+        setupReviewProductPicker();
+    }
 
-        if (productImage == null || productImage.trim().isEmpty()) {
-            imgProduct.setImageResource(R.drawable.ic_cart);
-        } else {
-            ImageLoader.load(this, productImage, imgProduct);
+    private void renderSelectedProduct() {
+        if (txtProductName != null) {
+            txtProductName.setText(
+                    productName == null || productName.trim().isEmpty()
+                            ? "Sản phẩm"
+                            : productName.trim()
+            );
         }
+
+        if (imgProduct != null) {
+            if (productImage == null || productImage.trim().isEmpty()) {
+                imgProduct.setImageResource(R.drawable.ic_cart);
+            } else {
+                ImageLoader.load(this, productImage, imgProduct);
+            }
+        }
+    }
+
+    private void setupReviewProductPicker() {
+        if (layoutReviewProductPicker == null || rcvReviewProducts == null) {
+            return;
+        }
+
+        if (reviewItems.size() <= 1) {
+            layoutReviewProductPicker.setVisibility(View.GONE);
+            return;
+        }
+
+        layoutReviewProductPicker.setVisibility(View.VISIBLE);
+
+        if (productPickerAdapter == null) {
+            productPickerAdapter = new ReviewProductPickerAdapter();
+
+            rcvReviewProducts.setLayoutManager(
+                    new androidx.recyclerview.widget.LinearLayoutManager(
+                            this,
+                            androidx.recyclerview.widget.LinearLayoutManager.HORIZONTAL,
+                            false
+                    )
+            );
+
+            rcvReviewProducts.setAdapter(productPickerAdapter);
+
+            productPickerAdapter.setOnItemClickListener(item -> {
+                if (item == null || item.getOrderItemId() == null) return;
+
+                selectReviewItem(item, true);
+            });
+        }
+
+        productPickerAdapter.setData(reviewItems, orderItemId);
     }
 
     private void initEvents() {
@@ -239,14 +325,104 @@ public class ReviewActivity extends BaseActivity {
             hideLoading();
 
             if (state.isSuccess()) {
-                showToast("Đánh giá thành công");
+                markCurrentItemReviewed();
                 setResult(RESULT_OK);
-                finish();
+
+                if (hasUnreviewedItem()) {
+                    showToast("Đánh giá thành công. Bạn có thể chọn sản phẩm khác.");
+                    selectFirstUnreviewedItem();
+                    setupReviewProductPicker();
+                } else {
+                    showToast("Đã đánh giá xong tất cả sản phẩm");
+                    finish();
+                }
             } else {
                 showLongToast(state.getMessage());
             }
         });
     }
+
+    private void selectReviewItem(
+            ReviewItemArg item,
+            boolean resetForm
+    ) {
+        if (item == null) return;
+
+        if (item.isReviewed()) {
+            showToast("Sản phẩm này đã được đánh giá");
+            return;
+        }
+
+        orderItemId = item.getOrderItemId();
+        productName = item.getProductName();
+        productImage = item.getProductImage();
+
+        if (resetForm) {
+            resetReviewForm();
+        }
+
+        renderSelectedProduct();
+
+        if (productPickerAdapter != null) {
+            productPickerAdapter.setSelectedOrderItemId(orderItemId);
+        }
+    }
+
+    private void selectFirstUnreviewedItem() {
+        for (ReviewItemArg item : reviewItems) {
+            if (item != null && !item.isReviewed()) {
+                selectReviewItem(item, true);
+                return;
+            }
+        }
+    }
+
+    private boolean hasUnreviewedItem() {
+        for (ReviewItemArg item : reviewItems) {
+            if (item != null && !item.isReviewed()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private void markCurrentItemReviewed() {
+        for (ReviewItemArg item : reviewItems) {
+            if (item != null
+                    && item.getOrderItemId() != null
+                    && item.getOrderItemId().equals(orderItemId)) {
+                item.setReviewed(true);
+                break;
+            }
+        }
+
+        if (productPickerAdapter != null) {
+            productPickerAdapter.notifyDataSetChanged();
+        }
+    }
+
+    private void resetReviewForm() {
+        selectedRating = 5;
+        currentUploadIndex = 0;
+        uploading = false;
+
+        selectedImageUris.clear();
+        uploadedImageUrls.clear();
+
+        selectedVideoUri = null;
+        uploadedVideoUrl = null;
+
+        if (edtComment != null) {
+            edtComment.setText("");
+        }
+
+        updateStars();
+        renderSelectedImages();
+        renderSelectedVideo();
+        updateSubmitState();
+    }
+
     private void setRating(int rating) {
         selectedRating = rating;
         updateStars();
@@ -260,9 +436,6 @@ public class ReviewActivity extends BaseActivity {
         star5.setText(selectedRating >= 5 ? "★" : "☆");
     }
 
-    /**
-     * Upload ảnh tuần tự để dễ kiểm soát lỗi.
-     */
     private void uploadImagesSequentially(int index) {
         if (index >= selectedImageUris.size()) {
             uploading = false;
@@ -306,9 +479,6 @@ public class ReviewActivity extends BaseActivity {
         });
     }
 
-    /**
-     * Upload video review.
-     */
     private void uploadVideo(Uri uri) {
         uploading = true;
         showLoading();
@@ -368,7 +538,12 @@ public class ReviewActivity extends BaseActivity {
         }
 
         if (uploading && !selectedImageUris.isEmpty()) {
-            btnChooseImages.setText("Đang upload ảnh " + currentUploadIndex + "/" + selectedImageUris.size());
+            btnChooseImages.setText(
+                    "Đang upload ảnh "
+                            + currentUploadIndex
+                            + "/"
+                            + selectedImageUris.size()
+            );
         } else {
             btnChooseImages.setText("Chọn tối đa 4 ảnh (" + uploadedImageUrls.size() + "/4)");
         }
@@ -414,7 +589,8 @@ public class ReviewActivity extends BaseActivity {
             return;
         }
 
-        if (selectedVideoUri != null && (uploadedVideoUrl == null || uploadedVideoUrl.trim().isEmpty())) {
+        if (selectedVideoUri != null
+                && (uploadedVideoUrl == null || uploadedVideoUrl.trim().isEmpty())) {
             showToast("Video chưa upload xong, vui lòng thử lại");
             return;
         }
@@ -434,6 +610,7 @@ public class ReviewActivity extends BaseActivity {
                 uploadedVideoUrl
         );
     }
+
     private void updateSubmitState() {
         boolean enabled = !uploading;
 
@@ -443,5 +620,59 @@ public class ReviewActivity extends BaseActivity {
         btnChooseImages.setEnabled(enabled);
         btnChooseVideo.setEnabled(enabled);
         btnRemoveVideo.setEnabled(enabled);
+    }
+
+    public static class ReviewItemArg {
+
+        private Long orderItemId;
+        private String productName;
+        private String productImage;
+        private String variantSku;
+        private boolean reviewed;
+
+        public ReviewItemArg() {
+        }
+
+        public ReviewItemArg(
+                Long orderItemId,
+                String productName,
+                String productImage,
+                String variantSku,
+                boolean reviewed
+        ) {
+            this.orderItemId = orderItemId;
+            this.productName = productName;
+            this.productImage = productImage;
+            this.variantSku = variantSku;
+            this.reviewed = reviewed;
+        }
+
+        public Long getOrderItemId() {
+            return orderItemId;
+        }
+
+        public String getProductName() {
+            if (productName == null || productName.trim().isEmpty()) {
+                return "Sản phẩm";
+            }
+
+            return productName.trim();
+        }
+
+        public String getProductImage() {
+            return productImage == null ? "" : productImage;
+        }
+
+        public String getVariantSku() {
+            return variantSku == null ? "" : variantSku;
+        }
+
+        public boolean isReviewed() {
+            return reviewed;
+        }
+
+        public void setReviewed(boolean reviewed) {
+            this.reviewed = reviewed;
+        }
     }
 }
