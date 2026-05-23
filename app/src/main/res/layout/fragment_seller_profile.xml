@@ -19,15 +19,16 @@
             android:orientation="horizontal"
             android:padding="16dp">
 
-            <TextView
-                android:layout_width="58dp"
-                android:layout_height="58dp"
-                android:background="@drawable/bg_logo_box"
-                android:gravity="center"
-                android:text="Tôi"
-                android:textColor="@color/text_white"
-                android:textSize="16sp"
-                android:textStyle="bold" />
+            <ImageView
+                android:id="@+id/imgShopAvatar"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:background="@drawable/bg_shop_avatar_ring"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="9dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_shop" />
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -148,6 +149,59 @@
             android:textColor="@color/text_primary"
             android:textSize="20sp"
             android:textStyle="bold" />
+
+        <LinearLayout
+            android:id="@+id/rowWallet"
+            android:layout_width="match_parent"
+            android:layout_height="74dp"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/bg_seller_row"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp">
+
+            <TextView
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:background="@drawable/bg_soft_blue"
+                android:gravity="center"
+                android:text="💳"
+                android:textSize="20sp" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="12dp"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Ví người bán"
+                    android:textColor="@color/text_primary"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="Số dư, doanh thu, rút tiền, đối soát"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="13sp" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="›"
+                android:textColor="@color/text_hint"
+                android:textSize="28sp" />
+        </LinearLayout>
 
         <LinearLayout
             android:id="@+id/rowVoucherManager"
@@ -278,3 +332,5 @@
         </LinearLayout>
     </LinearLayout>
 </ScrollView>
+
+

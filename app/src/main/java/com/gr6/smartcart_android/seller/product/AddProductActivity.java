@@ -23,10 +23,10 @@ import com.gr6.smartcart_android.common.base.BaseResponse;
 import com.gr6.smartcart_android.seller.utils.ApiErrorUtils;
 import com.gr6.smartcart_android.common.utils.ThemeColor;
 import com.gr6.smartcart_android.seller.cloudinary.CloudinaryUploader;
-import com.gr6.smartcart_android.seller.model.ProductRequest;
-import com.gr6.smartcart_android.seller.model.ProductResponse;
-import com.gr6.smartcart_android.seller.model.ProductVariantRequest;
-import com.gr6.smartcart_android.seller.repository.SellerProductRepository;
+import com.gr6.smartcart_android.seller.product.request.ProductRequest;
+import com.gr6.smartcart_android.seller.product.response.ProductResponse;
+import com.gr6.smartcart_android.seller.product.request.ProductVariantRequest;
+import com.gr6.smartcart_android.seller.product.repository.SellerProductRepository;
 
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
@@ -45,6 +45,8 @@ public class AddProductActivity extends BaseActivity {
     private static final int REQ_PICK_BRAND = 2103;
     private static final int REQ_EDIT_VARIANTS = 2104;
     private static final int REQ_EDIT_SHIPPING = 2105;
+
+    public static final String EXTRA_EDIT_PRODUCT_ID = "extra_edit_product_id";
 
     private static final int MAX_PRODUCT_IMAGES = 9;
 
@@ -65,6 +67,7 @@ public class AddProductActivity extends BaseActivity {
     private TextView btnSaveDraft;
 
     private final List<Uri> productImageUris = new ArrayList<>();
+    private final List<String> existingImageUrls = new ArrayList<>();
     private final List<ProductVariantRequest> selectedVariants = new ArrayList<>();
 
     private ImageAdapter imageAdapter;
@@ -80,6 +83,8 @@ public class AddProductActivity extends BaseActivity {
     private String heightText = "";
 
     private boolean submitting = false;
+    private boolean editMode = false;
+    private Long editProductId = null;
 
     private final Gson gson = new Gson();
 
@@ -91,12 +96,22 @@ public class AddProductActivity extends BaseActivity {
         ThemeColor.applyWhiteNavigationBar(this);
 
         repository = new SellerProductRepository(this);
+        long rawEditProductId = getIntent().getLongExtra(EXTRA_EDIT_PRODUCT_ID, -1L);
+        if (rawEditProductId > 0) {
+            editMode = true;
+            editProductId = rawEditProductId;
+        }
 
         bindViews();
         setupImageList();
         bindCounters();
         bindActions();
         renderSelectedState();
+
+        if (editMode) {
+            setupEditMode();
+            loadProductForEdit();
+        }
     }
 
     private void bindViews() {
@@ -156,13 +171,93 @@ public class AddProductActivity extends BaseActivity {
 
         btnPublishProduct.setOnClickListener(v -> submitProduct());
 
-        btnSaveDraft.setOnClickListener(v ->
-                showToast("Hiện backend chưa có API lưu nháp, dùng nút Hiển thị để đăng sản phẩm")
-        );
+        btnSaveDraft.setOnClickListener(v -> {
+            if (editMode) {
+                finish();
+            } else {
+                showToast("Hiện backend chưa có API lưu nháp, dùng nút Hiển thị để đăng sản phẩm");
+            }
+        });
+    }
+
+    private void setupEditMode() {
+        btnPublishProduct.setText("Cập nhật");
+        btnSaveDraft.setText("Hủy");
+    }
+
+    private void loadProductForEdit() {
+        if (editProductId == null || editProductId <= 0) {
+            showToast("Không tìm thấy sản phẩm cần sửa");
+            finish();
+            return;
+        }
+
+        showLoading();
+        repository.loadProductForSeller(editProductId, new SellerProductRepository.ProductCallback<ProductResponse>() {
+            @Override
+            public void onSuccess(ProductResponse data, String message) {
+                runOnUiThread(() -> {
+                    hideLoading();
+                    fillProductForEdit(data);
+                });
+            }
+
+            @Override
+            public void onError(String message) {
+                runOnUiThread(() -> {
+                    hideLoading();
+                    showLongToast(message == null ? "Không tải được sản phẩm cần sửa" : message);
+                    finish();
+                });
+            }
+        });
+    }
+
+    private void fillProductForEdit(ProductResponse product) {
+        if (product == null) return;
+
+        etProductName.setText(product.getName() == null ? "" : product.getName());
+        etProductDesc.setText(product.getDescription() == null ? "" : product.getDescription());
+        edtProductPrice.setText(product.getBasePrice() == null ? "" : product.getBasePrice().stripTrailingZeros().toPlainString());
+
+        selectedCategoryId = product.getCategoryId();
+        tvCategoryValue.setText(selectedCategoryId == null ? "Vui lòng chọn" : "Mã danh mục #" + selectedCategoryId);
+
+        selectedBrand = product.getBrand();
+        selectedCondition = product.getCondition() == null ? "NEW" : product.getCondition();
+        weightText = product.getWeight() == null ? "" : product.getWeight().stripTrailingZeros().toPlainString();
+        lengthText = product.getLength() == null ? "" : product.getLength().stripTrailingZeros().toPlainString();
+        widthText = product.getWidth() == null ? "" : product.getWidth().stripTrailingZeros().toPlainString();
+        heightText = product.getHeight() == null ? "" : product.getHeight().stripTrailingZeros().toPlainString();
+
+        existingImageUrls.clear();
+        if (product.getImages() != null) {
+            for (String url : product.getImages()) {
+                if (!TextUtils.isEmpty(url)) existingImageUrls.add(url.trim());
+            }
+        }
+
+        selectedVariants.clear();
+        if (product.getVariants() != null && !product.getVariants().isEmpty()) {
+            for (com.gr6.smartcart_android.seller.product.response.VariantResponse variant : product.getVariants()) {
+                if (variant == null) continue;
+                selectedVariants.add(new ProductVariantRequest(
+                        variant.getSku(),
+                        variant.getPrice(),
+                        variant.getStockQuantity(),
+                        variant.getImageUrl(),
+                        variant.getAttributes()
+                ));
+            }
+        } else {
+            edtProductStock.setText("0");
+        }
+
+        renderSelectedState();
     }
 
     private void openProductImagePicker() {
-        if (productImageUris.size() >= MAX_PRODUCT_IMAGES) {
+        if (productImageUris.size() + existingImageUrls.size() >= MAX_PRODUCT_IMAGES) {
             showToast("Tối đa " + MAX_PRODUCT_IMAGES + " ảnh sản phẩm");
             return;
         }
@@ -221,8 +316,11 @@ public class AddProductActivity extends BaseActivity {
             @Override
             public void onSuccess(List<String> urls) {
                 runOnUiThread(() -> {
-                    request.setUploadImages(urls);
-                    createProductOnBackend(request);
+                    List<String> finalImageUrls = new ArrayList<>();
+                    finalImageUrls.addAll(existingImageUrls);
+                    if (urls != null) finalImageUrls.addAll(urls);
+                    request.setUploadImages(finalImageUrls);
+                    submitProductToBackend(request);
                 });
             }
 
@@ -242,7 +340,7 @@ public class AddProductActivity extends BaseActivity {
         String name = textOf(etProductName);
         String description = textOf(etProductDesc);
 
-        if (productImageUris.isEmpty()) {
+        if (productImageUris.isEmpty() && existingImageUrls.isEmpty()) {
             showToast("Vui lòng thêm ít nhất 1 ảnh sản phẩm");
             return null;
         }
@@ -295,8 +393,12 @@ public class AddProductActivity extends BaseActivity {
         return request;
     }
 
-    private void createProductOnBackend(ProductRequest request) {
-        repository.createProduct(request).enqueue(new Callback<BaseResponse<ProductResponse>>() {
+    private void submitProductToBackend(ProductRequest request) {
+        Call<BaseResponse<ProductResponse>> call = editMode
+                ? repository.updateProduct(editProductId, request)
+                : repository.createProduct(request);
+
+        call.enqueue(new Callback<BaseResponse<ProductResponse>>() {
             @Override
             public void onResponse(
                     Call<BaseResponse<ProductResponse>> call,
@@ -308,7 +410,7 @@ public class AddProductActivity extends BaseActivity {
 
                 BaseResponse<ProductResponse> body = response.body();
                 if (response.isSuccessful() && body != null && body.isSuccess()) {
-                    showToast("Đăng sản phẩm thành công");
+                    showToast(editMode ? "Cập nhật sản phẩm thành công" : "Đăng sản phẩm thành công");
                     setResult(RESULT_OK);
                     finish();
                     return;
@@ -320,7 +422,7 @@ public class AddProductActivity extends BaseActivity {
                 } else {
                     message = ApiErrorUtils.extractErrorMessage(response);
                 }
-                showLongToast("Đăng sản phẩm thất bại: " + message);
+                showLongToast((editMode ? "Cập nhật sản phẩm thất bại: " : "Đăng sản phẩm thất bại: ") + message);
             }
 
             @Override
@@ -328,7 +430,7 @@ public class AddProductActivity extends BaseActivity {
                 submitting = false;
                 setSubmitEnabled(true);
                 hideLoading();
-                showLongToast("Lỗi kết nối server khi đăng sản phẩm: " + t.getMessage());
+                showLongToast("Lỗi kết nối server: " + t.getMessage());
             }
         });
     }
@@ -384,7 +486,7 @@ public class AddProductActivity extends BaseActivity {
     }
 
     private void handlePickedProductImages(Intent data) {
-        int remaining = MAX_PRODUCT_IMAGES - productImageUris.size();
+        int remaining = MAX_PRODUCT_IMAGES - productImageUris.size() - existingImageUrls.size();
 
         if (data.getClipData() != null) {
             int count = Math.min(data.getClipData().getItemCount(), remaining);
@@ -451,7 +553,8 @@ public class AddProductActivity extends BaseActivity {
 
     private void updateImageCount() {
         if (tvImageCount != null) {
-            tvImageCount.setText(productImageUris.size() + "/" + MAX_PRODUCT_IMAGES + " ảnh");
+            int total = productImageUris.size() + existingImageUrls.size();
+            tvImageCount.setText(total + "/" + MAX_PRODUCT_IMAGES + " ảnh");
         }
     }
 
@@ -539,5 +642,3 @@ public class AddProductActivity extends BaseActivity {
         return TextUtils.isEmpty(value) ? "0" : value;
     }
 }
-
-

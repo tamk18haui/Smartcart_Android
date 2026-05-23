@@ -11,7 +11,10 @@ public class OrderStatusHelper {
 
     public static String label(String status) {
         String s = normalize(status);
+
         switch (s) {
+            case "PENDING_PAYMENT":
+                return "CHỜ THANH TOÁN";
             case "PENDING":
                 return "CHỜ XÁC NHẬN";
             case "CONFIRMED":
@@ -24,6 +27,8 @@ public class OrderStatusHelper {
                 return "HOÀN THÀNH";
             case "CANCELLED":
                 return "ĐÃ HỦY";
+            case "PAYMENT_FAILED":
+                return "THANH TOÁN LỖI";
             default:
                 return s.isEmpty() ? "KHÔNG RÕ" : s;
         }
@@ -33,21 +38,45 @@ public class OrderStatusHelper {
         String s = normalize(status);
         String t = normalize(tab);
 
-        if (t.equals("ALL")) return true;
-        if (t.equals("SHIPPING")) return s.equals("SHIPPING") || s.equals("DELIVERED");
-        if (t.equals("COMPLETED")) return s.equals("COMPLETED");
+        if ("ALL".equals(t)) {
+            return true;
+        }
+
+        if ("PENDING".equals(t)) {
+            return "PENDING".equals(s) || "PENDING_PAYMENT".equals(s);
+        }
+
+        if ("SHIPPING".equals(t)) {
+            return "SHIPPING".equals(s) || "DELIVERED".equals(s);
+        }
+
+        if ("COMPLETED".equals(t)) {
+            return "COMPLETED".equals(s);
+        }
+
         return s.equals(t);
     }
 
     public static String nextActionLabel(String status) {
         String s = normalize(status);
+
         switch (s) {
+            case "PENDING_PAYMENT":
+                return "Chờ thanh toán";
             case "PENDING":
                 return "Xác nhận đơn";
             case "CONFIRMED":
                 return "Chuyển đang giao";
             case "SHIPPING":
-                return "Hoàn thành giao";
+                return "Đã giao hàng";
+            case "DELIVERED":
+                return "Chờ người mua";
+            case "COMPLETED":
+                return "Xem chi tiết";
+            case "CANCELLED":
+                return "Xem chi tiết";
+            case "PAYMENT_FAILED":
+                return "Xem chi tiết";
             default:
                 return "Xem chi tiết";
         }
@@ -55,6 +84,7 @@ public class OrderStatusHelper {
 
     public static String nextStatus(String status) {
         String s = normalize(status);
+
         switch (s) {
             case "PENDING":
                 return "CONFIRMED";
@@ -65,5 +95,13 @@ public class OrderStatusHelper {
             default:
                 return "";
         }
+    }
+
+    public static boolean canSellerQuickAction(String status) {
+        String s = normalize(status);
+
+        return "PENDING".equals(s)
+                || "CONFIRMED".equals(s)
+                || "SHIPPING".equals(s);
     }
 }

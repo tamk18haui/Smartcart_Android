@@ -1,30 +1,44 @@
 package com.gr6.smartcart_android.seller.shop;
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import com.gr6.smartcart_android.R;
+import com.gr6.smartcart_android.buyer.address.location.LocationUnit;
+import com.gr6.smartcart_android.buyer.address.location.repository.VietnamAddressRepository;
 import com.gr6.smartcart_android.common.base.BaseResponse;
+import com.gr6.smartcart_android.common.cloudinary.CloudinaryRepository;
 import com.gr6.smartcart_android.common.network.ApiClient;
-import com.gr6.smartcart_android.seller.api.SellerCatalogApiService;
-import com.gr6.smartcart_android.seller.model.SellerShopInfoResponse;
-import com.gr6.smartcart_android.seller.model.SellerShopUpdateRequest;
+import com.gr6.smartcart_android.common.utils.ImageLoader;
+import com.gr6.smartcart_android.seller.shop.api.SellerShopApiService;
+import com.gr6.smartcart_android.seller.shop.request.SellerShopUpdateRequest;
+import com.gr6.smartcart_android.seller.shop.response.SellerShopInfoResponse;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class SellerShopInfoActivity extends AppCompatActivity {
 
+    private ImageView imgShopLogo;
+    private TextView txtChangeLogo;
     private TextView txtShopName;
     private TextView txtStatus;
     private TextView txtDescription;
@@ -33,22 +47,43 @@ public class SellerShopInfoActivity extends AppCompatActivity {
     private TextView txtEditShop;
     private View progressBar;
 
-    private SellerCatalogApiService sellerApiService;
+    private SellerShopApiService sellerApiService;
+    private CloudinaryRepository cloudinaryRepository;
+    private VietnamAddressRepository vietnamAddressRepository;
+    private ActivityResultLauncher<String> pickLogoLauncher;
+
     private SellerShopInfoResponse currentShop;
+    private String currentLogoUrl = "";
+    private String currentCoverUrl = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_seller_shop_info);
 
-        sellerApiService = ApiClient.createService(this, SellerCatalogApiService.class);
+        sellerApiService = ApiClient.createService(this, SellerShopApiService.class);
+        cloudinaryRepository = new CloudinaryRepository();
+        vietnamAddressRepository = new VietnamAddressRepository();
 
+        setupImagePicker();
         bindViews();
         bindEvents();
         loadShopInfo();
     }
 
+    private void setupImagePicker() {
+        pickLogoLauncher = registerForActivityResult(
+                new ActivityResultContracts.GetContent(),
+                uri -> {
+                    if (uri == null) return;
+                    uploadShopLogo(uri);
+                }
+        );
+    }
+
     private void bindViews() {
+        imgShopLogo = findViewById(R.id.imgShopLogo);
+        txtChangeLogo = findViewById(R.id.txtChangeLogo);
         txtShopName = findViewById(R.id.txtShopInfoName);
         txtStatus = findViewById(R.id.txtShopInfoStatus);
         txtDescription = findViewById(R.id.txtShopInfoDescription);
@@ -61,6 +96,47 @@ public class SellerShopInfoActivity extends AppCompatActivity {
     private void bindEvents() {
         findViewById(R.id.btnBack).setOnClickListener(v -> finish());
         txtEditShop.setOnClickListener(v -> openEditDialog());
+        txtChangeLogo.setOnClickListener(v -> chooseLogoImage());
+        imgShopLogo.setOnClickListener(v -> chooseLogoImage());
+    }
+
+    private void chooseLogoImage() {
+        if (currentShop == null) {
+            Toast.makeText(this, "Đang tải dữ liệu shop, thử lại sau", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (!"ACTIVE".equals(normalizeStatus(currentShop.getStatus()))) {
+            Toast.makeText(this, "Shop chưa hoạt động nên chưa thể đổi avatar", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        pickLogoLauncher.launch("image/*");
+    }
+
+    private void uploadShopLogo(Uri uri) {
+        setLoading(true);
+        imgShopLogo.setImageURI(uri);
+
+        cloudinaryRepository.uploadImage(this, uri, new CloudinaryRepository.UploadCallback() {
+            @Override
+            public void onSuccess(String imageUrl) {
+                runOnUiThread(() -> {
+                    currentLogoUrl = imageUrl == null ? "" : imageUrl.trim();
+                    ImageLoader.loadCircle(SellerShopInfoActivity.this, currentLogoUrl, imgShopLogo);
+                    updateShopProfile(null, buildCurrentUpdateRequest(currentLogoUrl));
+                });
+            }
+
+            @Override
+            public void onError(String message) {
+                runOnUiThread(() -> {
+                    setLoading(false);
+                    ImageLoader.loadCircle(SellerShopInfoActivity.this, currentLogoUrl, imgShopLogo);
+                    Toast.makeText(SellerShopInfoActivity.this, message, Toast.LENGTH_LONG).show();
+                });
+            }
+        });
     }
 
     private void loadShopInfo() {
@@ -96,6 +172,11 @@ public class SellerShopInfoActivity extends AppCompatActivity {
     }
 
     private void renderShop(SellerShopInfoResponse shop) {
+        currentLogoUrl = shop.getLogoUrl();
+        currentCoverUrl = shop.getCoverUrl();
+
+        ImageLoader.loadCircle(this, currentLogoUrl, imgShopLogo);
+
         txtShopName.setText(emptyToDefault(shop.getShopName(), "Cửa hàng SmartCart"));
         txtStatus.setText(toVietnameseStatus(shop.getStatus()));
         txtDescription.setText(emptyToDefault(shop.getDescription(), "Chưa có mô tả cửa hàng."));
@@ -106,6 +187,8 @@ public class SellerShopInfoActivity extends AppCompatActivity {
         boolean canEdit = "ACTIVE".equals(status);
         txtEditShop.setEnabled(canEdit);
         txtEditShop.setAlpha(canEdit ? 1f : 0.45f);
+        txtChangeLogo.setEnabled(canEdit);
+        txtChangeLogo.setAlpha(canEdit ? 1f : 0.45f);
     }
 
     private void openEditDialog() {
@@ -125,11 +208,27 @@ public class SellerShopInfoActivity extends AppCompatActivity {
         wrapper.setPadding(padding, padding / 2, padding, 0);
 
         EditText edtName = createEditText("Tên cửa hàng", currentShop.getShopName(), false);
-        EditText edtAddress = createEditText("Địa chỉ lấy hàng", currentShop.getPickupAddress(), true);
+        EditText edtDetailAddress = createEditText("Số nhà, tên đường/khu vực lấy hàng", currentShop.getPickupAddress(), true);
+        TextView txtProvince = createPickerText("Chọn tỉnh/thành phố lấy hàng");
+        TextView txtWard = createPickerText("Chọn phường/xã lấy hàng");
         EditText edtDescription = createEditText("Mô tả cửa hàng", currentShop.getDescription(), true);
 
+        final LocationUnit[] selectedProvince = {null};
+        final LocationUnit[] selectedWard = {null};
+
+        txtProvince.setOnClickListener(v -> loadAndPickProvince(txtProvince, txtWard, selectedProvince, selectedWard));
+        txtWard.setOnClickListener(v -> {
+            if (selectedProvince[0] == null) {
+                Toast.makeText(this, "Vui lòng chọn tỉnh/thành phố trước", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            loadAndPickWard(txtWard, selectedProvince[0], selectedWard);
+        });
+
         wrapper.addView(edtName);
-        wrapper.addView(edtAddress);
+        wrapper.addView(edtDetailAddress);
+        wrapper.addView(txtProvince);
+        wrapper.addView(txtWard);
         wrapper.addView(edtDescription);
 
         AlertDialog dialog = new AlertDialog.Builder(this)
@@ -143,7 +242,7 @@ public class SellerShopInfoActivity extends AppCompatActivity {
             Button positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
             positiveButton.setOnClickListener(v -> {
                 String name = edtName.getText().toString().trim();
-                String address = edtAddress.getText().toString().trim();
+                String detailAddress = edtDetailAddress.getText().toString().trim();
                 String description = edtDescription.getText().toString().trim();
 
                 if (name.isEmpty()) {
@@ -152,17 +251,150 @@ public class SellerShopInfoActivity extends AppCompatActivity {
                     return;
                 }
 
-                if (address.isEmpty()) {
-                    edtAddress.requestFocus();
-                    edtAddress.setError("Địa chỉ lấy hàng không được để trống");
+                if (detailAddress.isEmpty()) {
+                    edtDetailAddress.requestFocus();
+                    edtDetailAddress.setError("Địa chỉ lấy hàng không được để trống");
                     return;
                 }
 
-                updateShop(dialog, new SellerShopUpdateRequest(name, address, description));
+                String address = buildPickupAddress(detailAddress, selectedWard[0], selectedProvince[0]);
+
+                SellerShopUpdateRequest request = new SellerShopUpdateRequest(
+                        name,
+                        address,
+                        description,
+                        currentLogoUrl,
+                        currentCoverUrl
+                );
+
+                updateShopProfile(dialog, request);
             });
         });
 
         dialog.show();
+    }
+
+    private TextView createPickerText(String value) {
+        TextView textView = new TextView(this);
+        textView.setText(value);
+        textView.setTextSize(15);
+        textView.setTextColor(ContextCompat.getColor(this, R.color.text_primary));
+        textView.setGravity(android.view.Gravity.CENTER_VERTICAL);
+        textView.setBackgroundResource(R.drawable.bg_address_input);
+        textView.setPadding(dp(12), 0, dp(12), 0);
+
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                dp(52)
+        );
+        params.setMargins(0, dp(8), 0, dp(8));
+        textView.setLayoutParams(params);
+        return textView;
+    }
+
+    private void loadAndPickProvince(
+            TextView txtProvince,
+            TextView txtWard,
+            LocationUnit[] selectedProvince,
+            LocationUnit[] selectedWard
+    ) {
+        setLoading(true);
+        vietnamAddressRepository.getProvinces(new VietnamAddressRepository.LocationListCallback() {
+            @Override
+            public void onSuccess(List<LocationUnit> data) {
+                runOnUiThread(() -> {
+                    setLoading(false);
+                    showLocationDialog("Chọn tỉnh/thành phố", data, unit -> {
+                        selectedProvince[0] = unit;
+                        selectedWard[0] = null;
+                        txtProvince.setText(unit.getName());
+                        txtWard.setText("Chọn phường/xã lấy hàng");
+                    });
+                });
+            }
+
+            @Override
+            public void onError(String message) {
+                runOnUiThread(() -> {
+                    setLoading(false);
+                    Toast.makeText(SellerShopInfoActivity.this, message, Toast.LENGTH_SHORT).show();
+                });
+            }
+        });
+    }
+
+    private void loadAndPickWard(
+            TextView txtWard,
+            LocationUnit province,
+            LocationUnit[] selectedWard
+    ) {
+        setLoading(true);
+        vietnamAddressRepository.getWardsByProvince(province.getSafeCode(), new VietnamAddressRepository.LocationListCallback() {
+            @Override
+            public void onSuccess(List<LocationUnit> data) {
+                runOnUiThread(() -> {
+                    setLoading(false);
+                    showLocationDialog("Chọn phường/xã", data, unit -> {
+                        selectedWard[0] = unit;
+                        txtWard.setText(unit.getName());
+                    });
+                });
+            }
+
+            @Override
+            public void onError(String message) {
+                runOnUiThread(() -> {
+                    setLoading(false);
+                    Toast.makeText(SellerShopInfoActivity.this, message, Toast.LENGTH_SHORT).show();
+                });
+            }
+        });
+    }
+
+    private void showLocationDialog(String title, List<LocationUnit> data, LocationPickCallback callback) {
+        List<LocationUnit> safeData = data == null ? new ArrayList<>() : data;
+        if (safeData.isEmpty()) {
+            Toast.makeText(this, "Không có dữ liệu địa chỉ", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String[] names = new String[safeData.size()];
+        for (int i = 0; i < safeData.size(); i++) {
+            names[i] = safeData.get(i).getName();
+        }
+
+        new AlertDialog.Builder(this)
+                .setTitle(title)
+                .setItems(names, (dialog, which) -> {
+                    if (callback != null) {
+                        callback.onPick(safeData.get(which));
+                    }
+                })
+                .show();
+    }
+
+    private String buildPickupAddress(String detailAddress, LocationUnit ward, LocationUnit province) {
+        StringBuilder builder = new StringBuilder(detailAddress == null ? "" : detailAddress.trim());
+
+        if (ward != null) {
+            appendAddressPart(builder, ward.getName());
+        }
+
+        if (province != null) {
+            appendAddressPart(builder, province.getName());
+        }
+
+        return builder.toString();
+    }
+
+    private void appendAddressPart(StringBuilder builder, String value) {
+        if (value == null || value.trim().isEmpty()) return;
+        if (builder.length() > 0) builder.append(", ");
+        builder.append(value.trim());
+    }
+
+    private interface LocationPickCallback {
+        void onPick(LocationUnit unit);
     }
 
     private EditText createEditText(String hint, String value, boolean multiLine) {
@@ -184,7 +416,17 @@ public class SellerShopInfoActivity extends AppCompatActivity {
         return editText;
     }
 
-    private void updateShop(AlertDialog dialog, SellerShopUpdateRequest request) {
+    private SellerShopUpdateRequest buildCurrentUpdateRequest(String logoUrl) {
+        return new SellerShopUpdateRequest(
+                currentShop == null ? "Cửa hàng SmartCart" : currentShop.getSafeShopName(),
+                currentShop == null ? "Địa chỉ lấy hàng" : currentShop.getPickupAddress(),
+                currentShop == null ? "" : currentShop.getDescription(),
+                logoUrl,
+                currentCoverUrl
+        );
+    }
+
+    private void updateShopProfile(AlertDialog dialog, SellerShopUpdateRequest request) {
         setLoading(true);
         sellerApiService.updateMyShop(request).enqueue(new Callback<BaseResponse<Object>>() {
             @Override
@@ -202,7 +444,9 @@ public class SellerShopInfoActivity extends AppCompatActivity {
                 }
 
                 Toast.makeText(SellerShopInfoActivity.this, body.getSafeMessage(), Toast.LENGTH_SHORT).show();
-                dialog.dismiss();
+                if (dialog != null) {
+                    dialog.dismiss();
+                }
                 loadShopInfo();
             }
 
@@ -246,3 +490,5 @@ public class SellerShopInfoActivity extends AppCompatActivity {
         return normalized.isEmpty() ? "CHƯA XÁC ĐỊNH" : normalized;
     }
 }
+
+

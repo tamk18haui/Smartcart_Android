@@ -2,24 +2,24 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="@color/surface"
     android:orientation="vertical"
-    android:padding="22dp"
-    android:background="@color/seller_surface">
+    android:padding="20dp">
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:gravity="center"
         android:text="Cập nhật trạng thái"
-        android:textColor="@color/seller_text_primary"
-        android:textStyle="bold"
+        android:textColor="@color/text_primary"
         android:textSize="22sp"
-        android:gravity="center" />
+        android:textStyle="bold" />
 
     <RadioGroup
-        android:id="@+id/rgStatus"
+        android:id="@+id/radioGroupStatus"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="18dp"
         android:orientation="vertical">
 
         <RadioButton
@@ -27,80 +27,95 @@
             android:layout_width="match_parent"
             android:layout_height="52dp"
             android:text="CHỜ XÁC NHẬN"
-            android:textStyle="bold"
-            android:textColor="@color/seller_text_primary" />
+            android:textColor="@color/text_primary"
+            android:textSize="16sp"
+            android:textStyle="bold" />
 
         <RadioButton
             android:id="@+id/rbConfirmed"
             android:layout_width="match_parent"
             android:layout_height="52dp"
             android:text="ĐÃ XÁC NHẬN"
-            android:textStyle="bold"
-            android:textColor="@color/seller_text_primary" />
+            android:textColor="@color/text_primary"
+            android:textSize="16sp"
+            android:textStyle="bold" />
 
         <RadioButton
             android:id="@+id/rbShipping"
             android:layout_width="match_parent"
             android:layout_height="52dp"
             android:text="ĐANG GIAO"
-            android:textStyle="bold"
-            android:textColor="@color/seller_text_primary" />
+            android:textColor="@color/text_primary"
+            android:textSize="16sp"
+            android:textStyle="bold" />
 
         <RadioButton
             android:id="@+id/rbDelivered"
             android:layout_width="match_parent"
             android:layout_height="52dp"
-            android:text="HOÀN THÀNH GIAO"
-            android:textStyle="bold"
-            android:textColor="@color/seller_text_primary" />
+            android:text="ĐÃ GIAO"
+            android:textColor="@color/text_primary"
+            android:textSize="16sp"
+            android:textStyle="bold" />
 
         <RadioButton
             android:id="@+id/rbCancelled"
             android:layout_width="match_parent"
             android:layout_height="52dp"
             android:text="ĐÃ HỦY"
-            android:textStyle="bold"
-            android:textColor="@color/danger" />
+            android:textColor="@color/text_primary"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
     </RadioGroup>
 
     <EditText
         android:id="@+id/edtCancelReason"
         android:layout_width="match_parent"
-        android:layout_height="94dp"
-        android:layout_marginTop="12dp"
-        android:gravity="top"
-        android:hint="Nhập lý do khi hủy đơn..."
-        android:padding="14dp"
+        android:layout_height="96dp"
+        android:layout_marginTop="14dp"
+        android:background="@drawable/bg_seller_input"
+        android:gravity="top|start"
+        android:hint="Lý do hủy đơn nếu chọn hủy"
         android:inputType="textMultiLine"
-        android:maxLines="3"
-        android:background="@drawable/bg_seller_input" />
+        android:maxLines="4"
+        android:padding="12dp"
+        android:textColor="@color/text_primary"
+        android:textColorHint="@color/text_secondary"
+        android:textSize="14sp" />
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="54dp"
-        android:orientation="horizontal"
-        android:layout_marginTop="18dp">
+        android:layout_height="48dp"
+        android:layout_marginTop="18dp"
+        android:orientation="horizontal">
 
         <TextView
             android:id="@+id/btnCancel"
             android:layout_width="0dp"
             android:layout_height="match_parent"
+            android:layout_marginEnd="8dp"
             android:layout_weight="1"
+            android:background="@drawable/bg_seller_button_outline"
             android:gravity="center"
-            android:text="Hủy"
-            android:textStyle="bold"
-            android:textColor="@color/seller_text_secondary" />
+            android:text="Đóng"
+            android:textColor="@color/text_primary"
+            android:textSize="14sp"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/btnConfirm"
             android:layout_width="0dp"
             android:layout_height="match_parent"
+            android:layout_marginStart="8dp"
             android:layout_weight="1"
+            android:background="@drawable/bg_seller_button_primary"
             android:gravity="center"
-            android:text="Xác nhận"
-            android:textStyle="bold"
-            android:textColor="@color/seller_text_white"
-            android:background="@drawable/bg_seller_button_primary" />
+            android:text="Cập nhật"
+            android:textColor="@color/text_white"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
     </LinearLayout>
 
 </LinearLayout>

@@ -70,129 +70,103 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/bg_seller_card"
-                android:orientation="vertical"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
                 android:padding="18dp">
 
+                <ImageView
+                    android:id="@+id/imgShopLogo"
+                    android:layout_width="76dp"
+                    android:layout_height="76dp"
+                    android:background="@drawable/bg_shop_avatar_ring"
+                    android:padding="10dp"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/ic_shop" />
+
                 <LinearLayout
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
+                    android:layout_marginStart="16dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
 
                     <TextView
-                        android:layout_width="64dp"
-                        android:layout_height="64dp"
-                        android:background="@drawable/bg_logo_box"
-                        android:gravity="center"
-                        android:text="SC"
-                        android:textColor="@color/text_white"
-                        android:textSize="18sp"
+                        android:id="@+id/txtShopInfoName"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:text="Cửa hàng SmartCart"
+                        android:textColor="@color/text_primary"
+                        android:textSize="22sp"
                         android:textStyle="bold" />
 
-                    <LinearLayout
-                        android:layout_width="0dp"
+                    <TextView
+                        android:id="@+id/txtShopInfoId"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="14dp"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:id="@+id/txtShopInfoName"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="SmartCart Official"
-                            android:textColor="@color/text_primary"
-                            android:textSize="22sp"
-                            android:textStyle="bold" />
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="6dp"
-                            android:gravity="center_vertical"
-                            android:orientation="horizontal">
-
-                            <TextView
-                                android:id="@+id/txtShopInfoStatus"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:background="@drawable/bg_seller_chip_soft"
-                                android:paddingStart="10dp"
-                                android:paddingTop="4dp"
-                                android:paddingEnd="10dp"
-                                android:paddingBottom="4dp"
-                                android:text="ĐANG KIỂM TRA"
-                                android:textColor="@color/brand_primary"
-                                android:textSize="12sp"
-                                android:textStyle="bold" />
-
-                            <TextView
-                                android:id="@+id/txtShopInfoId"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart="8dp"
-                                android:text="#--"
-                                android:textColor="@color/text_hint"
-                                android:textSize="13sp" />
-                        </LinearLayout>
-                    </LinearLayout>
-                </LinearLayout>
-
-                <TextView
-                    android:id="@+id/txtShopInfoDescription"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:lineSpacingExtra="4dp"
-                    android:text="Chưa có mô tả cửa hàng."
-                    android:textColor="@color/text_primary"
-                    android:textSize="15sp" />
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginTop="18dp"
-                    android:background="@color/divider" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:orientation="horizontal">
+                        android:layout_marginTop="4dp"
+                        android:text="#--"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="13sp" />
 
                     <TextView
-                        android:layout_width="0dp"
+                        android:id="@+id/txtShopInfoStatus"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:gravity="center"
-                        android:text="4.9\nĐánh giá"
-                        android:textColor="@color/text_primary"
-                        android:textSize="14sp" />
+                        android:layout_marginTop="7dp"
+                        android:background="@drawable/bg_seller_chip_soft"
+                        android:paddingStart="10dp"
+                        android:paddingTop="4dp"
+                        android:paddingEnd="10dp"
+                        android:paddingBottom="4dp"
+                        android:text="ĐANG HOẠT ĐỘNG"
+                        android:textColor="@color/brand_primary"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
 
                     <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
+                        android:id="@+id/txtChangeLogo"
+                        android:layout_width="wrap_content"
+                        android:layout_height="36dp"
+                        android:layout_marginTop="10dp"
+                        android:background="@drawable/bg_seller_button_primary"
                         android:gravity="center"
-                        android:text="12.5k\nNgười theo dõi"
-                        android:textColor="@color/text_primary"
-                        android:textSize="14sp" />
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:gravity="center"
-                        android:text="98%\nPhản hồi"
-                        android:textColor="@color/text_primary"
-                        android:textSize="14sp" />
+                        android:paddingStart="14dp"
+                        android:paddingEnd="14dp"
+                        android:text="Đổi avatar shop"
+                        android:textColor="@color/text_white"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
                 </LinearLayout>
             </LinearLayout>
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="22dp"
+                android:text="Mô tả cửa hàng"
+                android:textColor="@color/text_primary"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/txtShopInfoDescription"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/bg_seller_card"
+                android:lineSpacingExtra="4dp"
+                android:minHeight="92dp"
+                android:padding="18dp"
+                android:text="Chưa có mô tả cửa hàng."
+                android:textColor="@color/text_secondary"
+                android:textSize="15sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="22dp"
                 android:text="Địa chỉ lấy hàng"
                 android:textColor="@color/text_primary"
                 android:textSize="20sp"
@@ -223,82 +197,20 @@
                     android:text="Chưa có địa chỉ lấy hàng."
                     android:textColor="@color/text_secondary"
                     android:textSize="15sp" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="118dp"
-                    android:layout_marginTop="16dp"
-                    android:background="@drawable/bg_soft_blue"
-                    android:gravity="center"
-                    android:text="📍 Bản đồ kho hàng"
-                    android:textColor="@color/brand_primary"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
             </LinearLayout>
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:text="Quản lý cửa hàng"
-                android:textColor="@color/text_primary"
-                android:textSize="20sp"
+                android:layout_marginTop="22dp"
+                android:layout_marginBottom="24dp"
+                android:background="@drawable/bg_soft_blue"
+                android:gravity="center"
+                android:padding="16dp"
+                android:text="Avatar shop sau khi lưu sẽ tự hiện ở Dashboard và màn hình Tôi."
+                android:textColor="@color/brand_primary"
+                android:textSize="14sp"
                 android:textStyle="bold" />
-
-            <GridLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:columnCount="2">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="94dp"
-                    android:layout_columnWeight="1"
-                    android:layout_margin="5dp"
-                    android:background="@drawable/bg_seller_card"
-                    android:gravity="center"
-                    android:text="Sản phẩm\nQuản lý sản phẩm"
-                    android:textColor="@color/text_primary"
-                    android:textSize="15sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="94dp"
-                    android:layout_columnWeight="1"
-                    android:layout_margin="5dp"
-                    android:background="@drawable/bg_seller_card"
-                    android:gravity="center"
-                    android:text="Đơn hàng\nTheo dõi đơn mới"
-                    android:textColor="@color/text_primary"
-                    android:textSize="15sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="94dp"
-                    android:layout_columnWeight="1"
-                    android:layout_margin="5dp"
-                    android:background="@drawable/bg_seller_card"
-                    android:gravity="center"
-                    android:text="Doanh thu\nThống kê tháng"
-                    android:textColor="@color/text_primary"
-                    android:textSize="15sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="94dp"
-                    android:layout_columnWeight="1"
-                    android:layout_margin="5dp"
-                    android:background="@drawable/bg_seller_card"
-                    android:gravity="center"
-                    android:text="Voucher\nƯu đãi của shop"
-                    android:textColor="@color/text_primary"
-                    android:textSize="15sp"
-                    android:textStyle="bold" />
-            </GridLayout>
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

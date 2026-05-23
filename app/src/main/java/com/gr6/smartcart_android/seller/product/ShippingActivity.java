@@ -60,3 +60,5 @@ public class ShippingActivity extends BaseActivity {
         return editText.getText() == null ? "" : editText.getText().toString().trim();
     }
 }
+
+
