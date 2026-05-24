@@ -231,7 +231,23 @@ public class CartActivity extends BaseActivity {
         shops.clear();
 
         if (cart != null && cart.getShops() != null) {
-            shops.addAll(cart.getShops());
+            List<CartDetailResponse.ShopCart> sortedShops = new ArrayList<>(cart.getShops());
+
+            sortedShops.sort((s1, s2) -> {
+                Long id1 = s1.getShopId() == null ? Long.MAX_VALUE : s1.getShopId();
+                Long id2 = s2.getShopId() == null ? Long.MAX_VALUE : s2.getShopId();
+                return id1.compareTo(id2);
+            });
+
+            for (CartDetailResponse.ShopCart shop : sortedShops) {
+                shop.getItems().sort((i1, i2) -> {
+                    Long id1 = i1.getCartItemId() == null ? Long.MAX_VALUE : i1.getCartItemId();
+                    Long id2 = i2.getCartItemId() == null ? Long.MAX_VALUE : i2.getCartItemId();
+                    return id1.compareTo(id2);
+                });
+            }
+
+            shops.addAll(sortedShops);
         }
 
         boolean empty = shops.isEmpty();
@@ -241,7 +257,6 @@ public class CartActivity extends BaseActivity {
         adapter.setData(shops);
         updateBottomBar();
     }
-
     private void showEmpty(boolean empty) {
         layoutEmptyCart.setVisibility(empty ? View.VISIBLE : View.GONE);
         rcvCartShops.setVisibility(empty ? View.GONE : View.VISIBLE);

@@ -2,6 +2,7 @@ package com.gr6.smartcart_android.buyer.product;
 
 import android.content.Intent;
 import android.graphics.Typeface;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.Gravity;
@@ -9,8 +10,10 @@ import android.view.View;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.MediaController;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.VideoView;
 
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
@@ -67,6 +70,7 @@ public class ProductDetailActivity extends BaseActivity {
     private View btnMessage;
     private View btnAddCart;
     private TextView btnBuyNow;
+    private TextView txtShopStatus;
 
     private ProductDetailViewModel viewModel;
     private ProductImageAdapter imageAdapter;
@@ -136,6 +140,7 @@ public class ProductDetailActivity extends BaseActivity {
         btnMessage = findViewById(R.id.btnMessage);
         btnAddCart = findViewById(R.id.btnAddCart);
         btnBuyNow = findViewById(R.id.btnBuyNow);
+        txtShopStatus = findViewById(R.id.txtShopStatus);
     }
 
     private void setupImages() {
@@ -322,8 +327,15 @@ public class ProductDetailActivity extends BaseActivity {
         } else {
             ImageLoader.load(this, shopImageUrl, imgShopAvatar);
         }
-    }
 
+        if (txtShopStatus != null) {
+            txtShopStatus.setText(productDetail.getShopOnlineText());
+            txtShopStatus.setTextColor(ContextCompat.getColor(
+                    this,
+                    productDetail.isShopOnline() ? R.color.success : R.color.text_secondary
+            ));
+        }
+    }
     private void bindVouchers(List<ProductDetailResponse.ShopVoucherDTO> vouchers) {
         layoutVouchers.removeAllViews();
 
@@ -422,10 +434,28 @@ public class ProductDetailActivity extends BaseActivity {
             return;
         }
 
-        int limit = Math.min(reviews.size(), 5);
+        int limit = Math.min(reviews.size(), 2);
 
         for (int i = 0; i < limit; i++) {
             addReviewItem(reviews.get(i));
+        }
+        if (reviews.size() > 2) {
+            TextView btnViewAll = createText(
+                    "Xem tất cả đánh giá",
+                    14,
+                    R.color.brand_primary,
+                    Typeface.BOLD
+            );
+
+            btnViewAll.setGravity(Gravity.CENTER);
+            btnViewAll.setPadding(0, dp(12), 0, dp(6));
+            btnViewAll.setOnClickListener(v -> {
+                Intent intent = new Intent(this, ProductReviewsActivity.class);
+                intent.putExtra(ProductReviewsActivity.EXTRA_PRODUCT_ID, productDetail.getProductId());
+                startActivity(intent);
+            });
+
+            layoutReviews.addView(btnViewAll);
         }
     }
     private void addReviewItem(ProductDetailResponse.ReviewDTO review) {
@@ -562,22 +592,30 @@ public class ProductDetailActivity extends BaseActivity {
     ) {
         if (videoUrl == null || videoUrl.trim().isEmpty()) return;
 
-        TextView video = createText(
-                "Video đánh giá: " + videoUrl.trim(),
-                13,
-                R.color.brand_primary,
-                Typeface.NORMAL
-        );
-        video.setSingleLine(true);
-        video.setEllipsize(TextUtils.TruncateAt.END);
+        VideoView videoView = new VideoView(this);
+        videoView.setVideoURI(Uri.parse(videoUrl.trim()));
+
+        MediaController mediaController = new
+                MediaController(this);
+        mediaController.setAnchorView(videoView);
+        videoView.setMediaController(mediaController);
+
+        videoView.setBackgroundResource(R.drawable.bg_image_placeholder);
 
         LinearLayout.LayoutParams videoParams = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
+                dp(210)
         );
-        videoParams.topMargin = dp(8);
+        videoParams.topMargin = dp(10);
 
-        parent.addView(video, videoParams);
+        parent.addView(videoView, videoParams);
+
+        videoView.setOnPreparedListener(mp -> {
+            mp.setLooping(false);
+            videoView.seekTo(100);
+        });
+
+        videoView.setOnClickListener(v -> videoView.start());
     }
 
     private void addSellerReply(

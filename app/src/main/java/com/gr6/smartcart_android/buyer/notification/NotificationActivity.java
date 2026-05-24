@@ -7,6 +7,7 @@ import android.widget.LinearLayout;
 import com.gr6.smartcart_android.R;
 import com.gr6.smartcart_android.common.base.BaseActivity;
 import com.gr6.smartcart_android.common.utils.ThemeColor;
+import com.gr6.smartcart_android.navigation.BuyerBottomNavHelper;
 
 public class NotificationActivity extends BaseActivity {
 
@@ -27,6 +28,8 @@ public class NotificationActivity extends BaseActivity {
 
         initViews();
         initEvents();
+
+        BuyerBottomNavHelper.setup(this, BuyerBottomNavHelper.TAB_NOTIFICATION);
     }
 
     private void initViews() {

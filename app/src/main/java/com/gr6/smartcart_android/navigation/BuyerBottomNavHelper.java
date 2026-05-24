@@ -7,12 +7,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.core.content.ContextCompat;
 
 import com.gr6.smartcart_android.R;
 import com.gr6.smartcart_android.buyer.account.AccountActivity;
+import com.gr6.smartcart_android.buyer.category.CategoryActivity;
 import com.gr6.smartcart_android.buyer.main.BuyerMainActivity;
 import com.gr6.smartcart_android.buyer.notification.NotificationActivity;
 import com.gr6.smartcart_android.common.utils.AuthGuard;
@@ -55,7 +55,10 @@ public class BuyerBottomNavHelper {
             navCategory.setOnClickListener(v -> {
                 if (activeTab == TAB_CATEGORY) return;
 
-                showToast(activity, "Danh mục sẽ làm ở bước sau");
+                Intent intent = new Intent(activity, CategoryActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                activity.startActivity(intent);
+                activity.overridePendingTransition(0, 0);
             });
         }
 
@@ -86,7 +89,11 @@ public class BuyerBottomNavHelper {
         }
     }
 
-    private static void applyActiveState(Activity activity, View item, boolean active) {
+    private static void applyActiveState(
+            Activity activity,
+            View item,
+            boolean active
+    ) {
         if (activity == null || item == null) return;
 
         item.setBackgroundResource(active ? R.drawable.bg_bottom_nav_selected : 0);
@@ -99,7 +106,11 @@ public class BuyerBottomNavHelper {
         applyColorRecursive(item, color, active);
     }
 
-    private static void applyColorRecursive(View view, int color, boolean active) {
+    private static void applyColorRecursive(
+            View view,
+            int color,
+            boolean active
+    ) {
         if (view instanceof ImageView) {
             ((ImageView) view).setColorFilter(color);
         }
@@ -117,10 +128,5 @@ public class BuyerBottomNavHelper {
                 applyColorRecursive(group.getChildAt(i), color, active);
             }
         }
-    }
-
-    private static void showToast(Activity activity, String message) {
-        if (activity == null || message == null || message.trim().isEmpty()) return;
-        Toast.makeText(activity, message, Toast.LENGTH_SHORT).show();
     }
 }

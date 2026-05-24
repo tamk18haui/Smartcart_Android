@@ -31,7 +31,8 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:visibility="gone"
-            tools:ignore="MissingConstraints">
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
             <TextView
                 android:id="@+id/txtUserName"
@@ -51,10 +52,10 @@
             android:orientation="horizontal"
             android:paddingStart="10dp"
             android:paddingEnd="10dp"
-            app:layout_constraintBottom_toBottomOf="@id/imgMessage"
-            app:layout_constraintEnd_toStartOf="@id/imgMessage"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/btnMessageBox"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@id/imgMessage">
+            app:layout_constraintTop_toTopOf="parent">
 
             <ImageView
                 android:layout_width="20dp"
@@ -80,19 +81,37 @@
         </LinearLayout>
 
         <!-- ICON TIN NHẮN -->
-        <ImageView
-            android:id="@+id/imgMessage"
-            android:layout_width="42dp"
-            android:layout_height="42dp"
+        <FrameLayout
+            android:id="@+id/btnMessageBox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_marginEnd="6dp"
-            android:background="@drawable/bg_icon_header"
-            android:foreground="?attr/selectableItemBackgroundBorderless"
-            android:padding="9dp"
-            android:src="@drawable/ic_message"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/imgCart"
-            app:layout_constraintTop_toTopOf="parent"
-            app:tint="@color/white" />
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:id="@+id/imgMessage"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:background="@drawable/bg_icon_header"
+                android:foreground="?attr/selectableItemBackgroundBorderless"
+                android:padding="9dp"
+                android:src="@drawable/ic_message"
+                app:tint="@color/white" />
+
+            <TextView
+                android:id="@+id/txtMessageBadge"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_gravity="top|end"
+                android:background="@drawable/bg_badge_red"
+                android:gravity="center"
+                android:textColor="@color/white"
+                android:textSize="10sp"
+                android:textStyle="bold"
+                android:visibility="gone" />
+        </FrameLayout>
 
         <!-- ICON GIỎ HÀNG -->
         <ImageView
@@ -103,9 +122,9 @@
             android:foreground="?attr/selectableItemBackgroundBorderless"
             android:padding="9dp"
             android:src="@drawable/ic_cart"
-            app:layout_constraintBottom_toBottomOf="@id/imgMessage"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/imgMessage"
+            app:layout_constraintTop_toTopOf="parent"
             app:tint="@color/white" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
@@ -276,119 +295,12 @@
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     <!-- 3. BOTTOM NAV -->
-    <LinearLayout
+    <include
         android:id="@+id/layoutBottomNav"
+        layout="@layout/layout_buyer_bottom_nav"
         android:layout_width="0dp"
-        android:layout_height="72dp"
-        android:background="@drawable/bg_bottom_nav"
-        android:elevation="16dp"
-        android:orientation="horizontal"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp"
+        android:layout_height="78dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
-
-        <LinearLayout
-            android:id="@+id/navHome"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:gravity="center"
-            android:orientation="vertical">
-
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_home"
-                app:tint="@color/brand_primary" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:fontFamily="sans-serif-medium"
-                android:text="Trang chủ"
-                android:textColor="@color/brand_primary"
-                android:textSize="12sp"
-                android:textStyle="bold" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/navCategory"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:gravity="center"
-            android:orientation="vertical">
-
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_category"
-                app:tint="@color/nav_inactive" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:fontFamily="sans-serif-medium"
-                android:text="Danh mục"
-                android:textColor="@color/nav_inactive"
-                android:textSize="12sp" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:gravity="center"
-            android:orientation="vertical">
-
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_notification"
-                app:tint="@color/nav_inactive" />
-
-            <TextView
-                android:id="@+id/navNotification"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:fontFamily="sans-serif-medium"
-                android:text="Thông báo"
-                android:textColor="@color/nav_inactive"
-                android:textSize="12sp" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/navAccount"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:orientation="vertical">
-
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_user"
-                app:tint="@color/nav_inactive" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:fontFamily="sans-serif-medium"
-                android:text="Tài khoản"
-                android:textColor="@color/nav_inactive"
-                android:textSize="12sp" />
-        </LinearLayout>
-
-    </LinearLayout>
-
+        app:layout_constraintStart_toStartOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

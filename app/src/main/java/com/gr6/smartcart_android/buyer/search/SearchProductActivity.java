@@ -43,6 +43,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SearchProductActivity extends BaseActivity {
+    public static final String EXTRA_KEYWORD = "keyword";
+    public static final String EXTRA_CATEGORY_ID = "category_id";
 
     private static final int PAGE_SIZE = 20;
     private static final long SEARCH_DELAY_MS = 450L;

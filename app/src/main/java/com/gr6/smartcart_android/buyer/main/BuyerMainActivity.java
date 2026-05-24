@@ -41,6 +41,8 @@ public class BuyerMainActivity extends BaseActivity {
     private EditText edtSearch;
     private ImageView imgCart;
     private ImageView imgMessage;
+
+    private TextView txtMessageBadge;
     private TextView txtUserName;
     private TextView txtEmpty;
     private TextView txtProductCount;
@@ -95,6 +97,7 @@ public class BuyerMainActivity extends BaseActivity {
         }
     }
 
+
     private void initViews() {
         swipeRefresh = findViewById(R.id.swipeRefresh);
         rcvCategories = findViewById(R.id.rcvCategories);
@@ -107,6 +110,7 @@ public class BuyerMainActivity extends BaseActivity {
         txtEmpty = findViewById(R.id.txtEmpty);
         txtProductCount = findViewById(R.id.txtProductCount);
         nestedHome = findViewById(R.id.nestedHome);
+        txtMessageBadge = findViewById(R.id.txtMessageBadge);
 
         // Ô search ở trang chủ chỉ dùng để mở màn search riêng.
         edtSearch.setFocusable(false);
@@ -186,6 +190,18 @@ public class BuyerMainActivity extends BaseActivity {
         edtSearch.setOnClickListener(v -> openSearchScreen());
 
         setupLoadMoreScroll();
+    }
+
+    private void updateMessageBadge(int unread) {
+        if (txtMessageBadge == null) return;
+
+        if (unread <= 0) {
+            txtMessageBadge.setVisibility(View.GONE);
+            return;
+        }
+
+        txtMessageBadge.setVisibility(View.VISIBLE);
+        txtMessageBadge.setText(unread > 99 ? "99+" : String.valueOf(unread));
     }
 
     private void setupLoadMoreScroll() {

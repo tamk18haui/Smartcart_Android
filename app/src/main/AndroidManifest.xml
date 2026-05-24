@@ -82,6 +82,18 @@
         <activity
             android:name=".buyer.review.ReviewActivity"
             android:exported="false"/>
+        <activity
+            android:name=".buyer.product.ProductReviewsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".buyer.category.CategoryActivity"
+            android:exported="false" />
+        <activity
+            android:name=".buyer.category.CategoryProductListActivity"
+            android:exported="false" />
+        <activity
+            android:name=".buyer.search.SearchProductActivity"
+            android:exported="false" />
 
 
         <activity

@@ -5,9 +5,11 @@
     android:id="@+id/rootNotification"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/border"> <LinearLayout
+    android:background="@color/border">
+    <LinearLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+        android:paddingBottom="78dp"
     android:orientation="vertical">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -205,5 +207,10 @@
     </LinearLayout>
 
 </LinearLayout>
-
+    <include
+        android:id="@+id/layoutBottomNav"
+        layout="@layout/layout_buyer_bottom_nav"
+        android:layout_width="match_parent"
+        android:layout_height="78dp"
+        android:layout_gravity="bottom" />
 </FrameLayout>

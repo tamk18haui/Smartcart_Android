@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/layoutBuyerBottomNavRoot"
+    android:layout_width="match_parent"
+    android:layout_height="78dp"
+    android:background="@drawable/bg_buyer_bottom_nav"
+    android:elevation="14dp"
+    android:gravity="center"
+    android:orientation="horizontal"
+    android:paddingStart="10dp"
+    android:paddingTop="8dp"
+    android:paddingEnd="10dp"
+    android:paddingBottom="8dp">
+
+    <LinearLayout
+        android:id="@+id/navHome"
+        style="@style/BuyerBottomNavItem">
+
+        <ImageView
+            style="@style/BuyerBottomNavIcon"
+            android:src="@drawable/ic_home"
+            app:tint="@color/nav_inactive" />
+
+        <TextView
+            style="@style/BuyerBottomNavText"
+            android:text="Trang chủ" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/navCategory"
+        style="@style/BuyerBottomNavItem">
+
+        <ImageView
+            style="@style/BuyerBottomNavIcon"
+            android:src="@drawable/ic_category"
+            app:tint="@color/nav_inactive" />
+
+        <TextView
+            style="@style/BuyerBottomNavText"
+            android:text="Danh mục" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/navNotification"
+        style="@style/BuyerBottomNavItem">
+
+        <ImageView
+            style="@style/BuyerBottomNavIcon"
+            android:src="@drawable/ic_notification"
+            app:tint="@color/nav_inactive" />
+
+        <TextView
+            style="@style/BuyerBottomNavText"
+            android:text="Thông báo" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/navAccount"
+        style="@style/BuyerBottomNavItem">
+
+        <ImageView
+            style="@style/BuyerBottomNavIcon"
+            android:src="@drawable/ic_user"
+            app:tint="@color/nav_inactive" />
+
+        <TextView
+            style="@style/BuyerBottomNavText"
+            android:text="Tài khoản" />
+
+    </LinearLayout>
+
+</LinearLayout>

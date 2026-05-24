@@ -111,6 +111,22 @@ public class ProductDetailResponse {
     @SerializedName("vouchers")
     private List<ShopVoucherDTO> vouchers;
 
+    @SerializedName(value = "shopStatus", alternate = {"statusShop", "shop_status"})
+    private String shopStatus;
+
+    public String getShopStatus() {
+        return shopStatus == null ? "" : shopStatus.trim().toUpperCase();
+    }
+
+    public boolean isShopOnline() {
+        String s = getShopStatus();
+        return "ACTIVE".equals(s) || "ONLINE".equals(s);
+    }
+
+    public String getShopOnlineText() {
+        return isShopOnline() ? "Đang hoạt động" : "Tạm ngừng";
+    }
+
     public Long getProductId() {
         if (productId != null) return productId;
         return id;

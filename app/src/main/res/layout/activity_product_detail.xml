@@ -339,11 +339,11 @@
                         android:textStyle="bold" />
 
                     <TextView
-                        android:layout_width="match_parent"
+                        android:id="@+id/txtShopStatus"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:text="Online vừa xong • Phản hồi nhanh"
-                        android:textColor="@color/text_secondary"
+                        android:text="Đang hoạt động"
+                        android:textColor="@color/success"
                         android:textSize="12sp" />
 
                     <TextView
