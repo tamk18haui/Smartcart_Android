@@ -79,15 +79,17 @@
                 android:paddingEnd="14dp"
                 android:singleLine="true" />
 
-            <Button
+            <TextView
                 android:id="@+id/btnAddVariantGroup"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:layout_marginTop="10dp"
                 android:background="@drawable/bg_seller_button_outline"
+                android:gravity="center"
                 android:text="+ Thêm nhóm phân loại"
-                android:textAllCaps="false"
-                android:textColor="@color/brand_primary" />
+                android:textColor="@color/brand_primary"
+                android:textSize="14sp"
+                android:textStyle="bold" />
 
             <LinearLayout
                 android:id="@+id/variantGroupContainer"
@@ -137,5 +139,7 @@
         android:textSize="16sp"
         android:textStyle="bold" />
 </LinearLayout>
+
+
 
 

@@ -555,17 +555,25 @@ public class SellerDashboardFragment extends Fragment {
     private String calculateAverageProductRating(List<ProductResponse> products) {
         if (products == null || products.isEmpty()) return "--";
 
-        double total = 0.0;
-        int count = 0;
+        double weightedTotal = 0.0;
+        int reviewTotal = 0;
+
         for (ProductResponse product : products) {
-            if (product != null && product.getAverageRating() != null && product.getAverageRating() > 0) {
-                total += product.getAverageRating();
-                count++;
+            if (product == null || product.getAverageRating() == null || product.getAverageRating() <= 0) {
+                continue;
             }
+
+            int reviewCount = Math.max(product.getReviewCount(), 0);
+            if (reviewCount <= 0) {
+                reviewCount = 1;
+            }
+
+            weightedTotal += product.getAverageRating() * reviewCount;
+            reviewTotal += reviewCount;
         }
 
-        if (count == 0) return "--";
-        return String.format(Locale.US, "%.1f", total / count);
+        if (reviewTotal == 0) return "--";
+        return String.format(Locale.US, "%.1f", weightedTotal / reviewTotal);
     }
 
     private void renderRecentOrders(List<OrderListResponse> orders) {
@@ -777,5 +785,7 @@ public class SellerDashboardFragment extends Fragment {
         return Math.round(value * getResources().getDisplayMetrics().density);
     }
 }
+
+
 
 

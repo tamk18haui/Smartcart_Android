@@ -192,7 +192,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="TỈ LỆ CHUYỂN ĐỔI"
+                        android:text="ĐÁNH GIÁ TB"
                         android:textColor="@color/text_primary"
                         android:textSize="10sp"
                         android:textStyle="bold" />
@@ -220,7 +220,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="LƯỢT XEM"
+                        android:text="LƯỢT ĐÁNH GIÁ"
                         android:textColor="@color/text_primary"
                         android:textSize="10sp"
                         android:textStyle="bold" />
@@ -348,6 +348,20 @@
                 android:textColor="@color/brand_primary"
                 android:textSize="14sp"
                 android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/btnViewReviews"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/bg_seller_button_outline"
+                android:gravity="center_vertical"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:text="Xem đánh giá sản phẩm  ›"
+                android:textColor="@color/text_primary"
+                android:textSize="14sp"
+                android:textStyle="bold" />
         </LinearLayout>
     </ScrollView>
 
@@ -389,3 +403,5 @@
     </LinearLayout>
 
 </LinearLayout>
+
+
