@@ -25,6 +25,7 @@ import com.gr6.smartcart_android.seller.product.repository.SellerProductReposito
 import com.gr6.smartcart_android.seller.product.response.ProductResponse;
 import com.gr6.smartcart_android.seller.product.response.VariantResponse;
 import com.gr6.smartcart_android.seller.voucher.CreateVoucherActivity;
+import com.gr6.smartcart_android.seller.review.SellerProductReviewsActivity;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
@@ -67,6 +68,7 @@ public class SellerProductDetailActivity extends BaseActivity {
     private TextView txtDescription;
 
     private TextView btnCreateVoucher;
+    private TextView btnViewReviews;
     private TextView btnHideProduct;
     private TextView btnEditProduct;
 
@@ -134,6 +136,7 @@ public class SellerProductDetailActivity extends BaseActivity {
         txtDescription = findViewById(R.id.txtDescription);
 
         btnCreateVoucher = findViewById(R.id.btnCreateVoucher);
+        btnViewReviews = findViewById(R.id.btnViewReviews);
         btnHideProduct = findViewById(R.id.btnHideProduct);
         btnEditProduct = findViewById(R.id.btnEditProduct);
     }
@@ -145,6 +148,7 @@ public class SellerProductDetailActivity extends BaseActivity {
                 startActivity(new Intent(this, CreateVoucherActivity.class))
         );
 
+        btnViewReviews.setOnClickListener(v -> openProductReviews());
 
         btnHideProduct.setOnClickListener(v -> confirmToggleProductVisibility());
 
@@ -281,8 +285,8 @@ public class SellerProductDetailActivity extends BaseActivity {
 
         txtRevenue.setText(formatMoney(calculateRevenue(product)));
         txtSold.setText(String.valueOf(sold));
-        txtConversion.setText("0%");
-        txtViews.setText("0");
+        txtConversion.setText(formatRating(product.getAverageRating()));
+        txtViews.setText(String.valueOf(product.getReviewCount()));
 
         renderStock(product.getVariants());
 
@@ -311,6 +315,18 @@ public class SellerProductDetailActivity extends BaseActivity {
         txtDescription.setText(isTextEmpty(product.getDescription())
                 ? "Chưa có mô tả sản phẩm"
                 : product.getDescription());
+    }
+
+    private void openProductReviews() {
+        if (currentProduct == null || currentProduct.getProductId() == null || currentProduct.getProductId() <= 0) {
+            Toast.makeText(this, "Chưa tải xong sản phẩm", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Intent intent = new Intent(this, SellerProductReviewsActivity.class);
+        intent.putExtra(SellerProductReviewsActivity.EXTRA_PRODUCT_ID, currentProduct.getProductId());
+        intent.putExtra(SellerProductReviewsActivity.EXTRA_PRODUCT_NAME, currentProduct.getName());
+        startActivity(intent);
     }
 
     private void updateHideButton(String status) {
@@ -436,12 +452,28 @@ public class SellerProductDetailActivity extends BaseActivity {
     }
 
     private BigDecimal calculateRevenue(ProductResponse product) {
-        if (product == null || product.getBasePrice() == null) {
+        if (product == null) {
             return BigDecimal.ZERO;
         }
 
-        int sold = product.getSoldQuantity() == null ? 0 : product.getSoldQuantity();
-        return product.getBasePrice().multiply(BigDecimal.valueOf(sold));
+        Long serverRevenue = product.getTotalRevenue();
+        if (serverRevenue != null && serverRevenue > 0) {
+            return BigDecimal.valueOf(serverRevenue);
+        }
+
+        if (product.getBasePrice() == null) {
+            return BigDecimal.ZERO;
+        }
+
+        return product.getBasePrice().multiply(BigDecimal.valueOf(product.getSoldQuantity()));
+    }
+
+    private String formatRating(Double rating) {
+        if (rating == null || rating <= 0) {
+            return "--";
+        }
+
+        return new DecimalFormat("0.0").format(rating) + " ★";
     }
 
     private String buildSkuText(ProductResponse product) {
@@ -562,3 +594,5 @@ public class SellerProductDetailActivity extends BaseActivity {
         }
     }
 }
+
+

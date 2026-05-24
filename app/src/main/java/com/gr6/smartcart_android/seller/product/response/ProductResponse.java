@@ -21,7 +21,9 @@ public class ProductResponse {
     private List<String> images;
     private List<VariantResponse> variants;
     private Double averageRating;
+    private Integer reviewCount;
     private Integer soldQuantity;
+    private Long totalRevenue;
 
     public Long getProductId() {
         return productId;
@@ -87,8 +89,16 @@ public class ProductResponse {
         return averageRating;
     }
 
+    public Integer getReviewCount() {
+        return reviewCount == null ? 0 : reviewCount;
+    }
+
     public Integer getSoldQuantity() {
-        return soldQuantity;
+        return soldQuantity == null ? 0 : soldQuantity;
+    }
+
+    public Long getTotalRevenue() {
+        return totalRevenue == null ? 0L : totalRevenue;
     }
 
     public String getFirstImage() {
@@ -102,5 +112,7 @@ public class ProductResponse {
         return value == null ? "" : value;
     }
 }
+
+
 
 

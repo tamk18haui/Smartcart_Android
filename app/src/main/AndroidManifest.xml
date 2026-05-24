@@ -81,8 +81,7 @@
 
         <activity
             android:name=".buyer.review.ReviewActivity"
-            android:exported="false"/>
-
+            android:exported="false" />
 
         <activity
             android:name=".buyer.checkout.CheckoutActivity"
@@ -117,6 +116,11 @@
 
         <activity
             android:name=".seller.product.VariantEditorActivity"
+            android:exported="false" />
+
+        <!-- Seller: đánh giá sản phẩm -->
+        <activity
+            android:name=".seller.review.SellerProductReviewsActivity"
             android:exported="false" />
 
         <!-- Seller: thông tin cửa hàng -->
