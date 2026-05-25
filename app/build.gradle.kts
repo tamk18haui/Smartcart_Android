@@ -1,5 +1,8 @@
 plugins {
     alias(libs.plugins.android.application)
+
+    // Firebase / Google Services
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -65,6 +68,10 @@ dependencies {
     // Glide
     implementation("com.github.bumptech.glide:glide:4.16.0")
     annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")
+
+    // Firebase Cloud Messaging
+    implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
+    implementation("com.google.firebase:firebase-messaging")
 
     // ZXing - tạo mã QR cho phiếu giao hàng / mã vận đơn nội bộ
     implementation("com.google.zxing:core:3.5.3")

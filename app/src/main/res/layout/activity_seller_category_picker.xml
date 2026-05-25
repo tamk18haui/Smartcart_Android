@@ -7,25 +7,30 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="56dp"
+        android:layout_height="wrap_content"
         android:background="@color/surface"
+        android:elevation="4dp"
         android:gravity="center_vertical"
+        android:minHeight="56dp"
         android:orientation="horizontal"
-        android:paddingStart="14dp"
-        android:paddingEnd="14dp">
+        android:paddingHorizontal="8dp"
+        android:paddingVertical="4dp">
 
         <TextView
             android:id="@+id/btnBack"
-            android:layout_width="44dp"
-            android:layout_height="match_parent"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
             android:gravity="center"
             android:text="‹"
             android:textColor="@color/brand_primary"
-            android:textSize="34sp" />
+            android:textSize="36sp" />
 
         <TextView
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
             android:text="Chọn ngành hàng"
@@ -34,34 +39,43 @@
             android:textStyle="bold" />
 
         <Space
-            android:layout_width="44dp"
+            android:layout_width="48dp"
             android:layout_height="match_parent" />
     </LinearLayout>
 
     <EditText
         android:id="@+id/edtCategorySearch"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_margin="14dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
         android:background="@drawable/bg_seller_input_soft"
-        android:hint="Tìm kiếm danh mục"
-        android:paddingStart="14dp"
-        android:paddingEnd="14dp"
-        android:singleLine="true"
+        android:drawableStart="@android:drawable/ic_menu_search"
+        android:drawablePadding="10dp"
+        android:hint="Tìm kiếm danh mục..."
+        android:imeOptions="actionSearch"
+        android:inputType="text"
+        android:maxLines="1"
+        android:minHeight="48dp"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="12dp"
         android:textColor="@color/text_primary"
-        android:textColorHint="@color/text_hint" />
+        android:textColorHint="@color/text_hint"
+        android:textSize="15sp" />
 
-    <ScrollView
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_weight="1"
+        android:clipToPadding="false"
+        android:fillViewport="true"
+        android:overScrollMode="never"
+        android:paddingBottom="24dp">
 
         <LinearLayout
             android:id="@+id/categoryListContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical" />
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
+
 </LinearLayout>
-
-

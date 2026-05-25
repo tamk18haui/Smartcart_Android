@@ -7,7 +7,9 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingVertical="6dp">
 
         <TextView
             android:layout_width="0dp"
@@ -22,14 +24,16 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/text_primary"
-            android:textSize="15sp" />
+            android:textSize="15sp"
+            android:textStyle="bold" />
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:orientation="horizontal">
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingVertical="6dp">
 
         <TextView
             android:layout_width="0dp"
@@ -44,14 +48,16 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/text_primary"
-            android:textSize="15sp" />
+            android:textSize="15sp"
+            android:textStyle="bold" />
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:orientation="horizontal">
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingVertical="6dp">
 
         <TextView
             android:layout_width="0dp"
@@ -65,21 +71,23 @@
             android:id="@+id/txtDiscount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/text_primary"
-            android:textSize="15sp" />
+            android:textColor="@color/success"
+            android:textSize="15sp"
+            android:textStyle="bold" />
     </LinearLayout>
 
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:layout_marginTop="12dp"
-        android:layout_marginBottom="12dp"
+        android:layout_marginVertical="12dp"
         android:background="@color/divider" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingBottom="6dp">
 
         <TextView
             android:layout_width="0dp"
@@ -95,9 +103,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/brand_primary_dark"
-            android:textSize="22sp"
+            android:textSize="24sp"
             android:textStyle="bold" />
     </LinearLayout>
 </LinearLayout>
-
-

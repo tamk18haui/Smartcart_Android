@@ -7,9 +7,11 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="38dp"
+        android:layout_height="wrap_content"
         android:gravity="center_vertical"
-        android:orientation="horizontal">
+        android:minHeight="48dp"
+        android:orientation="horizontal"
+        android:paddingVertical="8dp">
 
         <TextView
             android:layout_width="0dp"
@@ -17,7 +19,7 @@
             android:layout_weight="1"
             android:text="Giá bán lẻ"
             android:textColor="@color/text_secondary"
-            android:textSize="13sp" />
+            android:textSize="14sp" />
 
         <TextView
             android:id="@+id/txtRetailPrice"
@@ -25,15 +27,17 @@
             android:layout_height="wrap_content"
             android:text="0đ"
             android:textColor="@color/brand_primary"
-            android:textSize="18sp"
+            android:textSize="20sp"
             android:textStyle="bold" />
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="38dp"
+        android:layout_height="wrap_content"
         android:gravity="center_vertical"
-        android:orientation="horizontal">
+        android:minHeight="48dp"
+        android:orientation="horizontal"
+        android:paddingVertical="8dp">
 
         <TextView
             android:layout_width="0dp"
@@ -41,7 +45,7 @@
             android:layout_weight="1"
             android:text="Giá khuyến mãi"
             android:textColor="@color/text_secondary"
-            android:textSize="13sp" />
+            android:textSize="14sp" />
 
         <TextView
             android:id="@+id/txtSalePrice"
@@ -49,18 +53,20 @@
             android:layout_height="wrap_content"
             android:text="0đ"
             android:textColor="@color/success"
-            android:textSize="13sp"
+            android:textSize="16sp"
             android:textStyle="bold" />
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="38dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
         android:background="@drawable/bg_seller_input_soft"
         android:gravity="center_vertical"
+        android:minHeight="48dp"
         android:orientation="horizontal"
-        android:paddingStart="10dp"
-        android:paddingEnd="10dp">
+        android:paddingHorizontal="14dp"
+        android:paddingVertical="12dp">
 
         <TextView
             android:layout_width="0dp"
@@ -68,7 +74,7 @@
             android:layout_weight="1"
             android:text="Bán sỉ"
             android:textColor="@color/text_secondary"
-            android:textSize="12sp" />
+            android:textSize="14sp" />
 
         <TextView
             android:id="@+id/txtWholesalePrice"
@@ -76,7 +82,7 @@
             android:layout_height="wrap_content"
             android:text="0đ"
             android:textColor="@color/text_primary"
-            android:textSize="13sp"
+            android:textSize="16sp"
             android:textStyle="bold" />
     </LinearLayout>
 

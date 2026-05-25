@@ -34,6 +34,15 @@ public class SellerShopInfoResponse {
     @SerializedName("updatedAt")
     private String updatedAt;
 
+    @SerializedName("productCount")
+    private Long productCount;
+
+    @SerializedName(value = "ratingAverage", alternate = {"averageRating"})
+    private Double ratingAverage;
+
+    @SerializedName("reviewCount")
+    private Long reviewCount;
+
     public SellerShopInfoResponse() {
     }
 
@@ -83,6 +92,18 @@ public class SellerShopInfoResponse {
 
     public String getUpdatedAt() {
         return updatedAt == null ? "" : updatedAt;
+    }
+
+    public long getProductCount() {
+        return productCount == null ? 0L : productCount;
+    }
+
+    public double getRatingAverage() {
+        return ratingAverage == null ? 0.0 : ratingAverage;
+    }
+
+    public long getReviewCount() {
+        return reviewCount == null ? 0L : reviewCount;
     }
 
     public String getSafeShopName() {

@@ -9,6 +9,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -16,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.gr6.smartcart_android.R;
 import com.gr6.smartcart_android.seller.product.response.ProductResponse;
+import com.gr6.smartcart_android.seller.product.response.VariantResponse;
 import com.gr6.smartcart_android.seller.shop.repository.SellerShopRepository;
 import com.gr6.smartcart_android.seller.shop.response.SellerShopInfoResponse;
 
@@ -26,10 +28,20 @@ public class SellerProductsFragment extends Fragment {
 
     private static final String ARG_SHOP_ID = "shop_id";
 
+    private static final String SORT_DEFAULT = "DEFAULT";
+    private static final String SORT_STOCK_ASC = "STOCK_ASC";
+    private static final String SORT_SOLD_DESC = "SOLD_DESC";
+    private static final String SORT_RATING_DESC = "RATING_DESC";
+
     private RecyclerView recyclerProducts;
     private ProgressBar progressBar;
     private TextView txtEmpty;
     private TextView btnAddProduct;
+
+    private TextView chipSortDefault;
+    private TextView chipSortStock;
+    private TextView chipSortSold;
+    private TextView chipSortRating;
 
     private SellerProductManageAdapter adapter;
     private SellerProductViewModel viewModel;
@@ -37,6 +49,9 @@ public class SellerProductsFragment extends Fragment {
 
     private Long shopId;
     private boolean firstLoadDone = false;
+
+    private String sortMode = SORT_DEFAULT;
+    private final List<ProductResponse> allProducts = new ArrayList<>();
 
     public SellerProductsFragment() {
         super(R.layout.fragment_seller_products);
@@ -99,6 +114,11 @@ public class SellerProductsFragment extends Fragment {
         progressBar = view.findViewById(R.id.progressBar);
         txtEmpty = view.findViewById(R.id.txtEmpty);
         btnAddProduct = view.findViewById(R.id.btnAddProduct);
+
+        chipSortDefault = view.findViewById(R.id.chipSortDefault);
+        chipSortStock = view.findViewById(R.id.chipSortStock);
+        chipSortSold = view.findViewById(R.id.chipSortSold);
+        chipSortRating = view.findViewById(R.id.chipSortRating);
     }
 
     private void setupRecyclerView() {
@@ -122,6 +142,24 @@ public class SellerProductsFragment extends Fragment {
         btnAddProduct.setOnClickListener(v ->
                 startActivity(new Intent(requireContext(), AddProductActivity.class))
         );
+
+        if (chipSortDefault != null) {
+            chipSortDefault.setOnClickListener(v -> changeSortMode(SORT_DEFAULT));
+        }
+
+        if (chipSortStock != null) {
+            chipSortStock.setOnClickListener(v -> changeSortMode(SORT_STOCK_ASC));
+        }
+
+        if (chipSortSold != null) {
+            chipSortSold.setOnClickListener(v -> changeSortMode(SORT_SOLD_DESC));
+        }
+
+        if (chipSortRating != null) {
+            chipSortRating.setOnClickListener(v -> changeSortMode(SORT_RATING_DESC));
+        }
+
+        updateSortChips();
     }
 
     private void observeViewModel() {
@@ -180,10 +218,23 @@ public class SellerProductsFragment extends Fragment {
     private void renderProducts(List<ProductResponse> products) {
         showLoading(false);
 
-        List<ProductResponse> safeProducts = products == null ? new ArrayList<>() : products;
-        adapter.submitList(safeProducts);
+        allProducts.clear();
 
-        boolean empty = safeProducts.isEmpty();
+        if (products != null) {
+            allProducts.addAll(products);
+        }
+
+        applySortAndRender();
+    }
+
+    private void applySortAndRender() {
+        List<ProductResponse> displayProducts = new ArrayList<>(allProducts);
+
+        sortProducts(displayProducts);
+
+        adapter.submitList(displayProducts);
+
+        boolean empty = displayProducts.isEmpty();
 
         txtEmpty.setVisibility(empty ? View.VISIBLE : View.GONE);
         recyclerProducts.setVisibility(empty ? View.GONE : View.VISIBLE);
@@ -193,8 +244,100 @@ public class SellerProductsFragment extends Fragment {
         }
     }
 
+    private void changeSortMode(String newSortMode) {
+        sortMode = newSortMode == null || newSortMode.trim().isEmpty()
+                ? SORT_DEFAULT
+                : newSortMode;
+
+        updateSortChips();
+        applySortAndRender();
+    }
+
+    private void updateSortChips() {
+        setSortChipActive(chipSortDefault, SORT_DEFAULT.equals(sortMode));
+        setSortChipActive(chipSortStock, SORT_STOCK_ASC.equals(sortMode));
+        setSortChipActive(chipSortSold, SORT_SOLD_DESC.equals(sortMode));
+        setSortChipActive(chipSortRating, SORT_RATING_DESC.equals(sortMode));
+    }
+
+    private void setSortChipActive(TextView chip, boolean active) {
+        if (chip == null || getContext() == null) return;
+
+        chip.setSelected(active);
+        chip.setTextColor(ContextCompat.getColor(
+                requireContext(),
+                active ? R.color.text_white : R.color.text_primary
+        ));
+        chip.setBackgroundResource(
+                active
+                        ? R.drawable.bg_seller_button_primary
+                        : R.drawable.bg_seller_chip_soft
+        );
+    }
+
+    private void sortProducts(List<ProductResponse> products) {
+        if (products == null || products.size() <= 1) {
+            return;
+        }
+
+        switch (sortMode) {
+            case SORT_STOCK_ASC:
+                products.sort((p1, p2) -> Integer.compare(totalStock(p1), totalStock(p2)));
+                break;
+
+            case SORT_SOLD_DESC:
+                products.sort((p1, p2) -> Integer.compare(soldQuantity(p2), soldQuantity(p1)));
+                break;
+
+            case SORT_RATING_DESC:
+                products.sort((p1, p2) -> Double.compare(averageRating(p2), averageRating(p1)));
+                break;
+
+            case SORT_DEFAULT:
+            default:
+                /*
+                 * Giữ nguyên thứ tự API trả về để không ảnh hưởng hành vi cũ.
+                 */
+                break;
+        }
+    }
+
+    private int totalStock(ProductResponse product) {
+        if (product == null || product.getVariants() == null) {
+            return 0;
+        }
+
+        int total = 0;
+
+        for (VariantResponse variant : product.getVariants()) {
+            if (variant != null) {
+                total += Math.max(variant.getStockQuantity(), 0);
+            }
+        }
+
+        return total;
+    }
+
+    private int soldQuantity(ProductResponse product) {
+        if (product == null || product.getSoldQuantity() == null) {
+            return 0;
+        }
+
+        return Math.max(product.getSoldQuantity(), 0);
+    }
+
+    private double averageRating(ProductResponse product) {
+        if (product == null || product.getAverageRating() == null) {
+            return 0.0;
+        }
+
+        return Math.max(product.getAverageRating(), 0.0);
+    }
+
     private void renderError(String message) {
         showLoading(false);
+
+        allProducts.clear();
         adapter.submitList(new ArrayList<>());
 
         recyclerProducts.setVisibility(View.GONE);

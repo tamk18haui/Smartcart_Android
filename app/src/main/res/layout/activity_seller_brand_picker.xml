@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/bg_seller_screen"
@@ -7,25 +8,30 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="56dp"
+        android:layout_height="wrap_content"
         android:background="@color/surface"
+        android:elevation="4dp"
         android:gravity="center_vertical"
+        android:minHeight="56dp"
         android:orientation="horizontal"
-        android:paddingStart="14dp"
-        android:paddingEnd="14dp">
+        android:paddingHorizontal="8dp"
+        android:paddingVertical="4dp">
 
         <TextView
             android:id="@+id/btnBack"
-            android:layout_width="44dp"
-            android:layout_height="match_parent"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
             android:gravity="center"
             android:text="‹"
             android:textColor="@color/brand_primary"
-            android:textSize="34sp" />
+            android:textSize="36sp" />
 
         <TextView
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
             android:text="Tạo thương hiệu"
@@ -34,63 +40,77 @@
             android:textStyle="bold" />
 
         <Space
-            android:layout_width="44dp"
+            android:layout_width="48dp"
             android:layout_height="match_parent" />
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="64dp"
+        android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:padding="12dp">
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="16dp">
 
         <EditText
             android:id="@+id/edtBrandSearch"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_marginEnd="8dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="12dp"
             android:layout_weight="1"
             android:background="@drawable/bg_seller_input_soft"
-            android:hint="Tìm kiếm hoặc nhập thương hiệu"
-            android:paddingStart="14dp"
-            android:paddingEnd="14dp"
-            android:singleLine="true"
+            android:hint="Tìm kiếm hoặc nhập thương hiệu..."
+            android:inputType="text"
+            android:maxLines="1"
+            android:minHeight="48dp"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="12dp"
             android:textColor="@color/text_primary"
-            android:textColorHint="@color/text_hint" />
+            android:textColorHint="@color/text_hint"
+            android:textSize="15sp" />
 
         <Button
             android:id="@+id/btnSearchBrand"
-            android:layout_width="92dp"
-            android:layout_height="match_parent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:background="@drawable/bg_seller_button_primary"
+            android:minWidth="88dp"
+            android:minHeight="48dp"
             android:text="Tìm"
             android:textAllCaps="false"
-            android:textColor="@color/text_white" />
+            android:textColor="@color/white"
+            android:textSize="15sp"
+            android:textStyle="bold" />
     </LinearLayout>
 
     <Button
         android:id="@+id/btnUseCustomBrand"
         android:layout_width="match_parent"
-        android:layout_height="46dp"
-        android:layout_marginStart="12dp"
-        android:layout_marginEnd="12dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
         android:background="@drawable/bg_seller_button_outline"
+        android:minHeight="48dp"
         android:text="Dùng tên đang nhập nếu chưa có"
         android:textAllCaps="false"
-        android:textColor="@color/brand_primary" />
+        android:textColor="@color/brand_primary"
+        android:textSize="15sp"
+        android:textStyle="bold" />
 
-    <ScrollView
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="10dp"
-        android:layout_weight="1">
+        android:layout_marginTop="16dp"
+        android:layout_weight="1"
+        android:clipToPadding="false"
+        android:fillViewport="true"
+        android:overScrollMode="never"
+        android:paddingBottom="24dp">
 
         <LinearLayout
             android:id="@+id/brandListContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical" />
-    </ScrollView>
+            android:orientation="vertical"
+            android:paddingHorizontal="16dp" />
+    </androidx.core.widget.NestedScrollView>
+
 </LinearLayout>
-
-

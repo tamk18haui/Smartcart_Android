@@ -3,6 +3,9 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <!-- Android 13+ -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -14,12 +17,27 @@
         android:usesCleartextTraffic="true"
         android:theme="@style/Theme.SmartCartAndroid">
 
+        <!-- Firebase Notification Channel -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="smartcart_notification_channel" />
+
+        <!-- Firebase Messaging Service -->
+        <service
+            android:name=".common.notification.SmartCartFirebaseMessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
         <!-- Điều hướng role sau đăng nhập -->
         <activity
             android:name=".navigation.RoleRouterActivity"
             android:exported="false" />
 
-        <!-- Auth -->
+        <!-- ================= AUTH ================= -->
+
         <activity
             android:name=".auth.register.RegisterActivity"
             android:exported="false" />
@@ -28,7 +46,8 @@
             android:name=".auth.login.LoginActivity"
             android:exported="false" />
 
-        <!-- Chat dùng chung -->
+        <!-- ================= CHAT ================= -->
+
         <activity
             android:name=".chat.ChatListActivity"
             android:exported="false" />
@@ -84,6 +103,22 @@
             android:exported="false" />
 
         <activity
+            android:name=".buyer.product.ProductReviewsActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".buyer.category.CategoryActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".buyer.category.CategoryProductListActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".buyer.search.SearchProductActivity"
+            android:exported="false" />
+
+        <activity
             android:name=".buyer.checkout.CheckoutActivity"
             android:exported="false" />
 
@@ -93,7 +128,12 @@
             android:name=".seller.main.SellerHomeActivity"
             android:exported="false" />
 
-        <!-- Seller: sản phẩm -->
+        <!-- Seller Notification -->
+        <activity
+            android:name=".seller.notification.SellerNotificationActivity"
+            android:exported="false" />
+
+        <!-- Seller Product -->
         <activity
             android:name=".seller.product.AddProductActivity"
             android:exported="false" />
@@ -118,37 +158,35 @@
             android:name=".seller.product.VariantEditorActivity"
             android:exported="false" />
 
-        <!-- Seller: đánh giá sản phẩm -->
+        <!-- Seller Review -->
         <activity
             android:name=".seller.review.SellerProductReviewsActivity"
             android:exported="false" />
 
-        <!-- Seller: thông tin cửa hàng -->
+        <!-- Seller Shop -->
         <activity
             android:name=".seller.shop.SellerShopInfoActivity"
             android:exported="false" />
 
-        <!-- Seller: ví người bán -->
+        <!-- Seller Wallet -->
         <activity
             android:name=".seller.wallet.SellerWalletActivity"
             android:exported="false" />
 
-        <!-- Seller: thống kê doanh thu tuần/tháng -->
         <activity
             android:name=".seller.wallet.RevenueStatisticActivity"
             android:exported="false" />
 
-        <!-- Seller: đơn hàng -->
+        <!-- Seller Orders -->
         <activity
             android:name=".seller.order.SellerOrderDetailActivity"
             android:exported="false" />
 
-        <!-- Seller: in phiếu giao hàng / mã vận đơn nội bộ -->
         <activity
             android:name=".seller.order.ShippingLabelActivity"
             android:exported="false" />
 
-        <!-- Seller: voucher -->
+        <!-- Seller Voucher -->
         <activity
             android:name=".seller.voucher.SellerVoucherActivity"
             android:exported="false" />
@@ -157,7 +195,8 @@
             android:name=".seller.voucher.CreateVoucherActivity"
             android:exported="false" />
 
-        <!-- Launcher giữ nguyên theo buyer hiện tại -->
+        <!-- ================= MAIN ================= -->
+
         <activity
             android:name=".MainActivity"
             android:exported="true">

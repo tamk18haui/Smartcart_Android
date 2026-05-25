@@ -2,26 +2,31 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@color/seller_background">
+    android:background="@color/seller_background"
+    android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="64dp"
+        android:layout_height="wrap_content"
+        android:background="@color/seller_surface"
+        android:elevation="4dp"
         android:gravity="center_vertical"
+        android:minHeight="64dp"
         android:orientation="horizontal"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
-        android:background="@color/seller_surface">
+        android:paddingHorizontal="8dp"
+        android:paddingVertical="4dp">
 
         <TextView
             android:id="@+id/btnBack"
-            android:layout_width="42dp"
-            android:layout_height="42dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
             android:gravity="center"
             android:text="‹"
             android:textColor="@color/seller_text_primary"
-            android:textSize="34sp"
+            android:textSize="36sp"
             android:textStyle="bold" />
 
         <TextView
@@ -35,16 +40,20 @@
             android:textSize="20sp"
             android:textStyle="bold" />
 
-        <View
-            android:layout_width="42dp"
-            android:layout_height="42dp" />
+        <Space
+            android:layout_width="48dp"
+            android:layout_height="match_parent" />
     </LinearLayout>
 
-    <ScrollView
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:padding="16dp">
+        android:clipToPadding="false"
+        android:overScrollMode="never"
+        android:paddingHorizontal="16dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="24dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -63,16 +72,20 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="14dp"
+                android:baselineAligned="false"
                 android:orientation="horizontal">
 
                 <LinearLayout
                     android:layout_width="0dp"
-                    android:layout_height="96dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="6dp"
                     android:layout_weight="1"
-                    android:orientation="vertical"
+                    android:background="@drawable/bg_seller_card"
+                    android:elevation="2dp"
                     android:gravity="center_vertical"
-                    android:padding="16dp"
-                    android:background="@drawable/bg_seller_card">
+                    android:minHeight="96dp"
+                    android:orientation="vertical"
+                    android:padding="16dp">
 
                     <TextView
                         android:layout_width="match_parent"
@@ -85,22 +98,24 @@
                         android:id="@+id/txtTotalRevenue"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="6dp"
+                        android:layout_marginTop="8dp"
                         android:text="0đ"
                         android:textColor="@color/seller_primary_dark"
-                        android:textSize="20sp"
+                        android:textSize="22sp"
                         android:textStyle="bold" />
                 </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="0dp"
-                    android:layout_height="96dp"
-                    android:layout_marginStart="12dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
                     android:layout_weight="1"
-                    android:orientation="vertical"
+                    android:background="@drawable/bg_seller_card"
+                    android:elevation="2dp"
                     android:gravity="center_vertical"
-                    android:padding="16dp"
-                    android:background="@drawable/bg_seller_card">
+                    android:minHeight="96dp"
+                    android:orientation="vertical"
+                    android:padding="16dp">
 
                     <TextView
                         android:layout_width="match_parent"
@@ -113,10 +128,10 @@
                         android:id="@+id/txtTotalOrders"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="6dp"
+                        android:layout_marginTop="8dp"
                         android:text="0 đơn"
                         android:textColor="@color/seller_primary_dark"
-                        android:textSize="20sp"
+                        android:textSize="22sp"
                         android:textStyle="bold" />
                 </LinearLayout>
             </LinearLayout>
@@ -124,10 +139,11 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/bg_seller_card"
+                android:elevation="2dp"
                 android:orientation="vertical"
-                android:padding="16dp"
-                android:background="@drawable/bg_seller_card">
+                android:padding="20dp">
 
                 <TextView
                     android:layout_width="match_parent"
@@ -141,16 +157,17 @@
                     android:id="@+id/chartView"
                     android:layout_width="match_parent"
                     android:layout_height="260dp"
-                    android:layout_marginTop="10dp" />
+                    android:layout_marginTop="16dp" />
             </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/bg_seller_card"
+                android:elevation="2dp"
                 android:orientation="vertical"
-                android:padding="16dp"
-                android:background="@drawable/bg_seller_card">
+                android:padding="20dp">
 
                 <TextView
                     android:layout_width="match_parent"
@@ -164,10 +181,10 @@
                     android:id="@+id/layoutStatisticRows"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
+                    android:layout_marginTop="12dp"
                     android:orientation="vertical" />
             </LinearLayout>
         </LinearLayout>
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
 
 </LinearLayout>

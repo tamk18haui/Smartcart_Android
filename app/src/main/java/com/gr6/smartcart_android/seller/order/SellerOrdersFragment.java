@@ -184,6 +184,13 @@ public class SellerOrdersFragment extends Fragment {
                     allOrders.addAll(state.getOrders());
                 }
 
+                /*
+                 * Yêu cầu mới:
+                 * - Quản lý đơn hàng luôn hiển thị đơn mới nhất lên đầu.
+                 * - Sắp xếp ở local để không ảnh hưởng API/backend cũ.
+                 */
+                sortNewestOrdersFirst(allOrders);
+
                 applyFilter();
             }
         });
@@ -257,6 +264,8 @@ public class SellerOrdersFragment extends Fragment {
             }
         }
 
+        sortNewestOrdersFirst(filtered);
+
         if (adapter != null) {
             adapter.submitList(filtered);
         }
@@ -264,6 +273,23 @@ public class SellerOrdersFragment extends Fragment {
         if (layoutEmpty != null) {
             layoutEmpty.setVisibility(filtered.isEmpty() ? View.VISIBLE : View.GONE);
         }
+    }
+
+    private void sortNewestOrdersFirst(List<OrderListResponse> orders) {
+        if (orders == null || orders.size() <= 1) {
+            return;
+        }
+
+        orders.sort((o1, o2) -> {
+            String t1 = o1 == null || o1.getCreatedAt() == null ? "" : String.valueOf(o1.getCreatedAt());
+            String t2 = o2 == null || o2.getCreatedAt() == null ? "" : String.valueOf(o2.getCreatedAt());
+
+            /*
+             * createdAt dạng ISO/string thì so sánh chuỗi yyyy-MM-dd... vẫn cho đúng thứ tự mới-cũ.
+             * Nếu null thì đẩy xuống dưới.
+             */
+            return t2.compareTo(t1);
+        });
     }
 
     private void handlePrimaryAction(OrderListResponse order) {

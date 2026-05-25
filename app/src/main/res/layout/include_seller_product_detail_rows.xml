@@ -7,16 +7,18 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="42dp"
+        android:layout_height="wrap_content"
         android:gravity="center_vertical"
-        android:orientation="horizontal">
+        android:minHeight="48dp"
+        android:orientation="horizontal"
+        android:paddingVertical="8dp">
 
         <TextView
-            android:layout_width="105dp"
+            android:layout_width="120dp"
             android:layout_height="wrap_content"
             android:text="Danh mục"
             android:textColor="@color/text_secondary"
-            android:textSize="13sp" />
+            android:textSize="14sp" />
 
         <TextView
             android:id="@+id/txtCategory"
@@ -26,7 +28,8 @@
             android:gravity="end"
             android:text="Chưa cập nhật"
             android:textColor="@color/text_primary"
-            android:textSize="13sp" />
+            android:textSize="14sp"
+            android:textStyle="bold" />
     </LinearLayout>
 
     <View
@@ -36,16 +39,18 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="42dp"
+        android:layout_height="wrap_content"
         android:gravity="center_vertical"
-        android:orientation="horizontal">
+        android:minHeight="48dp"
+        android:orientation="horizontal"
+        android:paddingVertical="8dp">
 
         <TextView
-            android:layout_width="105dp"
+            android:layout_width="120dp"
             android:layout_height="wrap_content"
             android:text="Thương hiệu"
             android:textColor="@color/text_secondary"
-            android:textSize="13sp" />
+            android:textSize="14sp" />
 
         <TextView
             android:id="@+id/txtBrand"
@@ -55,7 +60,8 @@
             android:gravity="end"
             android:text="Chưa cập nhật"
             android:textColor="@color/text_primary"
-            android:textSize="13sp" />
+            android:textSize="14sp"
+            android:textStyle="bold" />
     </LinearLayout>
 
     <View
@@ -65,16 +71,18 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="42dp"
+        android:layout_height="wrap_content"
         android:gravity="center_vertical"
-        android:orientation="horizontal">
+        android:minHeight="48dp"
+        android:orientation="horizontal"
+        android:paddingVertical="8dp">
 
         <TextView
-            android:layout_width="105dp"
+            android:layout_width="120dp"
             android:layout_height="wrap_content"
             android:text="Kích thước"
             android:textColor="@color/text_secondary"
-            android:textSize="13sp" />
+            android:textSize="14sp" />
 
         <TextView
             android:id="@+id/txtSize"
@@ -84,7 +92,8 @@
             android:gravity="end"
             android:text="Chưa cập nhật"
             android:textColor="@color/text_primary"
-            android:textSize="13sp" />
+            android:textSize="14sp"
+            android:textStyle="bold" />
     </LinearLayout>
 
     <View
@@ -94,16 +103,18 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="42dp"
+        android:layout_height="wrap_content"
         android:gravity="center_vertical"
-        android:orientation="horizontal">
+        android:minHeight="48dp"
+        android:orientation="horizontal"
+        android:paddingVertical="8dp">
 
         <TextView
-            android:layout_width="105dp"
+            android:layout_width="120dp"
             android:layout_height="wrap_content"
             android:text="Khối lượng"
             android:textColor="@color/text_secondary"
-            android:textSize="13sp" />
+            android:textSize="14sp" />
 
         <TextView
             android:id="@+id/txtWeight"
@@ -113,7 +124,8 @@
             android:gravity="end"
             android:text="Chưa cập nhật"
             android:textColor="@color/text_primary"
-            android:textSize="13sp" />
+            android:textSize="14sp"
+            android:textStyle="bold" />
     </LinearLayout>
 
     <View
@@ -123,16 +135,18 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="42dp"
+        android:layout_height="wrap_content"
         android:gravity="center_vertical"
-        android:orientation="horizontal">
+        android:minHeight="48dp"
+        android:orientation="horizontal"
+        android:paddingVertical="8dp">
 
         <TextView
-            android:layout_width="105dp"
+            android:layout_width="120dp"
             android:layout_height="wrap_content"
             android:text="Tình trạng"
             android:textColor="@color/text_secondary"
-            android:textSize="13sp" />
+            android:textSize="14sp" />
 
         <TextView
             android:id="@+id/txtCondition"
@@ -142,7 +156,7 @@
             android:gravity="end"
             android:text="Chưa cập nhật"
             android:textColor="@color/text_primary"
-            android:textSize="13sp" />
+            android:textSize="14sp"
+            android:textStyle="bold" />
     </LinearLayout>
-
 </LinearLayout>

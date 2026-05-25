@@ -8,18 +8,20 @@
     <LinearLayout
         android:id="@+id/rowCategory"
         android:layout_width="match_parent"
-        android:layout_height="56dp"
+        android:layout_height="wrap_content"
         android:background="@drawable/bg_seller_row"
+        android:clickable="true"
+        android:focusable="true"
         android:gravity="center_vertical"
+        android:minHeight="60dp"
         android:orientation="horizontal"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp">
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="12dp">
 
         <TextView
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:gravity="center_vertical"
             android:text="Danh mục *"
             android:textColor="@color/text_primary"
             android:textSize="16sp"
@@ -28,16 +30,15 @@
         <TextView
             android:id="@+id/tvCategoryValue"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:gravity="center_vertical"
+            android:layout_height="wrap_content"
             android:text="Chọn danh mục"
             android:textColor="@color/text_hint"
             android:textSize="15sp" />
 
         <TextView
-            android:layout_width="24dp"
-            android:layout_height="match_parent"
-            android:gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
             android:text="›"
             android:textColor="@color/text_hint"
             android:textSize="28sp" />
@@ -46,18 +47,20 @@
     <LinearLayout
         android:id="@+id/rowBrand"
         android:layout_width="match_parent"
-        android:layout_height="56dp"
+        android:layout_height="wrap_content"
         android:background="@drawable/bg_seller_row"
+        android:clickable="true"
+        android:focusable="true"
         android:gravity="center_vertical"
+        android:minHeight="60dp"
         android:orientation="horizontal"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp">
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="12dp">
 
         <TextView
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:gravity="center_vertical"
             android:text="Thương hiệu"
             android:textColor="@color/text_primary"
             android:textSize="16sp" />
@@ -65,16 +68,15 @@
         <TextView
             android:id="@+id/tvBrandValue"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:gravity="center_vertical"
+            android:layout_height="wrap_content"
             android:text="No brand"
             android:textColor="@color/text_secondary"
             android:textSize="15sp" />
 
         <TextView
-            android:layout_width="24dp"
-            android:layout_height="match_parent"
-            android:gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
             android:text="›"
             android:textColor="@color/text_hint"
             android:textSize="28sp" />
@@ -82,16 +84,17 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="112dp"
+        android:layout_height="wrap_content"
         android:background="@color/surface"
         android:orientation="vertical"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp">
+        android:paddingHorizontal="16dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="16dp">
 
         <TextView
             android:layout_width="match_parent"
-            android:layout_height="36dp"
-            android:gravity="bottom"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
             android:text="Giá *"
             android:textColor="@color/text_primary"
             android:textSize="16sp"
@@ -100,13 +103,13 @@
         <EditText
             android:id="@+id/edtProductPrice"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
+            android:layout_height="wrap_content"
             android:background="@drawable/bg_seller_input"
             android:hint="Nhập giá"
             android:inputType="numberDecimal"
-            android:paddingStart="12dp"
-            android:paddingEnd="12dp"
-            android:singleLine="true"
+            android:maxLines="1"
+            android:minHeight="52dp"
+            android:paddingHorizontal="16dp"
             android:textColor="@color/text_primary"
             android:textColorHint="@color/text_hint"
             android:textSize="16sp" />
@@ -114,16 +117,16 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="112dp"
+        android:layout_height="wrap_content"
         android:background="@color/surface"
         android:orientation="vertical"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp">
+        android:paddingHorizontal="16dp"
+        android:paddingBottom="16dp">
 
         <TextView
             android:layout_width="match_parent"
-            android:layout_height="36dp"
-            android:gravity="bottom"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
             android:text="Kho hàng"
             android:textColor="@color/text_primary"
             android:textSize="16sp"
@@ -132,13 +135,13 @@
         <EditText
             android:id="@+id/edtProductStock"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
+            android:layout_height="wrap_content"
             android:background="@drawable/bg_seller_input"
             android:hint="Nhập tồn kho nếu không có biến thể"
             android:inputType="number"
-            android:paddingStart="12dp"
-            android:paddingEnd="12dp"
-            android:singleLine="true"
+            android:maxLines="1"
+            android:minHeight="52dp"
+            android:paddingHorizontal="16dp"
             android:textColor="@color/text_primary"
             android:textColorHint="@color/text_hint"
             android:textSize="16sp" />
@@ -147,19 +150,21 @@
     <LinearLayout
         android:id="@+id/rowVariants"
         android:layout_width="match_parent"
-        android:layout_height="56dp"
+        android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:background="@drawable/bg_seller_row"
+        android:clickable="true"
+        android:focusable="true"
         android:gravity="center_vertical"
+        android:minHeight="60dp"
         android:orientation="horizontal"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp">
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="12dp">
 
         <TextView
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:gravity="center_vertical"
             android:text="Phân loại hàng"
             android:textColor="@color/text_primary"
             android:textSize="16sp" />
@@ -167,16 +172,15 @@
         <TextView
             android:id="@+id/tvVariantValue"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:gravity="center_vertical"
+            android:layout_height="wrap_content"
             android:text="Thiết lập phân loại"
             android:textColor="@color/text_secondary"
             android:textSize="15sp" />
 
         <TextView
-            android:layout_width="24dp"
-            android:layout_height="match_parent"
-            android:gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
             android:text="›"
             android:textColor="@color/text_hint"
             android:textSize="28sp" />
@@ -185,19 +189,21 @@
     <LinearLayout
         android:id="@+id/rowShipping"
         android:layout_width="match_parent"
-        android:layout_height="56dp"
+        android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:background="@drawable/bg_seller_row"
+        android:clickable="true"
+        android:focusable="true"
         android:gravity="center_vertical"
+        android:minHeight="60dp"
         android:orientation="horizontal"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp">
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="12dp">
 
         <TextView
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:gravity="center_vertical"
             android:text="Phí vận chuyển *"
             android:textColor="@color/text_primary"
             android:textSize="16sp" />
@@ -205,16 +211,15 @@
         <TextView
             android:id="@+id/tvShippingValue"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:gravity="center_vertical"
+            android:layout_height="wrap_content"
             android:text="Thiết lập vận chuyển"
             android:textColor="@color/text_secondary"
             android:textSize="15sp" />
 
         <TextView
-            android:layout_width="24dp"
-            android:layout_height="match_parent"
-            android:gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
             android:text="›"
             android:textColor="@color/text_hint"
             android:textSize="28sp" />
@@ -223,19 +228,21 @@
     <LinearLayout
         android:id="@+id/rowCondition"
         android:layout_width="match_parent"
-        android:layout_height="56dp"
+        android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:background="@drawable/bg_seller_row"
+        android:clickable="true"
+        android:focusable="true"
         android:gravity="center_vertical"
+        android:minHeight="60dp"
         android:orientation="horizontal"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp">
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="12dp">
 
         <TextView
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:gravity="center_vertical"
             android:text="Tình trạng"
             android:textColor="@color/text_primary"
             android:textSize="16sp" />
@@ -243,20 +250,18 @@
         <TextView
             android:id="@+id/tvConditionValue"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:gravity="center_vertical"
+            android:layout_height="wrap_content"
             android:text="Mới"
             android:textColor="@color/text_secondary"
             android:textSize="15sp" />
 
         <TextView
-            android:layout_width="24dp"
-            android:layout_height="match_parent"
-            android:gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
             android:text="›"
             android:textColor="@color/text_hint"
             android:textSize="28sp" />
     </LinearLayout>
+
 </LinearLayout>
-
-

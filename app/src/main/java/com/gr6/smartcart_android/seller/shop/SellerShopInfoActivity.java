@@ -28,12 +28,13 @@ import com.gr6.smartcart_android.seller.shop.api.SellerShopApiService;
 import com.gr6.smartcart_android.seller.shop.request.SellerShopUpdateRequest;
 import com.gr6.smartcart_android.seller.shop.response.SellerShopInfoResponse;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class SellerShopInfoActivity extends AppCompatActivity {
 
@@ -45,6 +46,9 @@ public class SellerShopInfoActivity extends AppCompatActivity {
     private TextView txtPickupAddress;
     private TextView txtShopId;
     private TextView txtEditShop;
+    private TextView txtShopRatingAverage;
+    private TextView txtShopReviewCount;
+    private TextView txtShopProductCount;
     private View progressBar;
 
     private SellerShopApiService sellerApiService;
@@ -90,6 +94,9 @@ public class SellerShopInfoActivity extends AppCompatActivity {
         txtPickupAddress = findViewById(R.id.txtShopInfoPickupAddress);
         txtShopId = findViewById(R.id.txtShopInfoId);
         txtEditShop = findViewById(R.id.txtEditShop);
+        txtShopRatingAverage = findViewById(R.id.txtShopRatingAverage);
+        txtShopReviewCount = findViewById(R.id.txtShopReviewCount);
+        txtShopProductCount = findViewById(R.id.txtShopProductCount);
         progressBar = findViewById(R.id.progressShopInfo);
     }
 
@@ -183,10 +190,26 @@ public class SellerShopInfoActivity extends AppCompatActivity {
         txtPickupAddress.setText(emptyToDefault(shop.getPickupAddress(), "Chưa có địa chỉ lấy hàng."));
         txtShopId.setText(shop.getShopId() == null ? "#--" : "#" + shop.getShopId());
 
+        long productCount = shop.getProductCount();
+        long reviewCount = shop.getReviewCount();
+        double ratingAverage = shop.getRatingAverage();
+
+        txtShopProductCount.setText(String.valueOf(productCount));
+
+        if (reviewCount <= 0) {
+            txtShopRatingAverage.setText("Chưa có");
+            txtShopReviewCount.setText("0 đánh giá");
+        } else {
+            txtShopRatingAverage.setText(String.format(Locale.US, "%.1f/5", ratingAverage));
+            txtShopReviewCount.setText(reviewCount + " đánh giá");
+        }
+
         String status = normalizeStatus(shop.getStatus());
         boolean canEdit = "ACTIVE".equals(status);
+
         txtEditShop.setEnabled(canEdit);
         txtEditShop.setAlpha(canEdit ? 1f : 0.45f);
+
         txtChangeLogo.setEnabled(canEdit);
         txtChangeLogo.setAlpha(canEdit ? 1f : 0.45f);
     }
@@ -490,5 +513,3 @@ public class SellerShopInfoActivity extends AppCompatActivity {
         return normalized.isEmpty() ? "CHƯA XÁC ĐỊNH" : normalized;
     }
 }
-
-
