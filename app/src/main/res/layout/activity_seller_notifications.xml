@@ -66,13 +66,13 @@
             android:padding="32dp"
             android:visibility="gone">
 
-            <TextView
+            <ImageView
                 android:layout_width="72dp"
                 android:layout_height="72dp"
                 android:background="@drawable/bg_seller_card"
-                android:gravity="center"
-                android:text="🔔"
-                android:textSize="34sp" />
+                android:padding="20dp"
+                android:src="@drawable/ic_notification"
+                android:tint="@color/brand_primary" />
 
             <TextView
                 android:layout_width="match_parent"
@@ -95,3 +95,5 @@
         </LinearLayout>
     </FrameLayout>
 </LinearLayout>
+
+

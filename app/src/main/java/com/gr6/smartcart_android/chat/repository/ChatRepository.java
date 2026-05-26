@@ -89,17 +89,39 @@ public class ChatRepository {
             String content,
             DataCallback<ChatMessageResponse> callback
     ) {
+        sendMessageByRest(receiverId, content, null, "TEXT", callback);
+    }
+
+    public void sendMessageByRest(
+            Long receiverId,
+            String content,
+            String imageUrl,
+            String messageType,
+            DataCallback<ChatMessageResponse> callback
+    ) {
         if (receiverId == null || receiverId <= 0) {
             callback.onError("Không tìm thấy người nhận");
             return;
         }
 
-        if (content == null || content.trim().isEmpty()) {
+        String safeContent = content == null ? "" : content.trim();
+        String safeImageUrl = imageUrl == null ? "" : imageUrl.trim();
+
+        if (safeContent.isEmpty() && safeImageUrl.isEmpty()) {
             callback.onError("Tin nhắn không được để trống");
             return;
         }
 
-        ChatMessageRequest request = new ChatMessageRequest(receiverId, content.trim());
+        String safeMessageType = messageType == null || messageType.trim().isEmpty()
+                ? (safeImageUrl.isEmpty() ? "TEXT" : "IMAGE")
+                : messageType.trim().toUpperCase();
+
+        ChatMessageRequest request = new ChatMessageRequest(
+                receiverId,
+                safeContent,
+                safeImageUrl.isEmpty() ? null : safeImageUrl,
+                safeMessageType
+        );
 
         apiService.sendMessage(request).enqueue(new Callback<BaseResponse<ChatMessageResponse>>() {
             @Override
@@ -158,6 +180,15 @@ public class ChatRepository {
         return socketClient.sendMessage(receiverId, content);
     }
 
+    public boolean sendMessageBySocket(
+            Long receiverId,
+            String content,
+            String imageUrl,
+            String messageType
+    ) {
+        return socketClient.sendMessage(receiverId, content, imageUrl, messageType);
+    }
+
     public void disconnectWebSocket() {
         socketClient.disconnect();
     }
@@ -193,3 +224,5 @@ public class ChatRepository {
         void onError(String message);
     }
 }
+
+

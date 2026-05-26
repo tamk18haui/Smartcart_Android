@@ -18,6 +18,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.gr6.smartcart_android.R;
+import com.gr6.smartcart_android.buyer.cart.api.CartApiService;
+import com.gr6.smartcart_android.buyer.cart.response.CartDetailResponse;
 import com.gr6.smartcart_android.buyer.cart.CartActivity;
 import com.gr6.smartcart_android.buyer.main.response.HomeCategoryResponse;
 import com.gr6.smartcart_android.buyer.main.response.HomeProductResponse;
@@ -25,13 +27,22 @@ import com.gr6.smartcart_android.buyer.product.ProductDetailActivity;
 import com.gr6.smartcart_android.buyer.search.AiImageSearchActivity;
 import com.gr6.smartcart_android.buyer.search.SearchProductActivity;
 import com.gr6.smartcart_android.chat.ChatListActivity;
+import com.gr6.smartcart_android.chat.api.ChatApiService;
+import com.gr6.smartcart_android.chat.response.ConversationResponse;
 import com.gr6.smartcart_android.common.base.BaseActivity;
+import com.gr6.smartcart_android.common.base.BaseResponse;
+import com.gr6.smartcart_android.common.network.ApiClient;
+import com.gr6.smartcart_android.common.storage.TokenManager;
 import com.gr6.smartcart_android.common.storage.UserSession;
 import com.gr6.smartcart_android.common.utils.AuthGuard;
 import com.gr6.smartcart_android.common.utils.ThemeColor;
 import com.gr6.smartcart_android.navigation.BuyerBottomNavHelper;
 
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class BuyerMainActivity extends BaseActivity {
 
@@ -45,6 +56,7 @@ public class BuyerMainActivity extends BaseActivity {
     private ImageView imgMessage;
 
     private TextView txtMessageBadge;
+    private TextView txtCartBadge;
     private TextView txtUserName;
     private TextView txtEmpty;
     private TextView txtProductCount;
@@ -53,6 +65,8 @@ public class BuyerMainActivity extends BaseActivity {
     private BuyerHomeViewModel viewModel;
     private CategoryHomeAdapter categoryAdapter;
     private ProductHomeAdapter productAdapter;
+    private CartApiService cartApiService;
+    private ChatApiService chatApiService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +76,8 @@ public class BuyerMainActivity extends BaseActivity {
         setupSystemBars();
 
         viewModel = new ViewModelProvider(this).get(BuyerHomeViewModel.class);
+        cartApiService = ApiClient.createService(this, CartApiService.class);
+        chatApiService = ApiClient.createService(this, ChatApiService.class);
 
         initViews();
         setupRecyclerViews();
@@ -83,6 +99,8 @@ public class BuyerMainActivity extends BaseActivity {
             edtSearch.setText("");
             edtSearch.clearFocus();
         }
+
+        loadHeaderBadges();
     }
 
     private void setupSystemBars() {
@@ -114,6 +132,7 @@ public class BuyerMainActivity extends BaseActivity {
         txtProductCount = findViewById(R.id.txtProductCount);
         nestedHome = findViewById(R.id.nestedHome);
         txtMessageBadge = findViewById(R.id.txtMessageBadge);
+        txtCartBadge = findViewById(R.id.txtCartBadge);
 
         // Ô search ở trang chủ chỉ dùng để mở màn search riêng.
         edtSearch.setFocusable(false);
@@ -201,16 +220,99 @@ public class BuyerMainActivity extends BaseActivity {
         setupLoadMoreScroll();
     }
 
-    private void updateMessageBadge(int unread) {
-        if (txtMessageBadge == null) return;
-
-        if (unread <= 0) {
-            txtMessageBadge.setVisibility(View.GONE);
+    private void loadHeaderBadges() {
+        if (!TokenManager.getInstance(this).hasToken()) {
+            updateMessageBadge(0);
+            updateCartBadge(0);
             return;
         }
 
-        txtMessageBadge.setVisibility(View.VISIBLE);
-        txtMessageBadge.setText(unread > 99 ? "99+" : String.valueOf(unread));
+        loadUnreadMessageBadge();
+        loadCartBadge();
+    }
+
+    private void loadUnreadMessageBadge() {
+        if (chatApiService == null) {
+            updateMessageBadge(0);
+            return;
+        }
+
+        chatApiService.getConversations().enqueue(new Callback<BaseResponse<List<ConversationResponse>>>() {
+            @Override
+            public void onResponse(
+                    Call<BaseResponse<List<ConversationResponse>>> call,
+                    Response<BaseResponse<List<ConversationResponse>>> response
+            ) {
+                int totalUnread = 0;
+
+                if (response.body() != null && response.body().getData() != null) {
+                    for (ConversationResponse conversation : response.body().getData()) {
+                        if (conversation != null) {
+                            totalUnread += Math.max(conversation.getUnreadCount(), 0);
+                        }
+                    }
+                }
+
+                updateMessageBadge(totalUnread);
+            }
+
+            @Override
+            public void onFailure(
+                    Call<BaseResponse<List<ConversationResponse>>> call,
+                    Throwable t
+            ) {
+                updateMessageBadge(0);
+            }
+        });
+    }
+
+    private void loadCartBadge() {
+        if (cartApiService == null) {
+            updateCartBadge(0);
+            return;
+        }
+
+        cartApiService.getCartItems().enqueue(new Callback<BaseResponse<CartDetailResponse>>() {
+            @Override
+            public void onResponse(
+                    Call<BaseResponse<CartDetailResponse>> call,
+                    Response<BaseResponse<CartDetailResponse>> response
+            ) {
+                int totalItems = 0;
+
+                if (response.body() != null && response.body().getData() != null) {
+                    Integer value = response.body().getData().getTotalItems();
+                    totalItems = value == null ? 0 : Math.max(value, 0);
+                }
+
+                updateCartBadge(totalItems);
+            }
+
+            @Override
+            public void onFailure(Call<BaseResponse<CartDetailResponse>> call, Throwable t) {
+                updateCartBadge(0);
+            }
+        });
+    }
+
+    private void updateMessageBadge(int unread) {
+        renderHeaderBadge(txtMessageBadge, unread);
+    }
+
+    private void updateCartBadge(int totalItems) {
+        renderHeaderBadge(txtCartBadge, totalItems);
+    }
+
+    private void renderHeaderBadge(TextView badge, int count) {
+        if (badge == null) return;
+
+        if (count <= 0) {
+            badge.setVisibility(View.GONE);
+            return;
+        }
+
+        badge.setVisibility(View.VISIBLE);
+        badge.setText(count > 99 ? "99+" : String.valueOf(count));
     }
 
     private void setupLoadMoreScroll() {
@@ -302,3 +404,5 @@ public class BuyerMainActivity extends BaseActivity {
     }
 
 }
+
+

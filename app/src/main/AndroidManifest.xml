@@ -67,6 +67,10 @@
             android:exported="false" />
 
         <activity
+            android:name=".buyer.product.ProductReviewsActivity"
+            android:exported="false" />
+
+        <activity
             android:name=".buyer.account.AccountActivity"
             android:exported="false" />
 
@@ -87,6 +91,10 @@
             android:exported="false" />
 
         <activity
+            android:name=".buyer.support.SupportCenterActivity"
+            android:exported="false" />
+
+        <activity
             android:name=".buyer.cart.CartActivity"
             android:exported="false" />
 
@@ -100,37 +108,22 @@
 
         <activity
             android:name=".buyer.review.ReviewActivity"
-            android:exported="false"/>
-        <activity
-            android:name=".buyer.product.ProductReviewsActivity"
             android:exported="false" />
+
         <activity
             android:name=".buyer.category.CategoryActivity"
             android:exported="false" />
+
         <activity
             android:name=".buyer.category.CategoryProductListActivity"
             android:exported="false" />
+
         <activity
             android:name=".buyer.search.SearchProductActivity"
             android:exported="false" />
+
         <activity
             android:name=".buyer.search.AiImageSearchActivity"
-            android:exported="false" />
-
-        <activity
-            android:name=".buyer.product.ProductReviewsActivity"
-            android:exported="false" />
-
-        <activity
-            android:name=".buyer.category.CategoryActivity"
-            android:exported="false" />
-
-        <activity
-            android:name=".buyer.category.CategoryProductListActivity"
-            android:exported="false" />
-
-        <activity
-            android:name=".buyer.search.SearchProductActivity"
             android:exported="false" />
 
         <activity
@@ -214,7 +207,8 @@
 
         <activity
             android:name=".MainActivity"
-            android:exported="true">
+            android:exported="true"
+            android:launchMode="singleTop">
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

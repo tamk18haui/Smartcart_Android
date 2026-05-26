@@ -31,6 +31,12 @@ public class ChatMessageResponse {
     @SerializedName("content")
     private String content;
 
+    @SerializedName("imageUrl")
+    private String imageUrl;
+
+    @SerializedName("messageType")
+    private String messageType;
+
     @SerializedName("createdAt")
     private String createdAt;
 
@@ -70,7 +76,25 @@ public class ChatMessageResponse {
     }
 
     public String getContent() {
-        return content == null ? "" : content;
+        if (content == null || content.trim().isEmpty()) {
+            return isImageMessage() ? "[Ảnh]" : "";
+        }
+        return content.trim();
+    }
+
+    public String getImageUrl() {
+        return imageUrl == null ? "" : imageUrl.trim();
+    }
+
+    public String getMessageType() {
+        if (messageType == null || messageType.trim().isEmpty()) {
+            return getImageUrl().isEmpty() ? "TEXT" : "IMAGE";
+        }
+        return messageType.trim().toUpperCase();
+    }
+
+    public boolean isImageMessage() {
+        return "IMAGE".equalsIgnoreCase(getMessageType()) || !getImageUrl().isEmpty();
     }
 
     public String getCreatedAt() {
@@ -82,8 +106,6 @@ public class ChatMessageResponse {
     }
 
     public boolean isMine(Long currentUserId) {
-        return currentUserId != null
-                && senderId != null
-                && currentUserId.equals(senderId);
+        return currentUserId != null && senderId != null && currentUserId.equals(senderId);
     }
 }

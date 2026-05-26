@@ -248,10 +248,15 @@ public class SellerShopInfoActivity extends AppCompatActivity {
             loadAndPickWard(txtWard, selectedProvince[0], selectedWard);
         });
 
+        wrapper.addView(createFieldLabel("Tên cửa hàng"));
         wrapper.addView(edtName);
+        wrapper.addView(createFieldLabel("Số nhà, tên đường/khu vực lấy hàng"));
         wrapper.addView(edtDetailAddress);
+        wrapper.addView(createFieldLabel("Tỉnh/Thành phố lấy hàng"));
         wrapper.addView(txtProvince);
+        wrapper.addView(createFieldLabel("Phường/Xã lấy hàng"));
         wrapper.addView(txtWard);
+        wrapper.addView(createFieldLabel("Mô tả cửa hàng"));
         wrapper.addView(edtDescription);
 
         AlertDialog dialog = new AlertDialog.Builder(this)
@@ -295,6 +300,22 @@ public class SellerShopInfoActivity extends AppCompatActivity {
         });
 
         dialog.show();
+    }
+
+    private TextView createFieldLabel(String text) {
+        TextView label = new TextView(this);
+        label.setText(text);
+        label.setTextSize(13);
+        label.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
+        label.setTypeface(null, android.graphics.Typeface.BOLD);
+
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        params.setMargins(0, dp(10), 0, dp(4));
+        label.setLayoutParams(params);
+        return label;
     }
 
     private TextView createPickerText(String value) {
@@ -513,3 +534,5 @@ public class SellerShopInfoActivity extends AppCompatActivity {
         return normalized.isEmpty() ? "CHƯA XÁC ĐỊNH" : normalized;
     }
 }
+
+

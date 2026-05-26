@@ -41,11 +41,14 @@ import java.util.List;
 
 public class OrderHistoryActivity extends BaseActivity {
 
-    private static final String TAB_ALL = "ALL";
-    private static final String TAB_PENDING = "PENDING_GROUP";
-    private static final String TAB_SHIPPING = "SHIPPING";
-    private static final String TAB_COMPLETED = "COMPLETED_GROUP";
-    private static final String TAB_CANCELLED = "CANCELLED_GROUP";
+    public static final String EXTRA_INITIAL_TAB = "extra_initial_tab";
+
+    public static final String TAB_ALL = "ALL";
+    public static final String TAB_PENDING = "PENDING_GROUP";
+    public static final String TAB_SHIPPING = "SHIPPING";
+    public static final String TAB_COMPLETED = "COMPLETED_GROUP";
+    public static final String TAB_CANCELLED = "CANCELLED_GROUP";
+    public static final String TAB_REVIEW = "REVIEW_PENDING";
     private ProductRepository productRepository;
 
     private ImageView imgBack;
@@ -84,12 +87,29 @@ public class OrderHistoryActivity extends BaseActivity {
         initViews();          // BẮT BUỘC PHẢI CÓ DÒNG NÀY
         initRecyclerView();
         initEvents();
+        readInitialTab();
         observeOrderHistory();
         observeCancelOrder();
         observeCompleteOrder();
         observeRetryPayment();
 
         viewModel.loadOrderHistory();
+    }
+
+    private void readInitialTab() {
+        String initialTab = getIntent().getStringExtra(EXTRA_INITIAL_TAB);
+
+        if (TAB_PENDING.equals(initialTab)
+                || TAB_SHIPPING.equals(initialTab)
+                || TAB_COMPLETED.equals(initialTab)
+                || TAB_CANCELLED.equals(initialTab)
+                || TAB_REVIEW.equals(initialTab)) {
+            currentTab = initialTab;
+        } else {
+            currentTab = TAB_ALL;
+        }
+
+        applyTabUi();
     }
 
     private void observeCompleteOrder() {
@@ -660,7 +680,7 @@ public class OrderHistoryActivity extends BaseActivity {
         styleTab(tabAll, TAB_ALL.equals(currentTab));
         styleTab(tabPending, TAB_PENDING.equals(currentTab));
         styleTab(tabShipping, TAB_SHIPPING.equals(currentTab));
-        styleTab(tabCompleted, TAB_COMPLETED.equals(currentTab));
+        styleTab(tabCompleted, TAB_COMPLETED.equals(currentTab) || TAB_REVIEW.equals(currentTab));
         styleTab(tabCancelled, TAB_CANCELLED.equals(currentTab));
     }
 
@@ -725,12 +745,17 @@ public class OrderHistoryActivity extends BaseActivity {
         }
 
         if (TAB_SHIPPING.equals(currentTab)) {
-            return "SHIPPING".equals(status);
+            return "SHIPPING".equals(status)
+                    || "DELIVERING".equals(status)
+                    || "OUT_FOR_DELIVERY".equals(status);
+        }
+
+        if (TAB_REVIEW.equals(currentTab)) {
+            return isCompletedStatus(status) && hasPendingReview(order);
         }
 
         if (TAB_COMPLETED.equals(currentTab)) {
-            return "DELIVERED".equals(status)
-                    || "COMPLETED".equals(status);
+            return isCompletedStatus(status);
         }
 
         if (TAB_CANCELLED.equals(currentTab)) {
@@ -739,6 +764,25 @@ public class OrderHistoryActivity extends BaseActivity {
         }
 
         return true;
+    }
+
+    private boolean isCompletedStatus(String status) {
+        return "DELIVERED".equals(status)
+                || "COMPLETED".equals(status);
+    }
+
+    private boolean hasPendingReview(OrderHistoryUiModel order) {
+        if (order == null || order.getItems() == null || order.getItems().isEmpty()) {
+            return false;
+        }
+
+        for (OrderHistoryUiModel.OrderItemUiModel item : order.getItems()) {
+            if (item != null && item.canReview() && !item.isReviewed()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private boolean matchKeyword(OrderHistoryUiModel order) {
@@ -775,3 +819,5 @@ public class OrderHistoryActivity extends BaseActivity {
         return value == null ? "" : value.toLowerCase();
     }
 }
+
+

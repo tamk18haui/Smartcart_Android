@@ -7,6 +7,17 @@
     android:paddingTop="4dp"
     android:paddingBottom="4dp">
 
+    <ImageView
+        android:id="@+id/imgMessageImage"
+        android:layout_width="190dp"
+        android:layout_height="190dp"
+        android:layout_marginStart="72dp"
+        android:layout_marginBottom="4dp"
+        android:background="@drawable/bg_review_image_box"
+        android:padding="1dp"
+        android:scaleType="centerCrop"
+        android:visibility="gone" />
+
     <TextView
         android:id="@+id/txtMessage"
         android:layout_width="wrap_content"
@@ -34,3 +45,5 @@
         android:textSize="11sp" />
 
 </LinearLayout>
+
+

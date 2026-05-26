@@ -17,6 +17,7 @@ import com.gr6.smartcart_android.R;
 import com.gr6.smartcart_android.buyer.order.OrderDetailActivity;
 import com.gr6.smartcart_android.chat.ChatRoomActivity;
 import com.gr6.smartcart_android.navigation.RoleRouterActivity;
+import com.gr6.smartcart_android.seller.order.SellerOrderDetailActivity;
 
 import java.util.Map;
 import java.util.Random;
@@ -81,24 +82,63 @@ public class NotificationHelper {
 
     private static Intent buildOpenIntent(Context context, Map<String, String> data) {
         if (data != null) {
-            String type = data.get("type");
+            String type = get(data, "type");
+            String routeKey = get(data, "routeKey");
 
-            if ("CHAT".equalsIgnoreCase(type)) {
+            if ("CHAT".equalsIgnoreCase(type) || "CHAT_ROOM".equalsIgnoreCase(routeKey)) {
                 Intent intent = new Intent(context, ChatRoomActivity.class);
-                putLongExtraIfExists(intent, "partnerId", data.get("senderId"));
-                putLongExtraIfExists(intent, "conversationId", data.get("conversationId"));
+                putLongExtraIfExists(intent, ChatRoomActivity.EXTRA_PARTNER_ID,
+                        firstNotBlank(get(data, "partnerId"), get(data, "senderId"), get(data, "targetId")));
+                putLongExtraIfExists(intent, "conversation_id", get(data, "conversationId"));
+                intent.putExtra(ChatRoomActivity.EXTRA_PARTNER_NAME,
+                        firstNotBlank(get(data, "partnerName"), get(data, "senderName")));
+                intent.putExtra(ChatRoomActivity.EXTRA_PARTNER_AVATAR,
+                        firstNotBlank(get(data, "partnerAvatarUrl"), get(data, "senderAvatarUrl")));
                 return intent;
             }
 
-            if ("ORDER".equalsIgnoreCase(type) || "SELLER_ORDER".equalsIgnoreCase(type)) {
+            if ("SELLER_ORDER_DETAIL".equalsIgnoreCase(routeKey)) {
+                Intent intent = new Intent(context, SellerOrderDetailActivity.class);
+                putLongExtraIfExists(intent, SellerOrderDetailActivity.EXTRA_ORDER_ID,
+                        firstNotBlank(get(data, "targetId"), get(data, "shopOrderId"), get(data, "orderId")));
+                return intent;
+            }
+
+            if ("BUYER_ORDER_DETAIL".equalsIgnoreCase(routeKey)
+                    || "ORDER_DETAIL".equalsIgnoreCase(routeKey)
+                    || "SHOP_ORDER_DETAIL".equalsIgnoreCase(routeKey)
+                    || "ORDER".equalsIgnoreCase(type)) {
                 Intent intent = new Intent(context, OrderDetailActivity.class);
-                putLongExtraIfExists(intent, "orderId", data.get("orderId"));
-                putLongExtraIfExists(intent, "shopOrderId", data.get("shopOrderId"));
+                putLongExtraIfExists(intent, OrderDetailActivity.EXTRA_SHOP_ORDER_ID,
+                        firstNotBlank(get(data, "targetId"), get(data, "shopOrderId"), get(data, "orderId")));
                 return intent;
             }
         }
 
         return new Intent(context, RoleRouterActivity.class);
+    }
+
+    private static String get(Map<String, String> data, String key) {
+        if (data == null || key == null) {
+            return "";
+        }
+
+        String value = data.get(key);
+        return value == null ? "" : value.trim();
+    }
+
+    private static String firstNotBlank(String... values) {
+        if (values == null) {
+            return "";
+        }
+
+        for (String value : values) {
+            if (value != null && !value.trim().isEmpty()) {
+                return value.trim();
+            }
+        }
+
+        return "";
     }
 
     private static void putLongExtraIfExists(Intent intent, String key, String value) {
