@@ -17,10 +17,14 @@ import android.widget.VideoView;
 
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.gr6.smartcart_android.R;
+import com.gr6.smartcart_android.buyer.category.CategoryProductAdapter;
+import com.gr6.smartcart_android.buyer.main.response.HomeProductResponse;
 import com.gr6.smartcart_android.buyer.product.response.ProductDetailResponse;
 import com.gr6.smartcart_android.chat.ChatRoomActivity;
 import com.gr6.smartcart_android.common.base.BaseActivity;
@@ -67,6 +71,11 @@ public class ProductDetailActivity extends BaseActivity {
     private TextView txtReviewCount;
     private LinearLayout layoutReviews;
 
+    private LinearLayout layoutSimilarProducts;
+    private TextView txtSimilarCount;
+    private RecyclerView rcvSimilarProducts;
+    private CategoryProductAdapter similarAdapter;
+
     private View btnMessage;
     private View btnAddCart;
     private TextView btnBuyNow;
@@ -106,6 +115,7 @@ public class ProductDetailActivity extends BaseActivity {
 
         initViews();
         setupImages();
+        setupSimilarProducts();
         initEvents();
         observeData();
 
@@ -137,6 +147,10 @@ public class ProductDetailActivity extends BaseActivity {
         txtReviewCount = findViewById(R.id.txtReviewCount);
         layoutReviews = findViewById(R.id.layoutReviews);
 
+        layoutSimilarProducts = findViewById(R.id.layoutSimilarProducts);
+        txtSimilarCount = findViewById(R.id.txtSimilarCount);
+        rcvSimilarProducts = findViewById(R.id.rcvSimilarProducts);
+
         btnMessage = findViewById(R.id.btnMessage);
         btnAddCart = findViewById(R.id.btnAddCart);
         btnBuyNow = findViewById(R.id.btnBuyNow);
@@ -152,6 +166,29 @@ public class ProductDetailActivity extends BaseActivity {
             public void onPageSelected(int position) {
                 updateImageIndicator(position);
             }
+        });
+    }
+
+    private void setupSimilarProducts() {
+        if (rcvSimilarProducts == null) {
+            return;
+        }
+
+        similarAdapter = new CategoryProductAdapter();
+
+        rcvSimilarProducts.setLayoutManager(new GridLayoutManager(this, 2));
+        rcvSimilarProducts.setAdapter(similarAdapter);
+        rcvSimilarProducts.setNestedScrollingEnabled(false);
+
+        similarAdapter.setOnProductClickListener(product -> {
+            if (product == null || product.getProductId() == null) {
+                showToast("Không tìm thấy sản phẩm");
+                return;
+            }
+
+            Intent intent = new Intent(this, ProductDetailActivity.class);
+            intent.putExtra(ProductDetailActivity.EXTRA_PRODUCT_ID, product.getProductId());
+            startActivity(intent);
         });
     }
 
@@ -179,24 +216,6 @@ public class ProductDetailActivity extends BaseActivity {
         });
     }
 
-    private void openChatWithShop() {
-        if (productDetail == null) {
-            showToast("Không tìm thấy thông tin sản phẩm");
-            return;
-        }
-
-        if (productDetail.getShopOwnerId() == null || productDetail.getShopOwnerId() <= 0) {
-            showToast("Không tìm thấy chủ shop để nhắn tin");
-            return;
-        }
-
-        Intent intent = new Intent(this, ChatRoomActivity.class);
-        intent.putExtra(ChatRoomActivity.EXTRA_PARTNER_ID, productDetail.getShopOwnerId());
-        intent.putExtra(ChatRoomActivity.EXTRA_PARTNER_NAME, productDetail.getShopName());
-        intent.putExtra(ChatRoomActivity.EXTRA_PARTNER_AVATAR, productDetail.getShopImageUrl());
-        startActivity(intent);
-    }
-
     private void observeData() {
         viewModel.getDetailState().observe(this, state -> {
             if (state == null) return;
@@ -212,6 +231,8 @@ public class ProductDetailActivity extends BaseActivity {
                 productDetail = state.getData();
                 bindProductDetail();
 
+                viewModel.loadSimilarProducts(productId);
+
                 if (productDetail != null && productDetail.getShopId() != null) {
                     viewModel.loadShopVouchers(productDetail.getShopId());
                 }
@@ -222,6 +243,8 @@ public class ProductDetailActivity extends BaseActivity {
         });
 
         viewModel.getVoucherState().observe(this, this::bindVouchers);
+
+        viewModel.getSimilarProductsState().observe(this, this::bindSimilarProducts);
 
         viewModel.getActionState().observe(this, state -> {
             if (state == null) return;
@@ -239,6 +262,25 @@ public class ProductDetailActivity extends BaseActivity {
                 showLongToast(state.getMessage());
             }
         });
+    }
+
+    private void bindSimilarProducts(List<HomeProductResponse> products) {
+        if (layoutSimilarProducts == null || similarAdapter == null) {
+            return;
+        }
+
+        if (products == null || products.isEmpty()) {
+            layoutSimilarProducts.setVisibility(View.GONE);
+            return;
+        }
+
+        layoutSimilarProducts.setVisibility(View.VISIBLE);
+
+        if (txtSimilarCount != null) {
+            txtSimilarCount.setText(products.size() + " sản phẩm");
+        }
+
+        similarAdapter.setData(products);
     }
 
     private void bindProductDetail() {
@@ -336,6 +378,7 @@ public class ProductDetailActivity extends BaseActivity {
             ));
         }
     }
+
     private void bindVouchers(List<ProductDetailResponse.ShopVoucherDTO> vouchers) {
         layoutVouchers.removeAllViews();
 
@@ -439,6 +482,7 @@ public class ProductDetailActivity extends BaseActivity {
         for (int i = 0; i < limit; i++) {
             addReviewItem(reviews.get(i));
         }
+
         if (reviews.size() > 2) {
             TextView btnViewAll = createText(
                     "Xem tất cả đánh giá",
@@ -458,6 +502,7 @@ public class ProductDetailActivity extends BaseActivity {
             layoutReviews.addView(btnViewAll);
         }
     }
+
     private void addReviewItem(ProductDetailResponse.ReviewDTO review) {
         if (review == null) return;
 
@@ -595,8 +640,7 @@ public class ProductDetailActivity extends BaseActivity {
         VideoView videoView = new VideoView(this);
         videoView.setVideoURI(Uri.parse(videoUrl.trim()));
 
-        MediaController mediaController = new
-                MediaController(this);
+        MediaController mediaController = new MediaController(this);
         mediaController.setAnchorView(videoView);
         videoView.setMediaController(mediaController);
 
@@ -642,6 +686,7 @@ public class ProductDetailActivity extends BaseActivity {
 
         parent.addView(reply, replyParams);
     }
+
     private void showVariantBottomSheet() {
         if (productDetail == null) return;
 
@@ -1404,6 +1449,24 @@ public class ProductDetailActivity extends BaseActivity {
                 .replace("\\", "");
     }
 
+    private void openChatWithShop() {
+        if (productDetail == null) {
+            showToast("Không tìm thấy thông tin sản phẩm");
+            return;
+        }
+
+        if (productDetail.getShopOwnerId() == null || productDetail.getShopOwnerId() <= 0) {
+            showToast("Không tìm thấy chủ shop để nhắn tin");
+            return;
+        }
+
+        Intent intent = new Intent(this, ChatRoomActivity.class);
+        intent.putExtra(ChatRoomActivity.EXTRA_PARTNER_ID, productDetail.getShopOwnerId());
+        intent.putExtra(ChatRoomActivity.EXTRA_PARTNER_NAME, productDetail.getShopName());
+        intent.putExtra(ChatRoomActivity.EXTRA_PARTNER_AVATAR, productDetail.getShopImageUrl());
+        startActivity(intent);
+    }
+
     private void openCart() {
         try {
             Class<?> cartClass = Class.forName(
@@ -1452,6 +1515,7 @@ public class ProductDetailActivity extends BaseActivity {
             showToast("Không mở được màn hình thanh toán");
         }
     }
+
     private void updateImageIndicator(int position) {
         int count = imageAdapter.getImageCount();
 

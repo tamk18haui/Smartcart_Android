@@ -7,9 +7,12 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import com.gr6.smartcart_android.buyer.main.response.HomeProductResponse;
+import com.gr6.smartcart_android.buyer.main.response.RecommendationPageResponse;
 import com.gr6.smartcart_android.buyer.product.repository.ProductRepository;
 import com.gr6.smartcart_android.buyer.product.response.ProductDetailResponse;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ProductDetailViewModel extends AndroidViewModel {
@@ -19,6 +22,9 @@ public class ProductDetailViewModel extends AndroidViewModel {
     private final MutableLiveData<ProductDetailState> detailState = new MutableLiveData<>();
     private final MutableLiveData<ProductActionState> actionState = new MutableLiveData<>();
     private final MutableLiveData<List<ProductDetailResponse.ShopVoucherDTO>> voucherState =
+            new MutableLiveData<>();
+
+    private final MutableLiveData<List<HomeProductResponse>> similarProductsState =
             new MutableLiveData<>();
 
     public ProductDetailViewModel(@NonNull Application application) {
@@ -36,6 +42,10 @@ public class ProductDetailViewModel extends AndroidViewModel {
 
     public LiveData<List<ProductDetailResponse.ShopVoucherDTO>> getVoucherState() {
         return voucherState;
+    }
+
+    public LiveData<List<HomeProductResponse>> getSimilarProductsState() {
+        return similarProductsState;
     }
 
     public void loadProductDetail(Long productId) {
@@ -83,9 +93,36 @@ public class ProductDetailViewModel extends AndroidViewModel {
 
             @Override
             public void onError(String message) {
-                // Không làm hỏng màn chi tiết sản phẩm, chỉ log/toast ở Activity nếu muốn
                 voucherState.postValue(null);
             }
         });
+    }
+
+    public void loadSimilarProducts(Long productId) {
+        if (productId == null || productId <= 0) {
+            similarProductsState.postValue(new ArrayList<>());
+            return;
+        }
+
+        repository.getSimilarProducts(
+                productId,
+                0,
+                10,
+                new ProductRepository.RecommendationCallback() {
+                    @Override
+                    public void onSuccess(RecommendationPageResponse data) {
+                        if (data == null) {
+                            similarProductsState.postValue(new ArrayList<>());
+                        } else {
+                            similarProductsState.postValue(data.getProducts());
+                        }
+                    }
+
+                    @Override
+                    public void onError(String message) {
+                        similarProductsState.postValue(new ArrayList<>());
+                    }
+                }
+        );
     }
 }

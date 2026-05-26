@@ -39,6 +39,15 @@ public class HomeProductResponse {
     @SerializedName("thumbnailUrl")
     private String thumbnailUrl;
 
+    @SerializedName("soldCount")
+    private Integer soldCount;
+
+    @SerializedName("score")
+    private Double score;
+
+    @SerializedName("reason")
+    private String reason;
+
     @SerializedName("imageUrl")
     private String imageUrl;
 
@@ -151,7 +160,20 @@ public class HomeProductResponse {
     public Integer getSoldQuantity() {
         if (soldQuantity != null) return Math.max(soldQuantity, 0);
         if (totalSold != null) return Math.max(totalSold, 0);
+        if (soldCount != null) return Math.max(soldCount, 0);
         return 0;
+    }
+
+    public Double getScore() {
+        return score == null ? 0.0 : score;
+    }
+
+    public String getReason() {
+        if (reason == null || reason.trim().isEmpty()) {
+            return "";
+        }
+
+        return reason.trim();
     }
 
     public Double getAverageRating() {

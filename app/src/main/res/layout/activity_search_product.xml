@@ -85,6 +85,18 @@
                 android:textSize="24sp" />
 
         </LinearLayout>
+        <ImageView
+            android:id="@+id/btnImageSearch"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/bg_ai_camera_button"
+            android:clickable="true"
+            android:focusable="true"
+            android:contentDescription="Tìm kiếm bằng hình ảnh"
+            android:padding="9dp"
+            android:src="@drawable/ic_camera"
+            app:tint="@color/white" />
 
         <!-- Nút Lọc -->
         <ImageView

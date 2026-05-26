@@ -94,7 +94,9 @@
         <activity
             android:name=".buyer.search.SearchProductActivity"
             android:exported="false" />
-
+        <activity
+            android:name=".buyer.search.AiImageSearchActivity"
+            android:exported="false" />
 
         <activity
             android:name=".buyer.checkout.CheckoutActivity"

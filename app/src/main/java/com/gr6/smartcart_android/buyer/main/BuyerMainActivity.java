@@ -22,6 +22,7 @@ import com.gr6.smartcart_android.buyer.cart.CartActivity;
 import com.gr6.smartcart_android.buyer.main.response.HomeCategoryResponse;
 import com.gr6.smartcart_android.buyer.main.response.HomeProductResponse;
 import com.gr6.smartcart_android.buyer.product.ProductDetailActivity;
+import com.gr6.smartcart_android.buyer.search.AiImageSearchActivity;
 import com.gr6.smartcart_android.buyer.search.SearchProductActivity;
 import com.gr6.smartcart_android.chat.ChatListActivity;
 import com.gr6.smartcart_android.common.base.BaseActivity;
@@ -39,6 +40,7 @@ public class BuyerMainActivity extends BaseActivity {
     private RecyclerView rcvProducts;
 
     private EditText edtSearch;
+    private ImageView btnHomeCameraSearch;
     private ImageView imgCart;
     private ImageView imgMessage;
 
@@ -103,6 +105,7 @@ public class BuyerMainActivity extends BaseActivity {
         rcvCategories = findViewById(R.id.rcvCategories);
         rcvProducts = findViewById(R.id.rcvProducts);
 
+        btnHomeCameraSearch = findViewById(R.id.btnHomeCameraSearch);
         edtSearch = findViewById(R.id.edtSearch);
         imgCart = findViewById(R.id.imgCart);
         imgMessage = findViewById(R.id.imgMessage);
@@ -152,6 +155,12 @@ public class BuyerMainActivity extends BaseActivity {
             edtSearch.clearFocus();
             viewModel.refreshHome();
         });
+        if (btnHomeCameraSearch != null) {
+            btnHomeCameraSearch.setOnClickListener(v -> {
+                Intent intent = new Intent(this, AiImageSearchActivity.class);
+                startActivity(intent);
+            });
+        }
 
         imgCart.setOnClickListener(v -> {
             if (!AuthGuard.requireLogin(this, CartActivity.class)) return;

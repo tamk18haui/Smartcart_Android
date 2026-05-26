@@ -41,6 +41,7 @@ import com.gr6.smartcart_android.common.utils.ThemeColor;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import android.widget.ImageView;
 
 public class SearchProductActivity extends BaseActivity {
     public static final String EXTRA_KEYWORD = "keyword";
@@ -50,6 +51,8 @@ public class SearchProductActivity extends BaseActivity {
     private static final long SEARCH_DELAY_MS = 450L;
 
     private EditText edtSearch;
+
+    private ImageView btnImageSearch;
     private ImageView btnBack;
     private TextView btnClear;
     private ImageView btnFilter;
@@ -120,6 +123,7 @@ public class SearchProductActivity extends BaseActivity {
         btnBack = findViewById(R.id.btnBack);
         btnClear = findViewById(R.id.btnClear);
         btnFilter = findViewById(R.id.btnFilter);
+        btnImageSearch = findViewById(R.id.btnImageSearch);
 
         tabRelevance = findViewById(R.id.tabRelevance);
         tabLatest = findViewById(R.id.tabLatest);
@@ -184,6 +188,12 @@ public class SearchProductActivity extends BaseActivity {
             clearResultOnly();
             showInitialEmpty();
         });
+        if (btnImageSearch != null) {
+            btnImageSearch.setOnClickListener(v -> {
+                Intent intent = new Intent(this, AiImageSearchActivity.class);
+                startActivity(intent);
+            });
+        }
 
         btnFilter.setOnClickListener(v -> showFilterDialog());
 

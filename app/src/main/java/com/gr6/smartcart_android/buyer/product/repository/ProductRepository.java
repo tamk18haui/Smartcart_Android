@@ -4,6 +4,7 @@ import android.content.Context;
 
 import androidx.annotation.NonNull;
 
+import com.gr6.smartcart_android.buyer.main.response.RecommendationPageResponse;
 import com.gr6.smartcart_android.buyer.product.api.ProductApiService;
 import com.gr6.smartcart_android.buyer.product.request.AddToCartRequest;
 import com.gr6.smartcart_android.buyer.product.response.ProductDetailResponse;
@@ -49,7 +50,7 @@ public class ProductRepository {
                 }
 
                 if (body.getData() == null) {
-                    callback.onError("Dữ liệu chi tiết sản phẩm không hợp lệ");
+                    callback.onError("Không tìm thấy sản phẩm");
                     return;
                 }
 
@@ -66,7 +67,11 @@ public class ProductRepository {
         });
     }
 
-    public void addToCart(Long variantId, Integer quantity, ActionCallback callback) {
+    public void addToCart(
+            Long variantId,
+            Integer quantity,
+            ActionCallback callback
+    ) {
         AddToCartRequest request = new AddToCartRequest(variantId, quantity);
 
         apiService.addToCart(request).enqueue(new Callback<BaseResponse<Object>>() {
@@ -83,7 +88,7 @@ public class ProductRepository {
                 BaseResponse<Object> body = response.body();
 
                 if (body == null) {
-                    callback.onError("Server không trả phản hồi");
+                    callback.onError("Server không trả dữ liệu");
                     return;
                 }
 
@@ -140,16 +145,49 @@ public class ProductRepository {
                     @NonNull Call<BaseResponse<List<ProductDetailResponse.ShopVoucherDTO>>> call,
                     @NonNull Throwable t
             ) {
-                callback.onError("Không kết nối được server voucher: " + t.getMessage());
+                callback.onError("Không kết nối được server: " + t.getMessage());
             }
         });
     }
 
-    public interface VoucherCallback {
-        void onSuccess(List<ProductDetailResponse.ShopVoucherDTO> vouchers);
+    public void getSimilarProducts(
+            Long productId,
+            int page,
+            int size,
+            RecommendationCallback callback
+    ) {
+        apiService.getSimilarProducts(productId, page, size)
+                .enqueue(new Callback<RecommendationPageResponse>() {
+                    @Override
+                    public void onResponse(
+                            @NonNull Call<RecommendationPageResponse> call,
+                            @NonNull Response<RecommendationPageResponse> response
+                    ) {
+                        if (!response.isSuccessful()) {
+                            callback.onError("Không lấy được sản phẩm gợi ý. Mã lỗi: " + response.code());
+                            return;
+                        }
 
-        void onError(String message);
+                        RecommendationPageResponse body = response.body();
+
+                        if (body == null) {
+                            callback.onError("Server không trả dữ liệu gợi ý");
+                            return;
+                        }
+
+                        callback.onSuccess(body);
+                    }
+
+                    @Override
+                    public void onFailure(
+                            @NonNull Call<RecommendationPageResponse> call,
+                            @NonNull Throwable t
+                    ) {
+                        callback.onError("Không kết nối được server: " + t.getMessage());
+                    }
+                });
     }
+
     public interface ProductDetailCallback {
         void onSuccess(ProductDetailResponse data);
 
@@ -158,6 +196,18 @@ public class ProductRepository {
 
     public interface ActionCallback {
         void onSuccess(String message);
+
+        void onError(String message);
+    }
+
+    public interface VoucherCallback {
+        void onSuccess(List<ProductDetailResponse.ShopVoucherDTO> vouchers);
+
+        void onError(String message);
+    }
+
+    public interface RecommendationCallback {
+        void onSuccess(RecommendationPageResponse data);
 
         void onError(String message);
     }

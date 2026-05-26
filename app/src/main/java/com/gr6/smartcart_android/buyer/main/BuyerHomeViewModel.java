@@ -12,6 +12,8 @@ import com.gr6.smartcart_android.buyer.main.request.SearchProductRequest;
 import com.gr6.smartcart_android.buyer.main.response.HomeCategoryResponse;
 import com.gr6.smartcart_android.buyer.main.response.HomeProductResponse;
 import com.gr6.smartcart_android.buyer.main.response.ProductPageResponse;
+import com.gr6.smartcart_android.buyer.main.response.RecommendationPageResponse;
+import com.gr6.smartcart_android.common.storage.TokenManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,6 +47,11 @@ public class BuyerHomeViewModel extends AndroidViewModel {
 
     public void loadHome() {
         firstLoading = true;
+        currentKeyword = "";
+        currentCategoryId = null;
+        currentPage = 0;
+        lastPage = false;
+
         homeState.setValue(BuyerHomeState.loading());
 
         repository.getCategories(new BuyerHomeRepository.HomeCallback<List<HomeCategoryResponse>>() {
@@ -56,7 +63,7 @@ public class BuyerHomeViewModel extends AndroidViewModel {
                     cachedCategories.addAll(categories);
                 }
 
-                loadProductsPage(0, true);
+                loadAiHomePage(0, true);
             }
 
             @Override
@@ -68,42 +75,139 @@ public class BuyerHomeViewModel extends AndroidViewModel {
     }
 
     public void refreshHome() {
-        currentKeyword = "";
-        currentCategoryId = null;
         loadHome();
     }
 
     public void searchProducts(String keyword) {
         currentKeyword = keyword == null ? "" : keyword.trim();
-        loadProductsPage(0, true);
+        currentCategoryId = null;
+
+        if (currentKeyword.isEmpty()) {
+            loadAiHomePage(0, true);
+        } else {
+            loadAiSearchPage(0, true);
+        }
     }
 
     public void filterByCategory(Long categoryId) {
+        currentKeyword = "";
         currentCategoryId = categoryId;
-        loadProductsPage(0, true);
+        loadNormalProductsPage(0, true);
     }
 
     public void clearCategoryFilter() {
+        currentKeyword = "";
         currentCategoryId = null;
-        loadProductsPage(0, true);
+        loadAiHomePage(0, true);
     }
 
     public void loadMoreProducts() {
         if (loadingMore || lastPage || firstLoading) return;
 
-        loadProductsPage(currentPage + 1, false);
+        int nextPage = currentPage + 1;
+
+        if (isAiHomeMode()) {
+            loadAiHomePage(nextPage, false);
+        } else if (isAiSearchMode()) {
+            loadAiSearchPage(nextPage, false);
+        } else {
+            loadNormalProductsPage(nextPage, false);
+        }
     }
 
-    private void loadProductsPage(int page, boolean reset) {
-        if (reset) {
-            firstLoading = true;
-            cachedProducts.clear();
-            currentPage = 0;
-            lastPage = false;
-            homeState.setValue(BuyerHomeState.loading());
+    private boolean isAiHomeMode() {
+        boolean emptyKeyword = currentKeyword == null || currentKeyword.trim().isEmpty();
+        return emptyKeyword && currentCategoryId == null;
+    }
+
+    private boolean isAiSearchMode() {
+        boolean hasKeyword = currentKeyword != null && !currentKeyword.trim().isEmpty();
+        return hasKeyword && currentCategoryId == null;
+    }
+
+    private void loadAiHomePage(
+            int page,
+            boolean reset
+    ) {
+        preparePageState(reset);
+
+        boolean hasToken = TokenManager.getInstance(getApplication()).hasToken();
+
+        if (hasToken) {
+            repository.getAiPersonal(
+                    page,
+                    PAGE_SIZE,
+                    new BuyerHomeRepository.HomeCallback<RecommendationPageResponse>() {
+                        @Override
+                        public void onSuccess(RecommendationPageResponse data) {
+                            handleAiSuccess(data, reset);
+                        }
+
+                        @Override
+                        public void onError(String message) {
+                            loadAiTrendingPage(page, reset);
+                        }
+                    }
+            );
         } else {
-            loadingMore = true;
+            loadAiTrendingPage(page, reset);
         }
+    }
+
+    private void loadAiTrendingPage(
+            int page,
+            boolean reset
+    ) {
+        repository.getAiTrending(
+                page,
+                PAGE_SIZE,
+                new BuyerHomeRepository.HomeCallback<RecommendationPageResponse>() {
+                    @Override
+                    public void onSuccess(RecommendationPageResponse data) {
+                        handleAiSuccess(data, reset);
+                    }
+
+                    @Override
+                    public void onError(String message) {
+                        finishLoading();
+
+                        if (cachedProducts.isEmpty()) {
+                            homeState.postValue(BuyerHomeState.error(message));
+                        }
+                    }
+                }
+        );
+    }
+
+    private void loadAiSearchPage(
+            int page,
+            boolean reset
+    ) {
+        preparePageState(reset);
+
+        repository.getAiSearch(
+                currentKeyword,
+                page,
+                PAGE_SIZE,
+                new BuyerHomeRepository.HomeCallback<RecommendationPageResponse>() {
+                    @Override
+                    public void onSuccess(RecommendationPageResponse data) {
+                        handleAiSuccess(data, reset);
+                    }
+
+                    @Override
+                    public void onError(String message) {
+                        loadNormalProductsPage(page, reset);
+                    }
+                }
+        );
+    }
+
+    private void loadNormalProductsPage(
+            int page,
+            boolean reset
+    ) {
+        preparePageState(reset);
 
         SearchProductRequest request = SearchProductRequest.ofKeywordAndCategory(
                 currentKeyword,
@@ -117,14 +221,10 @@ public class BuyerHomeViewModel extends AndroidViewModel {
                 new BuyerHomeRepository.HomeCallback<ProductPageResponse>() {
                     @Override
                     public void onSuccess(ProductPageResponse data) {
-                        firstLoading = false;
-                        loadingMore = false;
+                        finishLoading();
 
                         if (data == null) {
-                            homeState.postValue(BuyerHomeState.success(
-                                    new ArrayList<>(cachedCategories),
-                                    new ArrayList<>(cachedProducts)
-                            ));
+                            postCurrentHome();
                             return;
                         }
 
@@ -137,16 +237,12 @@ public class BuyerHomeViewModel extends AndroidViewModel {
 
                         cachedProducts.addAll(data.getProducts());
 
-                        homeState.postValue(BuyerHomeState.success(
-                                new ArrayList<>(cachedCategories),
-                                new ArrayList<>(cachedProducts)
-                        ));
+                        postCurrentHome();
                     }
 
                     @Override
                     public void onError(String message) {
-                        firstLoading = false;
-                        loadingMore = false;
+                        finishLoading();
 
                         if (cachedProducts.isEmpty()) {
                             homeState.postValue(BuyerHomeState.error(message));
@@ -154,5 +250,52 @@ public class BuyerHomeViewModel extends AndroidViewModel {
                     }
                 }
         );
+    }
+
+    private void handleAiSuccess(
+            RecommendationPageResponse data,
+            boolean reset
+    ) {
+        finishLoading();
+
+        if (data == null) {
+            postCurrentHome();
+            return;
+        }
+
+        currentPage = data.getPageIndexZeroBased();
+        lastPage = data.isLast();
+
+        if (reset) {
+            cachedProducts.clear();
+        }
+
+        cachedProducts.addAll(data.getProducts());
+
+        postCurrentHome();
+    }
+
+    private void preparePageState(boolean reset) {
+        if (reset) {
+            firstLoading = true;
+            currentPage = 0;
+            lastPage = false;
+            cachedProducts.clear();
+            homeState.setValue(BuyerHomeState.loading());
+        } else {
+            loadingMore = true;
+        }
+    }
+
+    private void finishLoading() {
+        firstLoading = false;
+        loadingMore = false;
+    }
+
+    private void postCurrentHome() {
+        homeState.postValue(BuyerHomeState.success(
+                new ArrayList<>(cachedCategories),
+                new ArrayList<>(cachedProducts)
+        ));
     }
 }
