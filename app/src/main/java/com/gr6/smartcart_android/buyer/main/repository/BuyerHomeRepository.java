@@ -2,6 +2,7 @@ package com.gr6.smartcart_android.buyer.main.repository;
 
 import android.content.Context;
 import android.net.Uri;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 
@@ -26,12 +27,14 @@ import retrofit2.Response;
 
 public class BuyerHomeRepository {
 
+    private static final String TAG = "AI_IMAGE_REPO";
+
     private final Context context;
     private final BuyerHomeApiService apiService;
 
     public BuyerHomeRepository(Context context) {
         this.context = context.getApplicationContext();
-        apiService = ApiClient.createService(context, BuyerHomeApiService.class);
+        this.apiService = ApiClient.createService(context, BuyerHomeApiService.class);
     }
 
     public void getCategories(HomeCallback<List<HomeCategoryResponse>> callback) {
@@ -158,12 +161,19 @@ public class BuyerHomeRepository {
             int size,
             HomeCallback<RecommendationPageResponse> callback
     ) {
+        Log.d(TAG, "===== searchByImage() called =====");
+        Log.d(TAG, "imageUri = " + imageUri);
+        Log.d(TAG, "page = " + page + ", size = " + size);
+
         MultipartBody.Part imagePart = createImagePart(imageUri);
 
         if (imagePart == null) {
+            Log.e(TAG, "imagePart null -> không đọc được ảnh");
             callback.onError("Không đọc được ảnh đã chọn");
             return;
         }
+
+        Log.d(TAG, "Bắt đầu gọi API: /api/v3/recommendations/ai/image-search");
 
         apiService.searchByImage(imagePart, page, size).enqueue(new Callback<RecommendationPageResponse>() {
             @Override
@@ -171,6 +181,32 @@ public class BuyerHomeRepository {
                     @NonNull Call<RecommendationPageResponse> call,
                     @NonNull Response<RecommendationPageResponse> response
             ) {
+                Log.d(TAG, "API image-search response code = " + response.code());
+                Log.d(TAG, "API image-search isSuccessful = " + response.isSuccessful());
+
+                if (response.errorBody() != null) {
+                    try {
+                        Log.e(TAG, "API image-search errorBody = " + response.errorBody().string());
+                    } catch (Exception e) {
+                        Log.e(TAG, "Không đọc được errorBody", e);
+                    }
+                }
+
+                RecommendationPageResponse body = response.body();
+
+                if (body != null) {
+                    int productSize = body.getProducts() == null ? 0 : body.getProducts().size();
+
+                    Log.d(TAG, "API image-search body != null");
+                    Log.d(TAG, "products size = " + productSize);
+                    Log.d(TAG, "totalElements = " + body.getTotalElements());
+                    Log.d(TAG, "hasMore = " + body.isHasMore());
+                    Log.d(TAG, "page = " + body.getPage());
+                    Log.d(TAG, "size = " + body.getSize());
+                } else {
+                    Log.e(TAG, "API image-search body null");
+                }
+
                 handleRawResponse(response, callback, "Không tìm kiếm được bằng hình ảnh");
             }
 
@@ -179,18 +215,27 @@ public class BuyerHomeRepository {
                     @NonNull Call<RecommendationPageResponse> call,
                     @NonNull Throwable t
             ) {
+                Log.e(TAG, "API image-search failure", t);
                 callback.onError("Không kết nối được server: " + t.getMessage());
             }
         });
     }
 
     private MultipartBody.Part createImagePart(Uri imageUri) {
-        if (imageUri == null) return null;
+        if (imageUri == null) {
+            Log.e(TAG, "createImagePart: imageUri null");
+            return null;
+        }
 
         try {
+            Log.d(TAG, "createImagePart: uri = " + imageUri);
+
             InputStream inputStream = context.getContentResolver().openInputStream(imageUri);
 
-            if (inputStream == null) return null;
+            if (inputStream == null) {
+                Log.e(TAG, "createImagePart: inputStream null");
+                return null;
+            }
 
             ByteArrayOutputStream buffer = new ByteArrayOutputStream();
             byte[] data = new byte[8192];
@@ -205,7 +250,12 @@ public class BuyerHomeRepository {
 
             byte[] bytes = buffer.toByteArray();
 
-            if (bytes.length == 0) return null;
+            Log.d(TAG, "Ảnh đọc được bytes = " + bytes.length);
+
+            if (bytes.length == 0) {
+                Log.e(TAG, "createImagePart: bytes length = 0");
+                return null;
+            }
 
             String mimeType = context.getContentResolver().getType(imageUri);
 
@@ -213,17 +263,30 @@ public class BuyerHomeRepository {
                 mimeType = "image/jpeg";
             }
 
+            Log.d(TAG, "mimeType = " + mimeType);
+
             MediaType mediaType = MediaType.parse(mimeType);
+
+            if (mediaType == null) {
+                Log.e(TAG, "mediaType null, fallback image/jpeg");
+                mediaType = MediaType.parse("image/jpeg");
+            }
+
             RequestBody requestBody = RequestBody.create(mediaType, bytes);
 
             String fileName = "smartcart_image_search_" + System.currentTimeMillis() + ".jpg";
+
+            Log.d(TAG, "fileName = " + fileName);
+            Log.d(TAG, "multipart field name = file");
 
             return MultipartBody.Part.createFormData(
                     "file",
                     fileName,
                     requestBody
             );
+
         } catch (Exception e) {
+            Log.e(TAG, "createImagePart error", e);
             return null;
         }
     }

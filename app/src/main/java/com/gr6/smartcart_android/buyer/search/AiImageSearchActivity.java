@@ -3,6 +3,7 @@ package com.gr6.smartcart_android.buyer.search;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -26,6 +27,7 @@ import java.util.List;
 
 public class AiImageSearchActivity extends BaseActivity {
 
+    private static final String TAG = "AI_IMAGE_UI";
     private static final int PAGE_SIZE = 20;
 
     private ImageView imgBack;
@@ -73,20 +75,33 @@ public class AiImageSearchActivity extends BaseActivity {
         imagePickerLauncher = registerForActivityResult(
                 new ActivityResultContracts.GetContent(),
                 uri -> {
-                    if (uri == null) return;
+                    if (uri == null) {
+                        Log.e(TAG, "Không chọn được ảnh: uri null");
+                        showToast("Không chọn được ảnh");
+                        return;
+                    }
 
                     selectedImageUri = uri;
+
+                    Log.d(TAG, "Đã chọn ảnh uri = " + uri);
+
                     imgPreview.setImageURI(uri);
+
                     if (layoutImageHint != null) {
                         layoutImageHint.setVisibility(View.GONE);
                     }
+
                     btnSearchImage.setEnabled(true);
                     btnSearchImage.setAlpha(1f);
 
                     products.clear();
                     adapter.clear();
                     updateResultCount();
-                    showEmpty("Đã chọn ảnh. Bấm Tìm kiếm bằng ảnh để bắt đầu.");
+
+                    showEmpty("Đang gửi ảnh để AI tìm sản phẩm...");
+
+                    // Chọn ảnh xong gửi luôn
+                    searchByImage(true);
                 }
         );
     }
@@ -134,7 +149,10 @@ public class AiImageSearchActivity extends BaseActivity {
             ) {
                 super.onScrolled(recyclerView, dx, dy);
 
-                if (dy <= 0 || loading || lastPage || selectedImageUri == null) return;
+                if (dy <= 0) return;
+                if (loading) return;
+                if (lastPage) return;
+                if (selectedImageUri == null) return;
 
                 int visible = layoutManager.getChildCount();
                 int total = layoutManager.getItemCount();
@@ -150,9 +168,10 @@ public class AiImageSearchActivity extends BaseActivity {
     private void initEvents() {
         imgBack.setOnClickListener(v -> finish());
 
-        btnChooseImage.setOnClickListener(v ->
-                imagePickerLauncher.launch("image/*")
-        );
+        btnChooseImage.setOnClickListener(v -> {
+            Log.d(TAG, "Mở chọn ảnh");
+            imagePickerLauncher.launch("image/*");
+        });
 
         btnSearchImage.setOnClickListener(v -> {
             if (selectedImageUri == null) {
@@ -164,18 +183,35 @@ public class AiImageSearchActivity extends BaseActivity {
         });
     }
 
-    private void searchByImage(boolean refresh) {
-        if (selectedImageUri == null || loading) return;
+    private void searchByImage(boolean reset) {
+        if (selectedImageUri == null) {
+            showToast("Vui lòng chọn ảnh trước");
+            return;
+        }
 
-        if (refresh) {
+        if (loading) {
+            Log.d(TAG, "Đang loading, bỏ qua request lặp");
+            return;
+        }
+
+        if (reset) {
             currentPage = 0;
             lastPage = false;
             products.clear();
             adapter.clear();
+            updateResultCount();
         }
 
         loading = true;
-        showLoading();
+        setSearchButtonLoading(true);
+
+        if (reset) {
+            showEmpty("Đang gửi ảnh để AI tìm sản phẩm...");
+        }
+
+        Log.d(TAG, "Gửi ảnh searchByImage: uri = " + selectedImageUri
+                + ", page = " + currentPage
+                + ", size = " + PAGE_SIZE);
 
         repository.searchByImage(
                 selectedImageUri,
@@ -184,57 +220,83 @@ public class AiImageSearchActivity extends BaseActivity {
                 new BuyerHomeRepository.HomeCallback<RecommendationPageResponse>() {
                     @Override
                     public void onSuccess(RecommendationPageResponse data) {
-                        runOnUiThread(() -> {
-                            hideLoading();
-                            loading = false;
+                        loading = false;
+                        setSearchButtonLoading(false);
 
-                            if (data == null) {
-                                showEmpty("Không có dữ liệu trả về");
-                                return;
+                        if (data == null) {
+                            Log.e(TAG, "Response null");
+                            if (products.isEmpty()) {
+                                showEmpty("Server không trả dữ liệu tìm kiếm ảnh");
                             }
+                            return;
+                        }
 
-                            List<HomeProductResponse> newProducts = data.getProducts();
+                        List<HomeProductResponse> newProducts = data.getProducts();
 
-                            if (refresh) {
-                                products.clear();
-                                adapter.setData(newProducts);
+                        Log.d(TAG, "AI image search success, products = "
+                                + (newProducts == null ? 0 : newProducts.size())
+                                + ", page = " + data.getPage()
+                                + ", hasMore = " + data.isHasMore()
+                                + ", totalElements = " + data.getTotalElements());
+
+                        if (reset) {
+                            products.clear();
+                            adapter.clear();
+                        }
+
+                        if (newProducts != null && !newProducts.isEmpty()) {
+                            products.addAll(newProducts);
+
+                            if (reset) {
+                                adapter.setData(products);
                             } else {
                                 adapter.appendData(newProducts);
                             }
+                        }
 
-                            products.addAll(newProducts);
+                        updateResultCount();
 
-                            currentPage = data.getPageIndexZeroBased();
-                            lastPage = data.isLast();
+                        lastPage = !data.isHasMore();
 
-                            if (!lastPage) {
-                                currentPage++;
-                            }
+                        if (newProducts == null || newProducts.isEmpty()) {
+                            lastPage = true;
+                        }
 
-                            updateResultCount();
-
-                            if (products.isEmpty()) {
-                                showEmpty("AI chưa tìm thấy sản phẩm giống ảnh này");
-                            } else {
-                                if (layoutEmpty != null) {
-                                    layoutEmpty.setVisibility(View.GONE);
-                                }
-                                rcvProducts.setVisibility(View.VISIBLE);
-                            }
-                        });
+                        if (products.isEmpty()) {
+                            showEmpty("Không tìm thấy sản phẩm phù hợp với ảnh này");
+                        } else {
+                            showProducts();
+                            currentPage++;
+                        }
                     }
 
                     @Override
                     public void onError(String message) {
-                        runOnUiThread(() -> {
-                            hideLoading();
-                            loading = false;
-                            showEmpty(message);
-                            showLongToast(message);
-                        });
+                        loading = false;
+                        setSearchButtonLoading(false);
+
+                        Log.e(TAG, "AI image search error = " + message);
+
+                        if (products.isEmpty()) {
+                            showEmpty(message == null || message.trim().isEmpty()
+                                    ? "Không tìm kiếm được bằng hình ảnh"
+                                    : message);
+                        } else {
+                            showToast(message == null || message.trim().isEmpty()
+                                    ? "Không tải thêm được sản phẩm"
+                                    : message);
+                        }
                     }
                 }
         );
+    }
+
+    private void showProducts() {
+        if (layoutEmpty != null) {
+            layoutEmpty.setVisibility(View.GONE);
+        }
+
+        rcvProducts.setVisibility(View.VISIBLE);
     }
 
     private void showEmpty(String message) {
@@ -252,7 +314,18 @@ public class AiImageSearchActivity extends BaseActivity {
             txtEmpty.setText(message);
         }
     }
+
     private void updateResultCount() {
-        txtResultCount.setText(products.size() + " sản phẩm");
+        if (txtResultCount != null) {
+            txtResultCount.setText(products.size() + " sản phẩm");
+        }
+    }
+
+    private void setSearchButtonLoading(boolean isLoading) {
+        if (btnSearchImage == null) return;
+
+        btnSearchImage.setEnabled(!isLoading && selectedImageUri != null);
+        btnSearchImage.setAlpha(isLoading ? 0.65f : 1f);
+        btnSearchImage.setText(isLoading ? "Đang tìm..." : "Tìm kiếm bằng ảnh");
     }
 }

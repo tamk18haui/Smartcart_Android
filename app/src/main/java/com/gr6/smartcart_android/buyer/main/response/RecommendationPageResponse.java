@@ -59,6 +59,14 @@ public class RecommendationPageResponse {
         return totalPages == null ? 0 : totalPages;
     }
 
+    public int getPage() {
+        return page == null ? 0 : page;
+    }
+
+    public boolean isHasMore() {
+        return hasMore != null && hasMore;
+    }
+
     public boolean isLast() {
         if (hasMore == null) return true;
         return !hasMore;
