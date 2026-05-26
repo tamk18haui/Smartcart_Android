@@ -120,7 +120,15 @@ public class ProductDetailResponse {
 
     public boolean isShopOnline() {
         String s = getShopStatus();
-        return "ACTIVE".equals(s) || "ONLINE".equals(s);
+
+        if (s.isEmpty()) {
+            return true;
+        }
+
+        return "ACTIVE".equals(s)
+                || "ONLINE".equals(s)
+                || "OPEN".equals(s)
+                || "APPROVED".equals(s);
     }
 
     public String getShopOnlineText() {
@@ -422,6 +430,8 @@ public class ProductDetailResponse {
 
         @SerializedName("imageUrls")
         private List<String> imageUrls;
+        @SerializedName("videoThumbnailUrl")
+        private String videoThumbnailUrl;
 
         @SerializedName("videoUrl")
         private String videoUrl;
@@ -479,6 +489,9 @@ public class ProductDetailResponse {
 
         public String getVideoUrl() {
             return videoUrl == null ? "" : videoUrl.trim();
+        }
+        public String getVideoThumbnailUrl() {
+            return videoThumbnailUrl == null ? "" : videoThumbnailUrl.trim();
         }
 
         public String getUserName() {

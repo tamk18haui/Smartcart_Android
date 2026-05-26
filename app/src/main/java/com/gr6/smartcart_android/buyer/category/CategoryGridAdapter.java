@@ -86,7 +86,7 @@ public class CategoryGridAdapter extends RecyclerView.Adapter<CategoryGridAdapte
             if (imageUrl == null || imageUrl.trim().isEmpty()) {
                 imgCategory.setImageResource(android.R.drawable.ic_menu_gallery);
             } else {
-                ImageLoader.load(itemView.getContext(), imageUrl.trim(), imgCategory);
+                ImageLoader.loadCircle(itemView.getContext(), imageUrl.trim(), imgCategory);
             }
 
             itemView.setOnClickListener(v -> {

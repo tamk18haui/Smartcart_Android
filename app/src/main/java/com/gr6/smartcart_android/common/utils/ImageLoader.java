@@ -77,7 +77,7 @@ public class ImageLoader {
         if (context == null || imageView == null) return;
 
         if (url == null || url.trim().isEmpty()) {
-            imageView.setImageResource(R.drawable.bg_image_placeholder);
+            imageView.setImageResource(R.drawable.ic_category);
             return;
         }
 
@@ -85,10 +85,30 @@ public class ImageLoader {
                 .load(url.trim())
                 .apply(new RequestOptions()
                         .circleCrop()
-                        .override(180, 180)
+                        .override(220, 220)
                         .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
                         .placeholder(R.drawable.bg_image_placeholder)
                         .error(R.drawable.bg_image_placeholder)
+                )
+                .into(imageView);
+    }
+
+    public static void loadCircleShop(Context context, String url, ImageView imageView) {
+        if (context == null || imageView == null) return;
+
+        if (url == null || url.trim().isEmpty()) {
+            imageView.setImageResource(R.drawable.ic_shop);
+            return;
+        }
+
+        Glide.with(context)
+                .load(url.trim())
+                .apply(new RequestOptions()
+                        .circleCrop()
+                        .override(220, 220)
+                        .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
+                        .placeholder(R.drawable.ic_shop)
+                        .error(R.drawable.ic_shop)
                 )
                 .into(imageView);
     }

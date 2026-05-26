@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -118,7 +119,6 @@ public class ProductDetailActivity extends BaseActivity {
         setupSimilarProducts();
         initEvents();
         observeData();
-
         viewModel.loadProductDetail(productId);
     }
 
@@ -367,7 +367,7 @@ public class ProductDetailActivity extends BaseActivity {
         if (shopImageUrl == null || shopImageUrl.trim().isEmpty()) {
             imgShopAvatar.setImageResource(R.drawable.ic_shop);
         } else {
-            ImageLoader.load(this, shopImageUrl, imgShopAvatar);
+            ImageLoader.loadCircleShop(this, shopImageUrl, imgShopAvatar);
         }
 
         if (txtShopStatus != null) {
@@ -620,6 +620,8 @@ public class ProductDetailActivity extends BaseActivity {
             imageRow.addView(imageView, imageParams);
 
             ImageLoader.load(this, url.trim(), imageView);
+            String finalUrl = url.trim();
+            imageView.setOnClickListener(v -> showImagePreview(finalUrl));
         }
 
         LinearLayout.LayoutParams scrollParams = new LinearLayout.LayoutParams(
@@ -630,6 +632,33 @@ public class ProductDetailActivity extends BaseActivity {
 
         parent.addView(scrollView, scrollParams);
     }
+    private void showImagePreview(String imageUrl) {
+        if (imageUrl == null || imageUrl.trim().isEmpty()) return;
+
+        androidx.appcompat.app.AlertDialog dialog =
+                new androidx.appcompat.app.AlertDialog.Builder(this).create();
+
+        ImageView imageView = new ImageView(this);
+        imageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        imageView.setAdjustViewBounds(true);
+        imageView.setBackgroundColor(ContextCompat.getColor(this, android.R.color.black));
+        imageView.setPadding(dp(8), dp(8), dp(8), dp(8));
+
+        ImageLoader.loadProductBanner(this, imageUrl.trim(), imageView);
+
+        imageView.setOnClickListener(v -> dialog.dismiss());
+
+        dialog.setView(imageView);
+        dialog.show();
+
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawableResource(android.R.color.black);
+            dialog.getWindow().setLayout(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.MATCH_PARENT
+            );
+        }
+    }
 
     private void addReviewVideo(
             LinearLayout parent,
@@ -637,29 +666,76 @@ public class ProductDetailActivity extends BaseActivity {
     ) {
         if (videoUrl == null || videoUrl.trim().isEmpty()) return;
 
-        VideoView videoView = new VideoView(this);
-        videoView.setVideoURI(Uri.parse(videoUrl.trim()));
+        FrameLayout videoBox = new FrameLayout(this);
+        videoBox.setBackgroundResource(R.drawable.bg_image_placeholder);
+        videoBox.setClickable(true);
+        videoBox.setForeground(ContextCompat.getDrawable(this, android.R.drawable.list_selector_background));
 
-        MediaController mediaController = new MediaController(this);
-        mediaController.setAnchorView(videoView);
-        videoView.setMediaController(mediaController);
+        ImageView thumbnail = new ImageView(this);
+        thumbnail.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        thumbnail.setImageResource(R.drawable.bg_image_placeholder);
 
-        videoView.setBackgroundResource(R.drawable.bg_image_placeholder);
+        FrameLayout.LayoutParams thumbParams = new FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.MATCH_PARENT
+        );
+        videoBox.addView(thumbnail, thumbParams);
+
+        TextView playIcon = createText(
+                "▶",
+                42,
+                R.color.white,
+                Typeface.BOLD
+        );
+        playIcon.setGravity(Gravity.CENTER);
+        playIcon.setBackgroundResource(R.drawable.bg_preview_badge);
+
+        FrameLayout.LayoutParams playParams = new FrameLayout.LayoutParams(
+                dp(64),
+                dp(64),
+                Gravity.CENTER
+        );
+        videoBox.addView(playIcon, playParams);
+
+        TextView label = createText(
+                "Video đánh giá",
+                13,
+                R.color.white,
+                Typeface.BOLD
+        );
+        label.setPadding(dp(10), dp(5), dp(10), dp(5));
+        label.setBackgroundResource(R.drawable.bg_preview_badge);
+
+        FrameLayout.LayoutParams labelParams = new FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.WRAP_CONTENT,
+                FrameLayout.LayoutParams.WRAP_CONTENT,
+                Gravity.BOTTOM | Gravity.START
+        );
+        labelParams.leftMargin = dp(10);
+        labelParams.bottomMargin = dp(10);
+        videoBox.addView(label, labelParams);
 
         LinearLayout.LayoutParams videoParams = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
-                dp(210)
+                dp(190)
         );
         videoParams.topMargin = dp(10);
 
-        parent.addView(videoView, videoParams);
+        parent.addView(videoBox, videoParams);
 
-        videoView.setOnPreparedListener(mp -> {
-            mp.setLooping(false);
-            videoView.seekTo(100);
-        });
+        videoBox.setOnClickListener(v -> openVideo(videoUrl.trim()));
+    }
+    private void openVideo(String videoUrl) {
+        if (videoUrl == null || videoUrl.trim().isEmpty()) return;
 
-        videoView.setOnClickListener(v -> videoView.start());
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setDataAndType(Uri.parse(videoUrl.trim()), "video/*");
+
+        try {
+            startActivity(intent);
+        } catch (Exception e) {
+            showToast("Không mở được video đánh giá");
+        }
     }
 
     private void addSellerReply(

@@ -74,7 +74,7 @@ public class CategoryHomeAdapter extends RecyclerView.Adapter<CategoryHomeAdapte
 
         void bind(HomeCategoryResponse item) {
             txtCategoryName.setText(item.getCategoryName());
-            ImageLoader.load(itemView.getContext(), item.getCategoryImageUrl(), imgCategory);
+            ImageLoader.loadCircle(itemView.getContext(), item.getCategoryImageUrl(), imgCategory);
 
             itemView.setOnClickListener(v -> {
                 if (listener != null) {

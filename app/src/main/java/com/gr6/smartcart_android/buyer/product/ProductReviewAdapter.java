@@ -1,21 +1,26 @@
 package com.gr6.smartcart_android.buyer.product;
 
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Typeface;
 import android.net.Uri;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.MediaController;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.TextView;
-import android.widget.VideoView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.view.LayoutInflater;
-import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import com.gr6.smartcart_android.R;
 import com.gr6.smartcart_android.buyer.product.response.ProductDetailResponse;
+import com.gr6.smartcart_android.common.utils.ImageLoader;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -72,7 +77,8 @@ public class ProductReviewAdapter extends RecyclerView.Adapter<ProductReviewAdap
         private final TextView txtCreatedAt;
         private final TextView txtComment;
         private final RecyclerView rcvReviewImages;
-        private final VideoView videoReview;
+        private final FrameLayout layoutVideoPreview;
+        private final ImageView imgVideoThumbnail;
         private final View layoutSellerReply;
         private final TextView txtSellerReply;
 
@@ -85,7 +91,8 @@ public class ProductReviewAdapter extends RecyclerView.Adapter<ProductReviewAdap
             txtCreatedAt = itemView.findViewById(R.id.txtCreatedAt);
             txtComment = itemView.findViewById(R.id.txtComment);
             rcvReviewImages = itemView.findViewById(R.id.rcvReviewImages);
-            videoReview = itemView.findViewById(R.id.videoReview);
+            layoutVideoPreview = itemView.findViewById(R.id.layoutVideoPreview);
+            imgVideoThumbnail = itemView.findViewById(R.id.imgVideoThumbnail);
             layoutSellerReply = itemView.findViewById(R.id.layoutSellerReply);
             txtSellerReply = itemView.findViewById(R.id.txtSellerReply);
         }
@@ -100,6 +107,7 @@ public class ProductReviewAdapter extends RecyclerView.Adapter<ProductReviewAdap
             txtRating.setText(buildStars(review.getRating()) + "  " + review.getRating() + "/5");
 
             String createdAt = formatDate(review.getCreatedAt());
+
             if (createdAt.isEmpty()) {
                 txtCreatedAt.setVisibility(View.GONE);
             } else {
@@ -110,7 +118,7 @@ public class ProductReviewAdapter extends RecyclerView.Adapter<ProductReviewAdap
             txtComment.setText(review.getComment());
 
             bindImages(review.getImageUrls());
-            bindVideo(review.getVideoUrl());
+            bindVideoPreview(review);
             bindSellerReply(review.getSellerReply());
         }
 
@@ -137,26 +145,39 @@ public class ProductReviewAdapter extends RecyclerView.Adapter<ProductReviewAdap
             rcvReviewImages.setAdapter(imageAdapter);
         }
 
-        private void bindVideo(String videoUrl) {
+        private void bindVideoPreview(ProductDetailResponse.ReviewDTO review) {
+            String videoUrl = review.getVideoUrl();
+
             if (videoUrl == null || videoUrl.trim().isEmpty()) {
-                videoReview.stopPlayback();
-                videoReview.setVisibility(View.GONE);
+                layoutVideoPreview.setVisibility(View.GONE);
                 return;
             }
 
-            videoReview.setVisibility(View.VISIBLE);
-            videoReview.setVideoURI(Uri.parse(videoUrl.trim()));
+            layoutVideoPreview.setVisibility(View.VISIBLE);
 
-            MediaController mediaController = new MediaController(context);
-            mediaController.setAnchorView(videoReview);
-            videoReview.setMediaController(mediaController);
+            String thumb = review.getVideoThumbnailUrl();
 
-            videoReview.setOnPreparedListener(mp -> {
-                mp.setLooping(false);
-                videoReview.seekTo(100);
-            });
+            if (thumb == null || thumb.trim().isEmpty()) {
+                imgVideoThumbnail.setImageResource(R.drawable.bg_image_placeholder);
+            } else {
+                ImageLoader.load(context, thumb, imgVideoThumbnail);
+            }
 
-            videoReview.setOnClickListener(v -> videoReview.start());
+            layoutVideoPreview.setOnClickListener(v -> openVideo(videoUrl.trim()));
+        }
+
+        private void openVideo(String videoUrl) {
+            try {
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setDataAndType(Uri.parse(videoUrl), "video/*");
+                context.startActivity(intent);
+            } catch (Exception e) {
+                android.widget.Toast.makeText(
+                        context,
+                        "Không mở được video đánh giá",
+                        android.widget.Toast.LENGTH_SHORT
+                ).show();
+            }
         }
 
         private void bindSellerReply(String sellerReply) {
