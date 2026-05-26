@@ -7,36 +7,44 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="58dp"
+        android:layout_height="wrap_content"
         android:background="#52659E"
+        android:elevation="4dp"
         android:gravity="center_vertical"
+        android:minHeight="56dp"
         android:orientation="horizontal"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp">
+        android:paddingHorizontal="12dp"
+        android:paddingVertical="8dp">
 
         <TextView
             android:id="@+id/btnBack"
-            android:layout_width="42dp"
-            android:layout_height="match_parent"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
             android:gravity="center"
             android:text="‹"
             android:textColor="#FFFFFF"
-            android:textSize="38sp" />
+            android:textSize="40sp" />
 
         <TextView
             android:id="@+id/txtScreenTitle"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:gravity="center_vertical"
+            android:gravity="center"
             android:text="Tạo Voucher mới"
             android:textColor="#FFFFFF"
-            android:textSize="21sp"
+            android:textSize="20sp"
             android:textStyle="bold" />
 
         <TextView
-            android:layout_width="42dp"
-            android:layout_height="match_parent"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
             android:gravity="center"
             android:text="?"
             android:textColor="#FFFFFF"
@@ -44,57 +52,60 @@
             android:textStyle="bold" />
     </LinearLayout>
 
-    <ScrollView
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:fillViewport="false">
+        android:fillViewport="true"
+        android:isScrollContainer="true"
+        android:overScrollMode="never">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:paddingHorizontal="16dp"
+            android:paddingTop="16dp"
+            android:paddingBottom="24dp">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="XEM TRƯỚC VOUCHER"
                 android:textColor="#3F2B25"
-                android:textSize="12sp"
+                android:textSize="13sp"
                 android:textStyle="bold" />
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="112dp"
-                android:layout_marginTop="10dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
                 android:background="@drawable/bg_preview_voucher"
                 android:elevation="4dp"
                 android:gravity="center_vertical"
+                android:minHeight="112dp"
                 android:orientation="horizontal"
-                android:paddingStart="24dp"
-                android:paddingEnd="18dp">
+                android:paddingHorizontal="20dp"
+                android:paddingVertical="16dp">
 
                 <TextView
-                    android:layout_width="62dp"
-                    android:layout_height="match_parent"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:gravity="center"
                     android:text="🎟"
                     android:textColor="#FFFFFF"
-                    android:textSize="34sp" />
+                    android:textSize="36sp" />
 
                 <View
                     android:layout_width="1dp"
                     android:layout_height="72dp"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginEnd="16dp"
+                    android:layout_marginHorizontal="16dp"
                     android:background="#55FFFFFF" />
 
                 <LinearLayout
                     android:layout_width="0dp"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:gravity="center_vertical"
                     android:orientation="vertical">
 
                     <TextView
@@ -102,7 +113,7 @@
                         android:layout_height="wrap_content"
                         android:text="SMARTCART OFF"
                         android:textColor="#FFEBDD"
-                        android:textSize="15sp"
+                        android:textSize="14sp"
                         android:textStyle="bold" />
 
                     <TextView
@@ -111,7 +122,7 @@
                         android:layout_height="wrap_content"
                         android:text="Giảm đ50k"
                         android:textColor="#FFFFFF"
-                        android:textSize="24sp"
+                        android:textSize="22sp"
                         android:textStyle="bold" />
 
                     <TextView
@@ -120,14 +131,16 @@
                         android:layout_height="wrap_content"
                         android:text="Đơn tối thiểu đ200K"
                         android:textColor="#FFEBDD"
-                        android:textSize="15sp" />
+                        android:textSize="13sp" />
                 </LinearLayout>
 
                 <TextView
-                    android:layout_width="70dp"
-                    android:layout_height="32dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:background="@drawable/bg_preview_badge"
                     android:gravity="center"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="4dp"
                     android:text="SẮP HẾT HẠN"
                     android:textColor="#FFFFFF"
                     android:textSize="10sp"
@@ -137,24 +150,24 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="22dp"
+                android:layout_marginTop="24dp"
                 android:background="@drawable/bg_voucher_form_card"
+                android:elevation="2dp"
                 android:orientation="vertical"
-                android:padding="18dp">
+                android:padding="20dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="ⓘ  Thông tin cơ bản"
                     android:textColor="#111111"
-                    android:textSize="20sp"
+                    android:textSize="18sp"
                     android:textStyle="bold" />
 
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:layout_marginTop="12dp"
-                    android:layout_marginBottom="16dp"
+                    android:layout_marginVertical="12dp"
                     android:background="#EFE7E3" />
 
                 <TextView
@@ -162,20 +175,20 @@
                     android:layout_height="wrap_content"
                     android:text="Tên chương trình Voucher"
                     android:textColor="#4B3028"
-                    android:textSize="15sp" />
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
 
                 <EditText
                     android:id="@+id/edtProgramName"
                     android:layout_width="match_parent"
-                    android:layout_height="52dp"
+                    android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:background="@drawable/bg_input_border"
                     android:hint="Sale hè rực rỡ 2024"
-                    android:inputType="text"
+                    android:inputType="textCapSentences"
                     android:maxLength="80"
-                    android:paddingStart="14dp"
-                    android:paddingEnd="14dp"
-                    android:singleLine="true"
+                    android:minHeight="48dp"
+                    android:paddingHorizontal="16dp"
                     android:textColor="#231815"
                     android:textColorHint="#B9B0AE"
                     android:textSize="15sp" />
@@ -183,32 +196,32 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
+                    android:layout_marginTop="4dp"
                     android:text="Tên này chỉ hiển thị với bạn để quản lý"
                     android:textColor="#9C8C86"
-                    android:textSize="12sp"
+                    android:textSize="13sp"
                     android:textStyle="italic" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="18dp"
+                    android:layout_marginTop="20dp"
                     android:text="Mã Voucher"
                     android:textColor="#4B3028"
-                    android:textSize="15sp" />
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
 
                 <EditText
                     android:id="@+id/edtCode"
                     android:layout_width="match_parent"
-                    android:layout_height="52dp"
+                    android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:background="@drawable/bg_input_border"
                     android:hint="SUM50"
                     android:inputType="textCapCharacters"
                     android:maxLength="20"
-                    android:paddingStart="14dp"
-                    android:paddingEnd="14dp"
-                    android:singleLine="true"
+                    android:minHeight="48dp"
+                    android:paddingHorizontal="16dp"
                     android:textColor="#231815"
                     android:textColorHint="#B9B0AE"
                     android:textSize="15sp" />
@@ -216,40 +229,41 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
+                    android:layout_marginTop="4dp"
                     android:text="Mã khách hàng sẽ nhập khi thanh toán."
                     android:textColor="#9C8C86"
-                    android:textSize="12sp" />
+                    android:textSize="13sp" />
             </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="18dp"
+                android:layout_marginTop="20dp"
                 android:background="@drawable/bg_voucher_form_card"
+                android:elevation="2dp"
                 android:orientation="vertical"
-                android:padding="18dp">
+                android:padding="20dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="🏷  Loại &amp; Giá trị giảm"
                     android:textColor="#111111"
-                    android:textSize="20sp"
+                    android:textSize="18sp"
                     android:textStyle="bold" />
 
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:layout_marginTop="12dp"
-                    android:layout_marginBottom="16dp"
+                    android:layout_marginVertical="12dp"
                     android:background="#EFE7E3" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="54dp"
+                    android:layout_height="wrap_content"
                     android:background="@drawable/bg_discount_type_group"
                     android:gravity="center"
+                    android:minHeight="54dp"
                     android:orientation="horizontal"
                     android:padding="4dp">
 
@@ -257,8 +271,10 @@
                         android:id="@+id/btnFixed"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
+                        android:layout_marginEnd="4dp"
                         android:layout_weight="1"
                         android:background="@drawable/bg_button_orange_round"
+                        android:minHeight="46dp"
                         android:text="Theo số tiền"
                         android:textAllCaps="false"
                         android:textColor="#FFFFFF"
@@ -268,9 +284,10 @@
                         android:id="@+id/btnPercent"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
-                        android:layout_marginStart="8dp"
+                        android:layout_marginStart="4dp"
                         android:layout_weight="1"
                         android:background="@drawable/bg_input_border"
+                        android:minHeight="46dp"
                         android:text="Theo phần trăm"
                         android:textAllCaps="false"
                         android:textColor="#8B2F13"
@@ -280,12 +297,14 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="18dp"
+                    android:layout_marginTop="20dp"
+                    android:baselineAligned="false"
                     android:orientation="horizontal">
 
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:layout_marginEnd="8dp"
                         android:layout_weight="1"
                         android:orientation="vertical">
 
@@ -294,31 +313,28 @@
                             android:layout_height="wrap_content"
                             android:text="Mức giảm"
                             android:textColor="#4B3028"
-                            android:textSize="15sp" />
+                            android:textSize="15sp"
+                            android:textStyle="bold" />
 
                         <EditText
                             android:id="@+id/edtDiscountValue"
                             android:layout_width="match_parent"
-                            android:layout_height="52dp"
+                            android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
                             android:background="@drawable/bg_input_border"
                             android:hint="50000"
                             android:inputType="number"
-                            android:paddingStart="14dp"
-                            android:paddingEnd="14dp"
-                            android:singleLine="true"
+                            android:minHeight="48dp"
+                            android:paddingHorizontal="16dp"
                             android:textColor="#231815"
                             android:textColorHint="#B9B0AE"
                             android:textSize="15sp" />
                     </LinearLayout>
 
-                    <Space
-                        android:layout_width="14dp"
-                        android:layout_height="1dp" />
-
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
                         android:layout_weight="1"
                         android:orientation="vertical">
 
@@ -327,19 +343,19 @@
                             android:layout_height="wrap_content"
                             android:text="Giảm tối đa"
                             android:textColor="#4B3028"
-                            android:textSize="15sp" />
+                            android:textSize="15sp"
+                            android:textStyle="bold" />
 
                         <EditText
                             android:id="@+id/edtMaxDiscount"
                             android:layout_width="match_parent"
-                            android:layout_height="52dp"
+                            android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
                             android:background="@drawable/bg_input_border"
                             android:hint="50000"
                             android:inputType="number"
-                            android:paddingStart="14dp"
-                            android:paddingEnd="14dp"
-                            android:singleLine="true"
+                            android:minHeight="48dp"
+                            android:paddingHorizontal="16dp"
                             android:textColor="#231815"
                             android:textColorHint="#B9B0AE"
                             android:textSize="15sp" />
@@ -350,24 +366,24 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="18dp"
+                android:layout_marginTop="20dp"
                 android:background="@drawable/bg_voucher_form_card"
+                android:elevation="2dp"
                 android:orientation="vertical"
-                android:padding="18dp">
+                android:padding="20dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="☷  Điều kiện sử dụng"
                     android:textColor="#111111"
-                    android:textSize="20sp"
+                    android:textSize="18sp"
                     android:textStyle="bold" />
 
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:layout_marginTop="12dp"
-                    android:layout_marginBottom="16dp"
+                    android:layout_marginVertical="12dp"
                     android:background="#EFE7E3" />
 
                 <TextView
@@ -375,19 +391,19 @@
                     android:layout_height="wrap_content"
                     android:text="Giá trị đơn hàng tối thiểu"
                     android:textColor="#4B3028"
-                    android:textSize="15sp" />
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
 
                 <EditText
                     android:id="@+id/edtMinOrder"
                     android:layout_width="match_parent"
-                    android:layout_height="52dp"
+                    android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:background="@drawable/bg_input_border"
                     android:hint="200000"
                     android:inputType="number"
-                    android:paddingStart="14dp"
-                    android:paddingEnd="14dp"
-                    android:singleLine="true"
+                    android:minHeight="48dp"
+                    android:paddingHorizontal="16dp"
                     android:textColor="#231815"
                     android:textColorHint="#B9B0AE"
                     android:textSize="15sp" />
@@ -395,22 +411,22 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
+                    android:layout_marginTop="20dp"
                     android:text="Tổng lượt sử dụng tối đa"
                     android:textColor="#4B3028"
-                    android:textSize="15sp" />
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
 
                 <EditText
                     android:id="@+id/edtUsageLimit"
                     android:layout_width="match_parent"
-                    android:layout_height="52dp"
+                    android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:background="@drawable/bg_input_border"
                     android:hint="100"
                     android:inputType="number"
-                    android:paddingStart="14dp"
-                    android:paddingEnd="14dp"
-                    android:singleLine="true"
+                    android:minHeight="48dp"
+                    android:paddingHorizontal="16dp"
                     android:textColor="#231815"
                     android:textColorHint="#B9B0AE"
                     android:textSize="15sp" />
@@ -419,35 +435,36 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="18dp"
-                android:layout_marginBottom="18dp"
+                android:layout_marginTop="20dp"
                 android:background="@drawable/bg_voucher_form_card"
+                android:elevation="2dp"
                 android:orientation="vertical"
-                android:padding="18dp">
+                android:padding="20dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="▣  Thời gian áp dụng"
                     android:textColor="#111111"
-                    android:textSize="20sp"
+                    android:textSize="18sp"
                     android:textStyle="bold" />
 
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:layout_marginTop="12dp"
-                    android:layout_marginBottom="16dp"
+                    android:layout_marginVertical="12dp"
                     android:background="#EFE7E3" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:baselineAligned="false"
                     android:orientation="horizontal">
 
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:layout_marginEnd="8dp"
                         android:layout_weight="1"
                         android:orientation="vertical">
 
@@ -456,29 +473,29 @@
                             android:layout_height="wrap_content"
                             android:text="Ngày bắt đầu"
                             android:textColor="#4B3028"
-                            android:textSize="15sp" />
+                            android:textSize="15sp"
+                            android:textStyle="bold" />
 
                         <TextView
                             android:id="@+id/txtStartDate"
                             android:layout_width="match_parent"
-                            android:layout_height="52dp"
+                            android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
                             android:background="@drawable/bg_input_border"
+                            android:clickable="true"
+                            android:focusable="true"
                             android:gravity="center_vertical"
-                            android:paddingStart="14dp"
-                            android:paddingEnd="14dp"
+                            android:minHeight="48dp"
+                            android:paddingHorizontal="16dp"
                             android:text="Chọn ngày"
                             android:textColor="#231815"
                             android:textSize="15sp" />
                     </LinearLayout>
 
-                    <Space
-                        android:layout_width="14dp"
-                        android:layout_height="1dp" />
-
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
                         android:layout_weight="1"
                         android:orientation="vertical">
 
@@ -487,17 +504,20 @@
                             android:layout_height="wrap_content"
                             android:text="Ngày kết thúc"
                             android:textColor="#4B3028"
-                            android:textSize="15sp" />
+                            android:textSize="15sp"
+                            android:textStyle="bold" />
 
                         <TextView
                             android:id="@+id/txtEndDate"
                             android:layout_width="match_parent"
-                            android:layout_height="52dp"
+                            android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
                             android:background="@drawable/bg_input_border"
+                            android:clickable="true"
+                            android:focusable="true"
                             android:gravity="center_vertical"
-                            android:paddingStart="14dp"
-                            android:paddingEnd="14dp"
+                            android:minHeight="48dp"
+                            android:paddingHorizontal="16dp"
                             android:text="Chọn ngày"
                             android:textColor="#231815"
                             android:textSize="15sp" />
@@ -505,39 +525,39 @@
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="78dp"
+        android:layout_height="wrap_content"
         android:background="#FFFFFF"
-        android:elevation="8dp"
-        android:gravity="center"
+        android:elevation="12dp"
+        android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp">
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="12dp">
 
         <Button
             android:id="@+id/btnCancel"
             android:layout_width="0dp"
-            android:layout_height="54dp"
-            android:layout_weight="0.9"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
             android:background="@drawable/bg_button_blue_round"
+            android:minHeight="52dp"
             android:text="Hủy"
             android:textAllCaps="false"
             android:textColor="#FFFFFF"
             android:textSize="16sp" />
 
-        <Space
-            android:layout_width="16dp"
-            android:layout_height="1dp" />
-
         <Button
             android:id="@+id/btnSave"
             android:layout_width="0dp"
-            android:layout_height="54dp"
-            android:layout_weight="1.9"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_weight="2"
             android:background="@drawable/bg_button_orange_round"
+            android:minHeight="52dp"
             android:text="⚡  Lưu &amp; Kích hoạt"
             android:textAllCaps="false"
             android:textColor="#FFFFFF"
@@ -546,5 +566,3 @@
     </LinearLayout>
 
 </LinearLayout>
-
-

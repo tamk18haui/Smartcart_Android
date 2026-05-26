@@ -14,61 +14,65 @@
         android:layout_width="36dp"
         android:layout_height="4dp"
         android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="8dp"
         android:background="@drawable/bg_bottom_sheet_handle" />
 
     <TextView
         android:id="@+id/txtPickerTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="8dp"
         android:text="Chọn địa chỉ"
         android:textColor="@color/text_primary"
-        android:textSize="18sp"
+        android:textSize="20sp"
         android:textStyle="bold" />
 
     <TextView
         android:id="@+id/txtPickerSubtitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="2dp"
+        android:layout_marginTop="4dp"
         android:text="Nhập từ khóa tìm kiếm nhanh vị trí"
         android:textColor="@color/text_secondary"
-        android:textSize="12sp" />
+        android:textSize="13sp" />
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="44dp"
-        android:layout_marginTop="14dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
         android:background="@drawable/bg_location_search"
         android:gravity="center_vertical"
+        android:minHeight="52dp"
         android:orientation="horizontal"
         android:paddingHorizontal="12dp">
 
         <ImageView
-            android:layout_width="20dp"
-            android:layout_height="20dp"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
             android:src="@drawable/ic_search"
             app:tint="@color/brand_primary" />
 
         <EditText
             android:id="@+id/edtSearchLocation"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_marginStart="8dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
             android:layout_weight="1"
             android:background="@android:color/transparent"
-            android:hint="Tìm kiếm Tỉnh, Thành phố, Phường, Xã..."
+            android:hint="Tìm kiếm Tỉnh, Thành phố..."
+            android:imeOptions="actionSearch"
             android:inputType="text"
-            android:singleLine="true"
+            android:maxLines="1"
+            android:minHeight="48dp"
             android:textColor="@color/text_primary"
             android:textColorHint="@color/text_hint"
-            android:textSize="14sp" />
+            android:textSize="15sp" />
     </LinearLayout>
 
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="16dp"
         android:layout_weight="1">
 
         <androidx.recyclerview.widget.RecyclerView
@@ -77,45 +81,46 @@
             android:layout_height="match_parent"
             android:clipToPadding="false"
             android:overScrollMode="never"
-            android:paddingBottom="8dp" />
+            android:paddingBottom="16dp" />
 
         <LinearLayout
             android:id="@+id/layoutLocationEmpty"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
             android:gravity="center"
             android:orientation="vertical"
             android:padding="24dp"
             android:visibility="gone">
 
             <TextView
-                android:layout_width="60dp"
-                android:layout_height="60dp"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
                 android:background="@drawable/bg_location_empty_icon"
                 android:gravity="center"
                 android:text="⌕"
                 android:textColor="@color/brand_primary"
-                android:textSize="30sp"
+                android:textSize="32sp"
                 android:textStyle="bold" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
+                android:layout_marginTop="16dp"
                 android:gravity="center"
-                android:text="Không tìm thấy địa chỉ phù hợp"
+                android:text="Không tìm thấy địa chỉ"
                 android:textColor="@color/text_primary"
-                android:textSize="15sp"
+                android:textSize="16sp"
                 android:textStyle="bold" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
+                android:layout_marginTop="6dp"
                 android:gravity="center"
-                android:text="Vui lòng kiểm tra lại chính tả hoặc thử từ khóa khác"
+                android:text="Vui lòng kiểm tra lại chính tả"
                 android:textColor="@color/text_secondary"
-                android:textSize="12sp" />
+                android:textSize="13sp" />
         </LinearLayout>
     </FrameLayout>
 </LinearLayout>

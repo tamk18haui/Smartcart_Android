@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#F8F8FA">
 
-    <ScrollView
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:fillViewport="false"
+        android:clipToPadding="false"
+        android:fillViewport="true"
         android:paddingBottom="96dp">
 
         <LinearLayout
@@ -17,7 +19,7 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="54dp"
+                android:layout_height="wrap_content"
                 android:background="#FFFFFF"
                 android:gravity="center"
                 android:orientation="horizontal">
@@ -25,41 +27,57 @@
                 <TextView
                     android:id="@+id/tabAll"
                     android:layout_width="0dp"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true"
                     android:gravity="center"
+                    android:paddingVertical="16dp"
                     android:text="Tất cả"
-                    android:textSize="15sp"
+                    android:textSize="14sp"
                     android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/tabOngoing"
                     android:layout_width="0dp"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true"
                     android:gravity="center"
+                    android:paddingVertical="16dp"
                     android:text="Đang diễn ra"
-                    android:textSize="15sp"
+                    android:textSize="14sp"
                     android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/tabUpcoming"
                     android:layout_width="0dp"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true"
                     android:gravity="center"
+                    android:paddingVertical="16dp"
                     android:text="Sắp tới"
-                    android:textSize="15sp"
+                    android:textSize="14sp"
                     android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/tabEnded"
                     android:layout_width="0dp"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true"
                     android:gravity="center"
+                    android:paddingVertical="16dp"
                     android:text="Kết thúc"
-                    android:textSize="15sp"
+                    android:textSize="14sp"
                     android:textStyle="bold" />
             </LinearLayout>
 
@@ -71,26 +89,28 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:baselineAligned="false"
                 android:orientation="horizontal"
-                android:paddingStart="16dp"
-                android:paddingTop="20dp"
-                android:paddingEnd="16dp">
+                android:paddingHorizontal="16dp"
+                android:paddingTop="20dp">
 
                 <LinearLayout
                     android:layout_width="0dp"
-                    android:layout_height="104dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="7dp"
                     android:layout_weight="1"
                     android:background="@drawable/bg_voucher_stat_card"
-                    android:elevation="2dp"
+                    android:elevation="3dp"
                     android:orientation="vertical"
-                    android:padding="18dp">
+                    android:paddingHorizontal="18dp"
+                    android:paddingVertical="20dp">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Tổng Voucher"
                         android:textColor="#4B3028"
-                        android:textSize="16sp" />
+                        android:textSize="14sp" />
 
                     <TextView
                         android:id="@+id/txtTotalVoucher"
@@ -99,29 +119,27 @@
                         android:layout_marginTop="8dp"
                         android:text="0"
                         android:textColor="#8B2F13"
-                        android:textSize="30sp"
+                        android:textSize="28sp"
                         android:textStyle="bold" />
                 </LinearLayout>
 
-                <Space
-                    android:layout_width="14dp"
-                    android:layout_height="1dp" />
-
                 <LinearLayout
                     android:layout_width="0dp"
-                    android:layout_height="104dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="7dp"
                     android:layout_weight="1"
                     android:background="@drawable/bg_voucher_stat_card"
-                    android:elevation="2dp"
+                    android:elevation="3dp"
                     android:orientation="vertical"
-                    android:padding="18dp">
+                    android:paddingHorizontal="18dp"
+                    android:paddingVertical="20dp">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Lượt sử dụng"
                         android:textColor="#4B3028"
-                        android:textSize="16sp" />
+                        android:textSize="14sp" />
 
                     <TextView
                         android:id="@+id/txtTotalUsed"
@@ -130,7 +148,7 @@
                         android:layout_marginTop="8dp"
                         android:text="0"
                         android:textColor="#008D3D"
-                        android:textSize="30sp"
+                        android:textSize="28sp"
                         android:textStyle="bold" />
                 </LinearLayout>
             </LinearLayout>
@@ -140,9 +158,8 @@
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:paddingStart="16dp"
+                android:paddingHorizontal="16dp"
                 android:paddingTop="28dp"
-                android:paddingEnd="16dp"
                 android:paddingBottom="14dp">
 
                 <TextView
@@ -151,15 +168,20 @@
                     android:layout_weight="1"
                     android:text="Danh sách Voucher"
                     android:textColor="#111111"
-                    android:textSize="26sp"
+                    android:textSize="20sp"
                     android:textStyle="bold" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:paddingVertical="4dp"
+                    android:paddingStart="8dp"
                     android:text="Lọc theo ngày"
                     android:textColor="#8B2F13"
-                    android:textSize="16sp"
+                    android:textSize="14sp"
                     android:textStyle="bold" />
             </LinearLayout>
 
@@ -180,9 +202,10 @@
             <LinearLayout
                 android:id="@+id/emptyLayout"
                 android:layout_width="match_parent"
-                android:layout_height="260dp"
+                android:layout_height="wrap_content"
                 android:gravity="center"
                 android:orientation="vertical"
+                android:paddingVertical="60dp"
                 android:visibility="gone">
 
                 <TextView
@@ -200,30 +223,35 @@
                     android:gravity="center"
                     android:text="Tạo thêm nhiều ưu đãi"
                     android:textColor="#6A4338"
-                    android:textSize="22sp"
+                    android:textSize="20sp"
                     android:textStyle="bold" />
 
                 <TextView
-                    android:layout_width="280dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="40dp"
                     android:layout_marginTop="8dp"
                     android:gravity="center"
+                    android:lineSpacingExtra="4dp"
                     android:text="Giúp tăng tỷ lệ chuyển đổi và khuyến khích khách hàng đặt hàng."
                     android:textColor="#9D8A84"
                     android:textSize="14sp" />
             </LinearLayout>
         </LinearLayout>
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
 
     <Button
         android:id="@+id/btnCreateVoucher"
-        android:layout_width="250dp"
-        android:layout_height="62dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_marginEnd="16dp"
-        android:layout_marginBottom="18dp"
+        android:layout_marginBottom="16dp"
         android:background="@drawable/bg_button_orange_round"
         android:elevation="6dp"
+        android:minHeight="56dp"
+        android:paddingHorizontal="32dp"
+        android:paddingVertical="12dp"
         android:text="+  Tạo Voucher mới"
         android:textAllCaps="false"
         android:textColor="#FFFFFF"
@@ -231,5 +259,3 @@
         android:textStyle="bold" />
 
 </FrameLayout>
-
-

@@ -14,6 +14,7 @@ import com.gr6.smartcart_android.R;
 import com.gr6.smartcart_android.auth.register.RegisterActivity;
 import com.gr6.smartcart_android.auth.response.LoginResponse;
 import com.gr6.smartcart_android.common.base.BaseActivity;
+import com.gr6.smartcart_android.common.repository.FcmTokenRepository;
 import com.gr6.smartcart_android.common.storage.TokenManager;
 import com.gr6.smartcart_android.common.storage.UserSession;
 import com.gr6.smartcart_android.common.utils.AuthGuard;
@@ -145,6 +146,11 @@ public class LoginActivity extends BaseActivity {
             return;
         }
 
+        // Clear toàn bộ session cũ trước khi lưu tài khoản mới.
+        // Fix lỗi đăng nhập seller nhưng app vẫn giữ role BUYER của lần đăng nhập trước.
+        TokenManager.getInstance(this).clearAll();
+        UserSession.getInstance(this).clear();
+
         TokenManager.getInstance(this).saveToken(token);
 
         UserSession session = UserSession.getInstance(this);
@@ -155,11 +161,16 @@ public class LoginActivity extends BaseActivity {
 
         String role = loginResponse.getRole();
 
-        if (!Validator.isEmpty(role)) {
-            session.saveRole(role);
+        if (Validator.isEmpty(role)) {
+            showLongToast("Login thành công nhưng server chưa trả role. Kiểm tra API login.");
+            return;
         }
 
+        session.saveRole(role.trim().toUpperCase());
+
         android.util.Log.d("LOGIN_USER_ID", "Saved userId = " + user.getUserId());
+
+        FcmTokenRepository.getInstance(this).refreshAndSendTokenWithRetry();
 
         showToast("Đăng nhập thành công");
 
@@ -184,6 +195,7 @@ public class LoginActivity extends BaseActivity {
         startActivity(intent);
         finish();
     }
+
     private void togglePassword() {
         imgTogglePassword.animate()
                 .scaleX(0.75f)
@@ -221,3 +233,5 @@ public class LoginActivity extends BaseActivity {
                 .start();
     }
 }
+
+

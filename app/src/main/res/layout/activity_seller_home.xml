@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/rootSellerHome"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -16,14 +17,14 @@
         android:padding="24dp">
 
         <ProgressBar
-            android:layout_width="44dp"
-            android:layout_height="44dp" />
+            android:layout_width="48dp"
+            android:layout_height="48dp" />
 
         <TextView
             android:id="@+id/txtCheckingMessage"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="14dp"
+            android:layout_marginTop="16dp"
             android:gravity="center"
             android:text="Đang kiểm tra trạng thái cửa hàng..."
             android:textColor="@color/text_primary"
@@ -41,39 +42,39 @@
     <LinearLayout
         android:id="@+id/sellerBottomBar"
         android:layout_width="match_parent"
-        android:layout_height="72dp"
+        android:layout_height="wrap_content"
         android:background="@drawable/bg_seller_bottom_bar"
         android:elevation="12dp"
         android:gravity="center"
         android:orientation="horizontal"
-        android:paddingStart="6dp"
-        android:paddingTop="6dp"
-        android:paddingEnd="6dp"
-        android:paddingBottom="6dp"
+        android:paddingHorizontal="6dp"
         android:visibility="gone">
 
         <LinearLayout
             android:id="@+id/tabDashboard"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:background="?attr/selectableItemBackground"
             android:clickable="true"
             android:focusable="true"
             android:gravity="center"
-            android:orientation="vertical">
+            android:minHeight="64dp"
+            android:orientation="vertical"
+            android:paddingVertical="8dp">
 
             <ImageView
                 android:id="@+id/imgTabDashboard"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:src="@drawable/ic_seller_dashboard"
-                android:tint="@color/nav_inactive" />
+                app:tint="@color/nav_inactive" />
 
             <TextView
                 android:id="@+id/txtTabDashboard"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="3dp"
+                android:layout_marginTop="4dp"
                 android:text="Dashboard"
                 android:textColor="@color/nav_inactive"
                 android:textSize="12sp" />
@@ -83,25 +84,28 @@
         <LinearLayout
             android:id="@+id/tabProducts"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:background="?attr/selectableItemBackground"
             android:clickable="true"
             android:focusable="true"
             android:gravity="center"
-            android:orientation="vertical">
+            android:minHeight="64dp"
+            android:orientation="vertical"
+            android:paddingVertical="8dp">
 
             <ImageView
                 android:id="@+id/imgTabProducts"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:src="@drawable/ic_seller_products"
-                android:tint="@color/nav_inactive" />
+                app:tint="@color/nav_inactive" />
 
             <TextView
                 android:id="@+id/txtTabProducts"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="3dp"
+                android:layout_marginTop="4dp"
                 android:text="Sản phẩm"
                 android:textColor="@color/nav_inactive"
                 android:textSize="12sp" />
@@ -111,25 +115,28 @@
         <LinearLayout
             android:id="@+id/tabOrders"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:background="?attr/selectableItemBackground"
             android:clickable="true"
             android:focusable="true"
             android:gravity="center"
-            android:orientation="vertical">
+            android:minHeight="64dp"
+            android:orientation="vertical"
+            android:paddingVertical="8dp">
 
             <ImageView
                 android:id="@+id/imgTabOrders"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:src="@drawable/ic_seller_orders"
-                android:tint="@color/nav_inactive" />
+                app:tint="@color/nav_inactive" />
 
             <TextView
                 android:id="@+id/txtTabOrders"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="3dp"
+                android:layout_marginTop="4dp"
                 android:text="Đơn hàng"
                 android:textColor="@color/nav_inactive"
                 android:textSize="12sp" />
@@ -139,25 +146,28 @@
         <LinearLayout
             android:id="@+id/tabProfile"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:background="?attr/selectableItemBackground"
             android:clickable="true"
             android:focusable="true"
             android:gravity="center"
-            android:orientation="vertical">
+            android:minHeight="64dp"
+            android:orientation="vertical"
+            android:paddingVertical="8dp">
 
             <ImageView
                 android:id="@+id/imgTabProfile"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:src="@drawable/ic_user"
-                android:tint="@color/nav_inactive" />
+                app:tint="@color/nav_inactive" />
 
             <TextView
                 android:id="@+id/txtTabProfile"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="3dp"
+                android:layout_marginTop="4dp"
                 android:text="Tôi"
                 android:textColor="@color/nav_inactive"
                 android:textSize="12sp" />

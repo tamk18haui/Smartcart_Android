@@ -1,12 +1,18 @@
 package com.gr6.smartcart_android.navigation;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
 import com.gr6.smartcart_android.auth.login.LoginActivity;
 import com.gr6.smartcart_android.buyer.main.BuyerMainActivity;
+import com.gr6.smartcart_android.common.notification.NotificationHelper;
+import com.gr6.smartcart_android.common.repository.FcmTokenRepository;
 import com.gr6.smartcart_android.common.storage.TokenManager;
 import com.gr6.smartcart_android.common.storage.UserSession;
 import com.gr6.smartcart_android.common.utils.Constants;
@@ -17,10 +23,15 @@ public class RoleRouterActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        NotificationHelper.createChannel(this);
+        requestNotificationPermissionIfNeeded();
+
         if (!TokenManager.getInstance(this).hasToken()) {
             openLogin();
             return;
         }
+
+        FcmTokenRepository.getInstance(this).refreshAndSendTokenWithRetry();
 
         String role = UserSession.getInstance(this).getRole();
 
@@ -46,7 +57,20 @@ public class RoleRouterActivity extends AppCompatActivity {
             return;
         }
 
-        openBuyerHome();
+        // Role không hợp lệ thì bắt đăng nhập lại, không fallback về BUYER nữa.
+        openLogin();
+    }
+
+    private void requestNotificationPermissionIfNeeded() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+                && ActivityCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(
+                    this,
+                    new String[]{Manifest.permission.POST_NOTIFICATIONS},
+                    1001
+            );
+        }
     }
 
     private void openBuyerHome() {
@@ -73,3 +97,5 @@ public class RoleRouterActivity extends AppCompatActivity {
         finish();
     }
 }
+
+

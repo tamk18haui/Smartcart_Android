@@ -1,130 +1,139 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@color/seller_background">
+    android:background="@color/seller_background"
+    android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="76dp"
+        android:layout_height="wrap_content"
+        android:background="@color/seller_primary_dark"
+        android:elevation="4dp"
         android:gravity="center_vertical"
-        android:paddingStart="14dp"
-        android:paddingEnd="14dp"
-        android:background="@color/seller_primary_dark">
+        android:minHeight="64dp"
+        android:orientation="horizontal"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="12dp">
 
         <ImageView
             android:id="@+id/btnBack"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:padding="9dp"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
+            android:padding="10dp"
             android:src="@drawable/ic_back"
-            android:tint="@color/seller_text_white" />
+            app:tint="@color/seller_text_white" />
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
             android:layout_weight="1"
             android:text="Chi tiết đơn hàng"
             android:textColor="@color/seller_text_white"
-            android:textSize="22sp"
-            android:textStyle="bold"
-            android:layout_marginStart="8dp" />
+            android:textSize="20sp"
+            android:textStyle="bold" />
     </LinearLayout>
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:padding="16dp"
-        android:clipToPadding="false">
+        android:clipToPadding="false"
+        android:overScrollMode="never"
+        android:paddingHorizontal="16dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="24dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingBottom="12dp">
+            android:orientation="vertical">
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="132dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_seller_card"
+                android:elevation="2dp"
                 android:orientation="vertical"
-                android:padding="18dp"
-                android:background="@drawable/bg_seller_card">
+                android:padding="20dp">
 
                 <TextView
                     android:id="@+id/txtStatus"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:background="@drawable/bg_seller_chip_soft"
+                    android:paddingHorizontal="14dp"
+                    android:paddingVertical="6dp"
                     android:text="ĐANG GIAO"
-                    android:textStyle="bold"
                     android:textColor="@color/success"
-                    android:paddingStart="12dp"
-                    android:paddingEnd="12dp"
-                    android:paddingTop="6dp"
-                    android:paddingBottom="6dp"
-                    android:background="@drawable/bg_seller_chip_soft" />
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/txtOrderCode"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
+                    android:layout_marginTop="12dp"
                     android:text="#ORD-12344"
                     android:textColor="@color/seller_text_primary"
-                    android:textSize="22sp"
+                    android:textSize="24sp"
                     android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/txtTime"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
                     android:text="09:15 24/05/2024"
                     android:textColor="@color/seller_text_secondary"
-                    android:textSize="14sp"
-                    android:layout_marginTop="4dp" />
+                    android:textSize="14sp" />
             </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
+                android:background="@drawable/bg_seller_card"
+                android:elevation="2dp"
                 android:orientation="vertical"
-                android:padding="18dp"
-                android:background="@drawable/bg_seller_card">
+                android:padding="20dp">
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Thông tin người nhận"
                     android:textColor="@color/seller_text_primary"
-                    android:textStyle="bold"
-                    android:textSize="20sp" />
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/txtReceiverName"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
                     android:text="Tên khách hàng"
                     android:textColor="@color/seller_text_primary"
-                    android:textSize="16sp"
-                    android:layout_marginTop="14dp" />
+                    android:textSize="16sp" />
 
                 <TextView
                     android:id="@+id/txtReceiverPhone"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
                     android:text="Số điện thoại"
                     android:textColor="@color/seller_text_primary"
-                    android:textSize="16sp"
-                    android:layout_marginTop="8dp" />
+                    android:textSize="16sp" />
 
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:background="@color/seller_divider"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginBottom="10dp" />
+                    android:layout_marginVertical="16dp"
+                    android:background="@color/seller_divider" />
 
                 <TextView
                     android:layout_width="match_parent"
@@ -137,88 +146,91 @@
                     android:id="@+id/txtAddress"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:lineSpacingExtra="6dp"
                     android:text="Địa chỉ"
                     android:textColor="@color/seller_text_primary"
-                    android:textSize="15sp"
-                    android:lineSpacingExtra="4dp"
-                    android:layout_marginTop="6dp" />
+                    android:textSize="15sp" />
             </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
+                android:background="@drawable/bg_seller_card"
+                android:elevation="2dp"
                 android:orientation="vertical"
-                android:padding="18dp"
-                android:background="@drawable/bg_seller_card">
+                android:padding="20dp">
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Lịch sử hành trình"
                     android:textColor="@color/seller_text_primary"
-                    android:textStyle="bold"
-                    android:textSize="20sp" />
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/txtTimeline1"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
                     android:text="Đã đặt hàng"
                     android:textColor="@color/seller_text_primary"
-                    android:textStyle="bold"
-                    android:layout_marginTop="16dp" />
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/txtTimeline2"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
                     android:text="Shop đã xác nhận"
                     android:textColor="@color/seller_text_primary"
-                    android:textStyle="bold"
-                    android:layout_marginTop="12dp" />
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/txtTimeline3"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
                     android:text="Đang giao"
                     android:textColor="@color/seller_primary_dark"
-                    android:textStyle="bold"
-                    android:layout_marginTop="12dp" />
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/txtTimeline4"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
                     android:text="Chờ hoàn thành"
-                    android:textColor="@color/seller_text_secondary"
-                    android:layout_marginTop="12dp" />
+                    android:textColor="@color/seller_text_secondary" />
             </LinearLayout>
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="18dp"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="8dp"
                 android:text="Sản phẩm"
                 android:textColor="@color/seller_text_primary"
-                android:textStyle="bold"
-                android:textSize="20sp" />
+                android:textSize="18sp"
+                android:textStyle="bold" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvOrderItems"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:nestedScrollingEnabled="false"
-                android:layout_marginTop="10dp" />
+                android:overScrollMode="never" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
+                android:background="@drawable/bg_seller_card"
+                android:elevation="2dp"
                 android:orientation="vertical"
-                android:padding="18dp"
-                android:background="@drawable/bg_seller_card">
+                android:padding="20dp">
 
                 <TextView
                     android:id="@+id/txtSubtotal"
@@ -232,16 +244,15 @@
                     android:id="@+id/txtShippingFee"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
                     android:text="25,000đ"
                     android:textColor="@color/seller_text_primary"
-                    android:textSize="16sp"
-                    android:layout_marginTop="8dp" />
+                    android:textSize="16sp" />
 
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:layout_marginTop="12dp"
-                    android:layout_marginBottom="12dp"
+                    android:layout_marginVertical="16dp"
                     android:background="@color/seller_divider" />
 
                 <TextView
@@ -250,7 +261,7 @@
                     android:layout_height="wrap_content"
                     android:text="915,000đ"
                     android:textColor="@color/seller_primary_dark"
-                    android:textSize="22sp"
+                    android:textSize="24sp"
                     android:textStyle="bold" />
             </LinearLayout>
         </LinearLayout>
@@ -258,53 +269,60 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="76dp"
-        android:padding="14dp"
+        android:layout_height="wrap_content"
+        android:background="@color/seller_surface"
+        android:elevation="12dp"
         android:orientation="horizontal"
-        android:background="@color/seller_surface">
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="12dp">
 
         <TextView
             android:id="@+id/btnContactBuyer"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="0.9"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/bg_seller_button_outline"
+            android:clickable="true"
+            android:focusable="true"
             android:gravity="center"
+            android:minHeight="48dp"
             android:text="Liên hệ"
-            android:textSize="13sp"
-            android:textStyle="bold"
             android:textColor="@color/seller_primary_dark"
-            android:background="@drawable/bg_seller_button_outline" />
+            android:textSize="13sp"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/btnPrintLabel"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1.1"
+            android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
+            android:layout_weight="1.2"
+            android:background="@drawable/bg_seller_button_outline"
+            android:clickable="true"
+            android:focusable="true"
             android:gravity="center"
+            android:minHeight="48dp"
             android:text="In mã vận đơn"
+            android:textColor="@color/seller_primary_dark"
             android:textSize="13sp"
             android:textStyle="bold"
-            android:textColor="@color/seller_primary_dark"
-            android:background="@drawable/bg_seller_button_outline"
             android:visibility="gone" />
 
         <TextView
             android:id="@+id/btnUpdateStatus"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1.25"
+            android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
+            android:layout_weight="1.4"
+            android:background="@drawable/bg_seller_button_primary"
+            android:clickable="true"
+            android:focusable="true"
             android:gravity="center"
+            android:minHeight="48dp"
             android:text="Cập nhật trạng thái"
-            android:textSize="13sp"
-            android:textStyle="bold"
             android:textColor="@color/seller_text_white"
-            android:background="@drawable/bg_seller_button_primary" />
+            android:textSize="13sp"
+            android:textStyle="bold" />
     </LinearLayout>
 
 </LinearLayout>
-
-
-
-

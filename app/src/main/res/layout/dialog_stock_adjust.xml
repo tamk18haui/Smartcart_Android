@@ -2,81 +2,91 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="@color/seller_surface"
     android:orientation="vertical"
-    android:padding="22dp"
-    android:background="@color/seller_surface">
+    android:padding="24dp">
 
     <TextView
         android:id="@+id/txtDialogTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:gravity="center"
         android:text="Nhập thêm kho"
         android:textColor="@color/seller_text_primary"
-        android:textStyle="bold"
         android:textSize="22sp"
-        android:gravity="center" />
+        android:textStyle="bold" />
 
     <TextView
         android:id="@+id/txtProduct"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="14dp"
+        android:layout_marginTop="8dp"
+        android:gravity="center"
         android:text="Tên sản phẩm"
         android:textColor="@color/seller_text_secondary"
-        android:textSize="14sp"
-        android:gravity="center" />
+        android:textSize="14sp" />
 
     <EditText
         android:id="@+id/edtQuantity"
         android:layout_width="match_parent"
-        android:layout_height="52dp"
-        android:layout_marginTop="18dp"
-        android:paddingStart="14dp"
-        android:paddingEnd="14dp"
-        android:hint="Số lượng"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
         android:background="@drawable/bg_seller_input"
-        android:inputType="number" />
+        android:hint="Số lượng"
+        android:inputType="number"
+        android:maxLines="1"
+        android:minHeight="52dp"
+        android:paddingHorizontal="16dp" />
 
     <EditText
         android:id="@+id/edtReason"
         android:layout_width="match_parent"
-        android:layout_height="90dp"
+        android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
-        android:gravity="top"
-        android:padding="14dp"
-        android:hint="Lý do"
         android:background="@drawable/bg_seller_input"
-        android:inputType="textMultiLine"
-        android:maxLines="3" />
+        android:gravity="top|start"
+        android:hint="Lý do"
+        android:inputType="textMultiLine|textCapSentences"
+        android:maxLines="3"
+        android:minHeight="96dp"
+        android:padding="16dp" />
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="52dp"
-        android:layout_marginTop="18dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
         android:orientation="horizontal">
 
         <TextView
             android:id="@+id/btnCancel"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
             android:layout_weight="1"
+            android:clickable="true"
+            android:focusable="true"
             android:gravity="center"
+            android:minHeight="48dp"
             android:text="Hủy"
-            android:textStyle="bold"
-            android:textColor="@color/seller_text_secondary" />
+            android:textColor="@color/seller_text_secondary"
+            android:textSize="15sp"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/btnConfirm"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
             android:layout_weight="1"
+            android:background="@drawable/bg_seller_button_primary"
+            android:clickable="true"
+            android:focusable="true"
             android:gravity="center"
+            android:minHeight="48dp"
             android:text="Xác nhận"
-            android:textStyle="bold"
             android:textColor="@color/seller_text_white"
-            android:background="@drawable/bg_seller_button_primary" />
+            android:textSize="15sp"
+            android:textStyle="bold" />
     </LinearLayout>
 
 </LinearLayout>
-
-

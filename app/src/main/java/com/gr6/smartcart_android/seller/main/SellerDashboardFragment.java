@@ -17,6 +17,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.gr6.smartcart_android.R;
 import com.gr6.smartcart_android.chat.api.ChatApiService;
@@ -27,6 +28,8 @@ import com.gr6.smartcart_android.common.network.ApiClient;
 import com.gr6.smartcart_android.common.utils.ImageLoader;
 import com.gr6.smartcart_android.seller.inventory.api.SellerInventoryApiService;
 import com.gr6.smartcart_android.seller.inventory.response.InventoryItemResponse;
+import com.gr6.smartcart_android.seller.notification.SellerNotificationActivity;
+import com.gr6.smartcart_android.seller.notification.api.SellerNotificationApiService;
 import com.gr6.smartcart_android.seller.order.api.SellerOrderApiService;
 import com.gr6.smartcart_android.seller.order.response.OrderListResponse;
 import com.gr6.smartcart_android.seller.product.AddProductActivity;
@@ -56,6 +59,8 @@ public class SellerDashboardFragment extends Fragment {
 
     private static SellerShopInfoResponse cachedShop;
 
+    private SwipeRefreshLayout swipeRefreshDashboard;
+
     private ImageView imgSellerShopAvatar;
     private TextView txtSellerShopName;
     private TextView txtSellerStatus;
@@ -65,11 +70,13 @@ public class SellerDashboardFragment extends Fragment {
     private TextView txtLowStockCount;
     private TextView txtShopRating;
     private TextView txtUnreadMessageBadge;
+    private TextView txtUnreadNotificationBadge;
     private TextView txtRevenueDetail;
     private LinearLayout layoutRecentOrdersContainer;
 
     private View btnShopSetting;
     private View btnDashboardChat;
+    private View btnDashboardNotification;
     private View cardLowStock;
     private View toolAddProduct;
     private View toolOrders;
@@ -84,6 +91,8 @@ public class SellerDashboardFragment extends Fragment {
     private SellerOrderApiService orderApiService;
     private SellerInventoryApiService inventoryApiService;
     private ChatApiService chatApiService;
+    private SellerNotificationApiService notificationApiService;
+
     private final List<OrderListResponse> cachedOrders = new ArrayList<>();
 
     public static SellerDashboardFragment newInstance(SellerShopInfoResponse shop) {
@@ -124,6 +133,9 @@ public class SellerDashboardFragment extends Fragment {
         if (chatApiService != null) {
             loadUnreadMessages();
         }
+        if (notificationApiService != null) {
+            loadUnreadNotificationCount();
+        }
     }
 
     private void initServices() {
@@ -132,9 +144,12 @@ public class SellerDashboardFragment extends Fragment {
         orderApiService = ApiClient.createService(requireContext(), SellerOrderApiService.class);
         inventoryApiService = ApiClient.createService(requireContext(), SellerInventoryApiService.class);
         chatApiService = ApiClient.createService(requireContext(), ChatApiService.class);
+        notificationApiService = ApiClient.createService(requireContext(), SellerNotificationApiService.class);
     }
 
     private void initViews(@NonNull View view) {
+        swipeRefreshDashboard = view.findViewById(R.id.swipeRefreshDashboard);
+
         imgSellerShopAvatar = view.findViewById(R.id.imgSellerShopAvatar);
         txtSellerShopName = view.findViewById(R.id.txtSellerShopName);
         txtSellerStatus = view.findViewById(R.id.txtSellerStatus);
@@ -144,11 +159,13 @@ public class SellerDashboardFragment extends Fragment {
         txtLowStockCount = view.findViewById(R.id.txtLowStockCount);
         txtShopRating = view.findViewById(R.id.txtShopRating);
         txtUnreadMessageBadge = view.findViewById(R.id.txtUnreadMessageBadge);
+        txtUnreadNotificationBadge = view.findViewById(R.id.txtUnreadNotificationBadge);
         txtRevenueDetail = view.findViewById(R.id.txtRevenueDetail);
         layoutRecentOrdersContainer = view.findViewById(R.id.layoutRecentOrdersContainer);
 
         btnShopSetting = view.findViewById(R.id.btnShopSetting);
         btnDashboardChat = view.findViewById(R.id.btnDashboardChat);
+        btnDashboardNotification = view.findViewById(R.id.btnDashboardNotification);
         cardLowStock = view.findViewById(R.id.cardLowStock);
         toolAddProduct = view.findViewById(R.id.toolAddProduct);
         toolOrders = view.findViewById(R.id.toolOrders);
@@ -172,11 +189,21 @@ public class SellerDashboardFragment extends Fragment {
     }
 
     private void initEvents() {
+        if (swipeRefreshDashboard != null) {
+            swipeRefreshDashboard.setOnRefreshListener(this::loadDashboardData);
+        }
+
         btnShopSetting.setOnClickListener(v ->
                 startActivity(new Intent(requireContext(), SellerShopInfoActivity.class))
         );
 
         btnDashboardChat.setOnClickListener(v -> openChatList());
+
+        if (btnDashboardNotification != null) {
+            btnDashboardNotification.setOnClickListener(v ->
+                    startActivity(new Intent(requireContext(), SellerNotificationActivity.class))
+            );
+        }
 
         toolAddProduct.setOnClickListener(v ->
                 startActivity(new Intent(requireContext(), AddProductActivity.class))
@@ -209,6 +236,13 @@ public class SellerDashboardFragment extends Fragment {
         loadShopInfo();
         loadOrders();
         loadUnreadMessages();
+        loadUnreadNotificationCount();
+    }
+
+    private void finishRefreshIfNeeded() {
+        if (swipeRefreshDashboard != null && swipeRefreshDashboard.isRefreshing()) {
+            swipeRefreshDashboard.setRefreshing(false);
+        }
     }
 
     private void loadShopInfo() {
@@ -227,6 +261,8 @@ public class SellerDashboardFragment extends Fragment {
                     loadProductsAndRating();
                     loadLowStock();
                 }
+
+                finishRefreshIfNeeded();
             }
 
             @Override
@@ -236,6 +272,7 @@ public class SellerDashboardFragment extends Fragment {
             ) {
                 if (!isAdded()) return;
                 bindShopInfo(cachedShop);
+                finishRefreshIfNeeded();
             }
         });
     }
@@ -298,6 +335,8 @@ public class SellerDashboardFragment extends Fragment {
                 }
 
                 List<OrderListResponse> orders = body.getData() == null ? new ArrayList<>() : body.getData();
+                sortNewestOrdersFirst(orders);
+
                 cachedOrders.clear();
                 cachedOrders.addAll(orders);
                 txtPendingOrders.setText(String.valueOf(countPendingOrders(orders)));
@@ -315,6 +354,16 @@ public class SellerDashboardFragment extends Fragment {
                 txtTodayRevenue.setText("0đ");
                 renderRecentOrders(new ArrayList<>());
             }
+        });
+    }
+
+    private void sortNewestOrdersFirst(List<OrderListResponse> orders) {
+        if (orders == null) return;
+
+        orders.sort((o1, o2) -> {
+            String t1 = o1 == null ? "" : String.valueOf(o1.getCreatedAt());
+            String t2 = o2 == null ? "" : String.valueOf(o2.getCreatedAt());
+            return t2.compareTo(t1);
         });
     }
 
@@ -445,13 +494,18 @@ public class SellerDashboardFragment extends Fragment {
             }
         }
 
-        String message = "Số đơn hàng bán được: " + soldOrders
-                + "\nSố đơn hàng hủy: " + cancelledOrders
-                + "\nDoanh thu hôm nay: " + formatMoney(todayRevenue);
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_seller_today_revenue_detail, null);
+
+        TextView txtDialogSoldOrders = dialogView.findViewById(R.id.txtDialogSoldOrders);
+        TextView txtDialogCancelledOrders = dialogView.findViewById(R.id.txtDialogCancelledOrders);
+        TextView txtDialogTodayRevenue = dialogView.findViewById(R.id.txtDialogTodayRevenue);
+
+        txtDialogSoldOrders.setText(String.valueOf(soldOrders));
+        txtDialogCancelledOrders.setText(String.valueOf(cancelledOrders));
+        txtDialogTodayRevenue.setText(formatMoney(todayRevenue));
 
         new AlertDialog.Builder(requireContext())
-                .setTitle("Chi tiết doanh thu hôm nay")
-                .setMessage(message)
+                .setView(dialogView)
                 .setPositiveButton("Đóng", null)
                 .show();
     }
@@ -493,6 +547,38 @@ public class SellerDashboardFragment extends Fragment {
         });
     }
 
+    private void loadUnreadNotificationCount() {
+        if (notificationApiService == null || txtUnreadNotificationBadge == null) {
+            return;
+        }
+
+        notificationApiService.getUnreadCount().enqueue(new Callback<BaseResponse<Long>>() {
+            @Override
+            public void onResponse(
+                    @NonNull Call<BaseResponse<Long>> call,
+                    @NonNull Response<BaseResponse<Long>> response
+            ) {
+                if (!isAdded()) return;
+
+                Long count = 0L;
+                if (response.body() != null && response.body().getData() != null) {
+                    count = response.body().getData();
+                }
+
+                updateNotificationBadge(count == null ? 0 : count.intValue());
+            }
+
+            @Override
+            public void onFailure(
+                    @NonNull Call<BaseResponse<Long>> call,
+                    @NonNull Throwable t
+            ) {
+                if (!isAdded()) return;
+                updateNotificationBadge(0);
+            }
+        });
+    }
+
     private void updateUnreadBadge(int unread) {
         if (txtUnreadMessageBadge == null) return;
 
@@ -504,6 +590,19 @@ public class SellerDashboardFragment extends Fragment {
 
         txtUnreadMessageBadge.setVisibility(View.VISIBLE);
         txtUnreadMessageBadge.setText(unread > 99 ? "99+" : String.valueOf(unread));
+    }
+
+    private void updateNotificationBadge(int unread) {
+        if (txtUnreadNotificationBadge == null) return;
+
+        if (unread <= 0) {
+            txtUnreadNotificationBadge.setVisibility(View.GONE);
+            txtUnreadNotificationBadge.setText("0");
+            return;
+        }
+
+        txtUnreadNotificationBadge.setVisibility(View.VISIBLE);
+        txtUnreadNotificationBadge.setText(unread > 99 ? "99+" : String.valueOf(unread));
     }
 
     private int countPendingOrders(List<OrderListResponse> orders) {
@@ -530,7 +629,6 @@ public class SellerDashboardFragment extends Fragment {
         }
         return total;
     }
-
 
     private void setRatingText(String ratingText) {
         if (txtShopRating == null) return;
@@ -785,7 +883,3 @@ public class SellerDashboardFragment extends Fragment {
         return Math.round(value * getResources().getDisplayMetrics().density);
     }
 }
-
-
-
-

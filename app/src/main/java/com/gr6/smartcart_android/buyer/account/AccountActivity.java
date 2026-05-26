@@ -9,6 +9,8 @@ import android.widget.TextView;
 import com.gr6.smartcart_android.R;
 import com.gr6.smartcart_android.auth.login.LoginActivity;
 import com.gr6.smartcart_android.buyer.order.OrderHistoryActivity;
+import com.gr6.smartcart_android.buyer.notification.NotificationActivity;
+import com.gr6.smartcart_android.buyer.main.BuyerMainActivity;
 import com.gr6.smartcart_android.common.base.BaseActivity;
 import com.gr6.smartcart_android.common.storage.TokenManager;
 import com.gr6.smartcart_android.common.storage.UserSession;
@@ -191,7 +193,7 @@ public class AccountActivity extends BaseActivity {
     }
     private void initEvents() {
         setupSwipeRefresh(swipeAccount, () -> loadProfileFromServer(false));
-        imgBack.setOnClickListener(v -> finish());
+        imgBack.setOnClickListener(v -> openHome());
 
         itemOrders.setOnClickListener(v -> openOrderHistory());
 
@@ -208,9 +210,7 @@ public class AccountActivity extends BaseActivity {
             startActivity(intent);
         });
 
-        itemNotification.setOnClickListener(v ->
-                showToast("Thông báo sẽ làm ở bước sau")
-        );
+        itemNotification.setOnClickListener(v -> openNotification());
 
         itemChangePassword.setOnClickListener(v ->
                 showToast("Đổi mật khẩu sẽ làm ở bước sau")
@@ -220,9 +220,7 @@ public class AccountActivity extends BaseActivity {
                 showToast("Trung tâm hỗ trợ sẽ làm ở bước sau")
         );
 
-        itemAbout.setOnClickListener(v ->
-                showToast("SmartCart - ứng dụng mua sắm thông minh")
-        );
+        itemAbout.setOnClickListener(v -> openHome());
 
         itemLogout.setOnClickListener(v -> logout());
         imgAvatar.setOnClickListener(v -> openProfile());
@@ -242,23 +240,17 @@ public class AccountActivity extends BaseActivity {
     }
 
     private void openHome() {
-        try {
-            Class<?> homeClass = Class.forName(
-                    "com.gr6.smartcart_android.buyer.main.BuyerMainActivity"
-            );
-
-            Intent intent = new Intent(this, homeClass);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-            startActivity(intent);
-            finish();
-        } catch (Exception e) {
-            finish();
-        }
+        Intent intent = new Intent(this, BuyerMainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        startActivity(intent);
+        finish();
+        overridePendingTransition(0, 0);
     }
 
     private void openNotification() {
-        Intent intent = new Intent(this, com.gr6.smartcart_android.buyer.notification.NotificationActivity.class);
+        Intent intent = new Intent(this, NotificationActivity.class);
         startActivity(intent);
+        overridePendingTransition(0, 0);
     }
     private void openAddress() {
         try {
