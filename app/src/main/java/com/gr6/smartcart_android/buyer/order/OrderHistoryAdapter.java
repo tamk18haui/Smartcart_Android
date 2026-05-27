@@ -86,8 +86,9 @@ public class OrderHistoryAdapter extends RecyclerView.Adapter<OrderHistoryAdapte
 
         holder.txtTotalAmount.setText(formatVnd(order.getTotalAmount()));
 
-        holder.txtStatus.setText(getDisplayStatus(order.getStatus()));
-        applyStatusStyle(holder.txtStatus, order.getStatus());
+        holder.txtStatus.setText(getDisplayStatus(order.getStatus(), order.getPaymentStatus()));
+        applyStatusStyle(holder.txtStatus, order.getStatus(), order.getPaymentStatus());
+
 
         bindItems(holder.layoutItems, order.getItems());
         bindButtons(holder, order);
@@ -251,10 +252,23 @@ public class OrderHistoryAdapter extends RecyclerView.Adapter<OrderHistoryAdapte
         return status == null ? "" : status.trim().toUpperCase();
     }
 
-    private String getDisplayStatus(String status) {
-        switch (normalizeStatus(status)) {
-            case "PENDING_PAYMENT":
-                return "Chờ thanh toán";
+    private String getDisplayStatus(String status, String paymentStatus) {
+        String s = normalizeStatus(status);
+        String p = normalizeStatus(paymentStatus);
+
+        if ("PENDING".equals(s) && "COMPLETED".equals(p)) {
+            return "Đã thanh toán - Chờ xác nhận";
+        }
+
+        if ("PENDING_PAYMENT".equals(s)) {
+            return "Chờ thanh toán";
+        }
+
+        if ("PAYMENT_FAILED".equals(s) || "FAILED".equals(p)) {
+            return "Thanh toán lỗi";
+        }
+
+        switch (s) {
             case "PENDING":
                 return "Chờ xác nhận";
             case "CONFIRMED":
@@ -269,23 +283,24 @@ public class OrderHistoryAdapter extends RecyclerView.Adapter<OrderHistoryAdapte
                 return "Hoàn thành";
             case "CANCELLED":
                 return "Đã hủy";
-            case "PAYMENT_FAILED":
-                return "Thanh toán lỗi";
             default:
                 return "Không rõ";
         }
     }
-
-    private void applyStatusStyle(TextView textView, String status) {
+    private void applyStatusStyle(TextView textView, String status, String paymentStatus) {
         String s = normalizeStatus(status);
+        String p = normalizeStatus(paymentStatus);
 
         int bgColor;
         int textColor;
 
-        if ("COMPLETED".equals(s) || "DELIVERED".equals(s)) {
+        if ("PENDING".equals(s) && "COMPLETED".equals(p)) {
             bgColor = Color.parseColor("#E8F8EF");
             textColor = Color.parseColor("#16A34A");
-        } else if ("CANCELLED".equals(s) || "PAYMENT_FAILED".equals(s)) {
+        } else if ("COMPLETED".equals(s) || "DELIVERED".equals(s)) {
+            bgColor = Color.parseColor("#E8F8EF");
+            textColor = Color.parseColor("#16A34A");
+        } else if ("CANCELLED".equals(s) || "PAYMENT_FAILED".equals(s) || "FAILED".equals(p)) {
             bgColor = Color.parseColor("#FEECEC");
             textColor = Color.parseColor("#DC2626");
         } else if ("SHIPPING".equals(s)) {
@@ -303,7 +318,6 @@ public class OrderHistoryAdapter extends RecyclerView.Adapter<OrderHistoryAdapte
         textView.setBackground(drawable);
         textView.setTextColor(textColor);
     }
-
     private int dp(int value) {
         return (int) (value * context.getResources().getDisplayMetrics().density);
     }

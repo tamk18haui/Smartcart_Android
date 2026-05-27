@@ -31,6 +31,10 @@ public class OrderHistoryResponse {
 
     @SerializedName("canCancel")
     private Boolean canCancel;
+    private String paymentMethod;
+    private String paymentProvider;
+    private String paymentStatus;
+
 
     @SerializedName("items")
     private List<OrderItemResponse> items;
@@ -53,6 +57,17 @@ public class OrderHistoryResponse {
         }
 
         return shopName.trim();
+    }
+    public String getPaymentMethod() {
+        return paymentMethod == null ? "" : paymentMethod.trim().toUpperCase();
+    }
+
+    public String getPaymentProvider() {
+        return paymentProvider == null ? "" : paymentProvider.trim().toUpperCase();
+    }
+
+    public String getPaymentStatus() {
+        return paymentStatus == null ? "" : paymentStatus.trim().toUpperCase();
     }
 
     public String getStatus() {

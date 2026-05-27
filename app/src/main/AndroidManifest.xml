@@ -105,6 +105,23 @@
             android:name=".buyer.product.ProductReviewsActivity"
             android:exported="false" />
         <activity
+            android:name=".buyer.order.OrderSuccessActivity"
+            android:exported="true"
+            android:launchMode="singleTop">
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:scheme="smartcart"
+                    android:host="payment-result" />
+            </intent-filter>
+
+        </activity>
+        <activity
             android:name=".buyer.category.CategoryActivity"
             android:exported="false" />
         <activity

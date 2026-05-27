@@ -13,6 +13,8 @@ public class OrderHistoryUiModel {
     private final long totalAmount;
     private final String createdAt;
     private final boolean canCancel;
+
+    private final String paymentStatus;
     private final List<OrderItemUiModel> items;
 
     public OrderHistoryUiModel(
@@ -21,6 +23,7 @@ public class OrderHistoryUiModel {
             Long shopId,
             String shopName,
             String status,
+            String paymentStatus,
             long totalAmount,
             String createdAt,
             boolean canCancel,
@@ -31,10 +34,14 @@ public class OrderHistoryUiModel {
         this.shopId = shopId;
         this.shopName = shopName == null ? "SmartCart Shop" : shopName;
         this.status = status == null ? "" : status.trim().toUpperCase();
+        this.paymentStatus = paymentStatus == null ? "" : paymentStatus.trim().toUpperCase();
         this.totalAmount = totalAmount;
         this.createdAt = createdAt == null ? "--" : createdAt;
         this.canCancel = canCancel;
         this.items = items == null ? new ArrayList<>() : items;
+    }
+    public String getPaymentStatus() {
+        return paymentStatus;
     }
 
     public Long getOrderId() {

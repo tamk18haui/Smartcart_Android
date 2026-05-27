@@ -84,6 +84,18 @@ public class OrderDetailResponse {
     @SerializedName("items")
     private List<OrderItemResponse> items;
 
+    public String getPaymentMethod() {
+        return paymentMethod == null ? "" : paymentMethod.trim().toUpperCase();
+    }
+
+    public String getPaymentProvider() {
+        return paymentProvider == null ? "" : paymentProvider.trim().toUpperCase();
+    }
+
+    public String getPaymentStatus() {
+        return paymentStatus == null ? "" : paymentStatus.trim().toUpperCase();
+    }
+
     public Long getShopOrderId() {
         return shopOrderId;
     }

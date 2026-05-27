@@ -586,6 +586,7 @@ public class OrderHistoryActivity extends BaseActivity {
         String status = response.getStatus();
         long totalAmount = toLong(response.getTotalAmount());
         String createdAt = formatDateTime(response.getCreatedAt());
+        String paymentStatus = response.getPaymentStatus();
 
         List<OrderHistoryUiModel.OrderItemUiModel> itemUiModels = new ArrayList<>();
 
@@ -610,6 +611,7 @@ public class OrderHistoryActivity extends BaseActivity {
                 shopId,
                 shopName,
                 status,
+                paymentStatus,
                 totalAmount,
                 createdAt,
                 response.canCancel(),

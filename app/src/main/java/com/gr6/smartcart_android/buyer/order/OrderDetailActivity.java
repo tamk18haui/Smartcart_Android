@@ -199,13 +199,21 @@ public class OrderDetailActivity extends BaseActivity {
 
         txtOrderCode.setText(detail.getOrderCode());
         txtShopName.setText(detail.getShopName());
-        txtStatus.setText(formatStatus(detail.getStatus()));
+        txtStatus.setText(buildOrderStatusText(
+                detail.getStatus(),
+                detail.getPaymentStatus()
+        ));
+
+        txtPaymentMethod.setText(buildPaymentMethodText(
+                detail.getPaymentMethod(),
+                detail.getPaymentProvider()
+        ));
         txtCreatedAt.setText(formatDate(detail.getCreatedAt()));
 
         txtReceiverName.setText(detail.getReceiverName());
         txtReceiverPhone.setText(detail.getReceiverPhone());
         txtShippingAddress.setText(detail.getShippingAddress());
-        txtPaymentMethod.setText(detail.getPaymentText());
+
 
         bindJourney(detail);
 
@@ -443,5 +451,71 @@ public class OrderDetailActivity extends BaseActivity {
             default:
                 return status;
         }
+    }
+    private String buildOrderStatusText(String status, String paymentStatus) {
+        String s = normalizeStatus(status);
+        String p = normalizeStatus(paymentStatus);
+
+        if ("PENDING".equals(s) && "COMPLETED".equals(p)) {
+            return "Đã thanh toán - Chờ xác nhận";
+        }
+
+        if ("PENDING_PAYMENT".equals(s)) {
+            return "Chờ thanh toán";
+        }
+
+        if ("PAYMENT_FAILED".equals(s) || "FAILED".equals(p)) {
+            return "Thanh toán thất bại";
+        }
+
+        switch (s) {
+            case "PENDING":
+                return "Chờ xác nhận";
+            case "CONFIRMED":
+                return "Đã xác nhận";
+            case "PREPARING":
+                return "Đang chuẩn bị hàng";
+            case "SHIPPING":
+                return "Đang giao hàng";
+            case "DELIVERED":
+                return "Đã giao hàng";
+            case "COMPLETED":
+                return "Hoàn thành";
+            case "CANCELLED":
+                return "Đã hủy";
+            default:
+                return "Đang xử lý";
+        }
+    }
+
+    private String buildPaymentMethodText(String paymentMethod, String paymentProvider) {
+        String method = normalizeStatus(paymentMethod);
+        String provider = normalizeStatus(paymentProvider);
+
+        if ("ONLINE".equals(method)) {
+            if ("VNPAY".equals(provider)) {
+                return "Thanh toán bằng VNPay";
+            }
+
+            if ("MOMO".equals(provider)) {
+                return "Thanh toán bằng MoMo";
+            }
+
+            return "Thanh toán online";
+        }
+
+        if ("COD".equals(method)) {
+            return "Thanh toán khi nhận hàng";
+        }
+
+        return "Thanh toán bằng VNPay, MoMo hoặc thanh toán khi nhận hàng";
+    }
+
+    private String normalizeStatus(String value) {
+        if (value == null) {
+            return "";
+        }
+
+        return value.trim().toUpperCase();
     }
 }

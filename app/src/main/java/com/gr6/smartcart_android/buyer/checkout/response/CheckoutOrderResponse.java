@@ -3,16 +3,24 @@ package com.gr6.smartcart_android.buyer.checkout.response;
 public class CheckoutOrderResponse {
 
     private Long orderId;
+    private Long shopOrderId;
     private Long transactionId;
+
     private String paymentUrl;
+
     private String orderStatus;
     private String paymentStatus;
     private String paymentProvider;
     private String checkoutSource;
+
     private Long totalAmount;
 
     public Long getOrderId() {
         return orderId;
+    }
+
+    public Long getShopOrderId() {
+        return shopOrderId;
     }
 
     public Long getTransactionId() {

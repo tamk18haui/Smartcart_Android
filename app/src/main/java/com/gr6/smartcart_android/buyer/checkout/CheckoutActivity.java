@@ -29,6 +29,7 @@ import com.gr6.smartcart_android.buyer.checkout.request.CreateOrderRequest;
 import com.gr6.smartcart_android.buyer.checkout.response.CheckoutOrderResponse;
 import com.gr6.smartcart_android.buyer.checkout.response.CheckoutPreviewResponse;
 import com.gr6.smartcart_android.buyer.checkout.response.CheckoutVoucherResponse;
+import com.gr6.smartcart_android.buyer.order.OrderSuccessActivity;
 import com.gr6.smartcart_android.common.base.BaseActivity;
 import com.gr6.smartcart_android.common.utils.ThemeColor;
 
@@ -896,26 +897,76 @@ public class CheckoutActivity extends BaseActivity {
 
     private void handleOrderSuccess(CheckoutOrderResponse response) {
         if (response == null) {
-            showToast("Đặt hàng thành công");
+            showLongToast("Server không trả dữ liệu đơn hàng");
+            return;
+        }
+
+        String provider = safeText(response.getPaymentProvider(), "NONE");
+        String paymentUrl = safeText(response.getPaymentUrl(), "");
+
+        android.util.Log.d(
+                "CHECKOUT_PAYMENT_RESPONSE",
+                "orderId=" + response.getOrderId()
+                        + ", shopOrderId=" + response.getShopOrderId()
+                        + ", provider=" + provider
+                        + ", paymentUrl=" + paymentUrl
+                        + ", orderStatus=" + response.getOrderStatus()
+                        + ", paymentStatus=" + response.getPaymentStatus()
+        );
+
+        boolean onlinePayment = "MOMO".equalsIgnoreCase(provider)
+                || "VNPAY".equalsIgnoreCase(provider);
+
+        if (onlinePayment && paymentUrl.isEmpty()) {
+            showLongToast(
+                    "Server chưa trả link thanh toán " + provider
+                            + ". Kiểm tra backend createPaymentUrl()."
+            );
+            return;
+        }
+
+        if (!paymentUrl.isEmpty()) {
+            showToast("Chuyển tới cổng thanh toán " + provider);
+
+            try {
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(paymentUrl));
+                startActivity(intent);
+            } catch (Exception e) {
+                showLongToast("Không mở được cổng thanh toán " + provider);
+            }
+
             finish();
             return;
         }
 
-        String paymentUrl = response.getPaymentUrl();
+        Intent intent = new Intent(this, OrderSuccessActivity.class);
+        intent.putExtra(OrderSuccessActivity.EXTRA_SUCCESS, true);
 
-        if (!isEmpty(paymentUrl)) {
-            showToast("Chuyển tới cổng thanh toán");
-
-            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(paymentUrl));
-            startActivity(intent);
-            finish();
-            return;
+        if (response.getOrderId() != null) {
+            intent.putExtra(OrderSuccessActivity.EXTRA_ORDER_ID, response.getOrderId());
         }
 
-        showLongToast("Đặt hàng thành công. Mã đơn #" + response.getOrderId());
+        if (response.getShopOrderId() != null) {
+            intent.putExtra(OrderSuccessActivity.EXTRA_SHOP_ORDER_ID, response.getShopOrderId());
+        }
+
+        intent.putExtra(OrderSuccessActivity.EXTRA_TOTAL_AMOUNT, response.getTotalAmount());
+        intent.putExtra(OrderSuccessActivity.EXTRA_PAYMENT_METHOD, "COD");
+        intent.putExtra(OrderSuccessActivity.EXTRA_PAYMENT_PROVIDER, "NONE");
+        intent.putExtra(OrderSuccessActivity.EXTRA_PAYMENT_STATUS, safeText(response.getPaymentStatus(), "PENDING"));
+        intent.putExtra(OrderSuccessActivity.EXTRA_ORDER_STATUS, safeText(response.getOrderStatus(), "PENDING"));
+        intent.putExtra(OrderSuccessActivity.EXTRA_MESSAGE, "Đặt hàng thành công");
+
+        startActivity(intent);
         finish();
     }
+    private String safeText(String value, String fallback) {
+        if (value == null || value.trim().isEmpty()) {
+            return fallback;
+        }
 
+        return value.trim();
+    }
     private String formatVnd(Long value) {
         long amount = value == null ? 0L : value;
         NumberFormat formatter = NumberFormat.getInstance(new Locale("vi", "VN"));
