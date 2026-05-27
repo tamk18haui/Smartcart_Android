@@ -103,12 +103,24 @@ public class ChatWebSocketClient {
     }
 
     public boolean sendMessage(Long receiverId, String content) {
+        return sendMessage(receiverId, content, null, "TEXT");
+    }
+
+    public boolean sendMessage(
+            Long receiverId,
+            String content,
+            String imageUrl,
+            String messageType
+    ) {
         if (receiverId == null || receiverId <= 0) {
             notifyError("Không tìm thấy người nhận");
             return false;
         }
 
-        if (content == null || content.trim().isEmpty()) {
+        String safeContent = content == null ? "" : content.trim();
+        String safeImageUrl = imageUrl == null ? "" : imageUrl.trim();
+
+        if (safeContent.isEmpty() && safeImageUrl.isEmpty()) {
             notifyError("Tin nhắn không được để trống");
             return false;
         }
@@ -118,7 +130,16 @@ public class ChatWebSocketClient {
             return false;
         }
 
-        ChatMessageRequest request = new ChatMessageRequest(receiverId, content.trim());
+        String safeMessageType = messageType == null || messageType.trim().isEmpty()
+                ? (safeImageUrl.isEmpty() ? "TEXT" : "IMAGE")
+                : messageType.trim().toUpperCase();
+
+        ChatMessageRequest request = new ChatMessageRequest(
+                receiverId,
+                safeContent,
+                safeImageUrl.isEmpty() ? null : safeImageUrl,
+                safeMessageType
+        );
         String body = gson.toJson(request);
 
         String frame = "SEND\n"
@@ -285,3 +306,5 @@ public class ChatWebSocketClient {
         void onError(String message);
     }
 }
+
+

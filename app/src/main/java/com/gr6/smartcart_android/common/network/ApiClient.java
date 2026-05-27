@@ -74,7 +74,7 @@ public class ApiClient {
         baseUrl = baseUrl.replaceAll("\\s+", "");
 
         if (baseUrl.isEmpty()) {
-            baseUrl = "http://192.168.0.105:8080/";
+            baseUrl = "http://192.168.2.8+:8080/";
         }
 
         if (!baseUrl.endsWith("/")) {

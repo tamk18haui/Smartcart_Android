@@ -166,6 +166,52 @@ public class ChatRoomViewModel extends AndroidViewModel {
         );
     }
 
+
+    public void sendImage(String imageUrl) {
+        if (partnerId == null || partnerId <= 0) {
+            sendMessageState.setValue(SendMessageState.error("Không tìm thấy người nhận"));
+            return;
+        }
+
+        if (imageUrl == null || imageUrl.trim().isEmpty()) {
+            sendMessageState.setValue(SendMessageState.error("Ảnh không hợp lệ"));
+            return;
+        }
+
+        String safeImageUrl = imageUrl.trim();
+        sendMessageState.setValue(SendMessageState.loading());
+
+        boolean sentBySocket = repository.sendMessageBySocket(
+                partnerId,
+                "",
+                safeImageUrl,
+                "IMAGE"
+        );
+
+        if (sentBySocket) {
+            sendMessageState.setValue(SendMessageState.success(null, "Đã gửi ảnh"));
+            return;
+        }
+
+        repository.sendMessageByRest(
+                partnerId,
+                "",
+                safeImageUrl,
+                "IMAGE",
+                new ChatRepository.DataCallback<ChatMessageResponse>() {
+                    @Override
+                    public void onSuccess(ChatMessageResponse data, String message) {
+                        sendMessageState.postValue(SendMessageState.success(data, message));
+                    }
+
+                    @Override
+                    public void onError(String message) {
+                        sendMessageState.postValue(SendMessageState.error(message));
+                    }
+                }
+        );
+    }
+
     public void markAsRead() {
         repository.markAsRead(partnerId);
     }
@@ -189,3 +235,5 @@ public class ChatRoomViewModel extends AndroidViewModel {
         repository.disconnectWebSocket();
     }
 }
+
+

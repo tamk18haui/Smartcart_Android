@@ -24,6 +24,8 @@ import com.gr6.smartcart_android.seller.notification.response.SellerNotification
 import com.gr6.smartcart_android.seller.order.SellerOrderDetailActivity;
 import com.gr6.smartcart_android.seller.review.SellerProductReviewsActivity;
 
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -153,6 +155,8 @@ public class SellerNotificationActivity extends BaseActivity {
         if ("CHAT_ROOM".equals(routeKey) && targetId != null) {
             Intent intent = new Intent(this, ChatRoomActivity.class);
             intent.putExtra(ChatRoomActivity.EXTRA_PARTNER_ID, targetId);
+            intent.putExtra(ChatRoomActivity.EXTRA_PARTNER_NAME, readRouteParam(notification.getRouteParams(), "partnerName"));
+            intent.putExtra(ChatRoomActivity.EXTRA_PARTNER_AVATAR, readRouteParam(notification.getRouteParams(), "partnerAvatarUrl"));
             startActivity(intent);
             return;
         }
@@ -178,4 +182,19 @@ public class SellerNotificationActivity extends BaseActivity {
 
         finish();
     }
+
+    private String readRouteParam(String rawJson, String key) {
+        if (rawJson == null || rawJson.trim().isEmpty()) {
+            return "";
+        }
+
+        try {
+            JSONObject object = new JSONObject(rawJson);
+            return object.optString(key, "");
+        } catch (Exception ignored) {
+            return "";
+        }
+    }
 }
+
+

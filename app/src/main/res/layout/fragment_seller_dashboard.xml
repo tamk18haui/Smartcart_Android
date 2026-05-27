@@ -51,13 +51,12 @@
                     app:layout_constraintEnd_toStartOf="@id/btnDashboardChat"
                     app:layout_constraintTop_toTopOf="parent">
 
-                    <TextView
+                    <ImageView
                         android:layout_width="28dp"
                         android:layout_height="28dp"
                         android:layout_gravity="center"
-                        android:gravity="center"
-                        android:text="🔔"
-                        android:textSize="22sp" />
+                        android:src="@drawable/ic_notification"
+                        app:tint="@color/brand_primary" />
 
                     <TextView
                         android:id="@+id/txtUnreadNotificationBadge"
@@ -613,3 +612,5 @@
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+

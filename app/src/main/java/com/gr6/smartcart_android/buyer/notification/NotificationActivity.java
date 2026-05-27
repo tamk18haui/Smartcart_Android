@@ -1,25 +1,30 @@
 package com.gr6.smartcart_android.buyer.notification;
 
 import android.content.Intent;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.gr6.smartcart_android.R;
+import com.gr6.smartcart_android.buyer.main.BuyerMainActivity;
 import com.gr6.smartcart_android.buyer.notification.api.BuyerNotificationApiService;
 import com.gr6.smartcart_android.buyer.notification.response.BuyerNotificationResponse;
 import com.gr6.smartcart_android.buyer.order.OrderDetailActivity;
-import com.gr6.smartcart_android.buyer.main.BuyerMainActivity;
+import com.gr6.smartcart_android.chat.ChatRoomActivity;
 import com.gr6.smartcart_android.common.base.BaseActivity;
 import com.gr6.smartcart_android.common.base.BaseResponse;
 import com.gr6.smartcart_android.common.network.ApiClient;
 import com.gr6.smartcart_android.common.utils.ThemeColor;
 import com.gr6.smartcart_android.navigation.BuyerBottomNavHelper;
+
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -130,6 +135,8 @@ public class NotificationActivity extends BaseActivity {
 
     private void applyFilter(String filter) {
         currentFilter = filter;
+        applyTabUi();
+
         List<BuyerNotificationResponse> result = new ArrayList<>();
 
         for (BuyerNotificationResponse item : allItems) {
@@ -143,6 +150,39 @@ public class NotificationActivity extends BaseActivity {
         boolean empty = result.isEmpty();
         layoutEmpty.setVisibility(empty ? View.VISIBLE : View.GONE);
         rcvNotifications.setVisibility(empty ? View.GONE : View.VISIBLE);
+    }
+
+    private void applyTabUi() {
+        styleTab(tabAll, "ALL".equals(currentFilter));
+        styleTab(tabUnread, "UNREAD".equals(currentFilter));
+        styleTab(tabOrder, "ORDER".equals(currentFilter));
+        styleTab(tabPromotion, "PROMOTION".equals(currentFilter));
+    }
+
+    private void styleTab(LinearLayout tab, boolean selected) {
+        if (tab == null) return;
+
+        int bgColor = selected
+                ? ContextCompat.getColor(this, R.color.brand_primary_light)
+                : ContextCompat.getColor(this, R.color.surface);
+
+        int strokeColor = selected
+                ? ContextCompat.getColor(this, R.color.brand_primary)
+                : ContextCompat.getColor(this, R.color.border);
+
+        int textColor = selected
+                ? ContextCompat.getColor(this, R.color.brand_primary)
+                : ContextCompat.getColor(this, R.color.text_secondary);
+
+        GradientDrawable drawable = new GradientDrawable();
+        drawable.setColor(bgColor);
+        drawable.setCornerRadius(dp(999));
+        drawable.setStroke(dp(1), strokeColor);
+        tab.setBackground(drawable);
+
+        if (tab.getChildCount() > 0 && tab.getChildAt(0) instanceof TextView) {
+            ((TextView) tab.getChildAt(0)).setTextColor(textColor);
+        }
     }
 
     private void handleNotificationClick(BuyerNotificationResponse notification) {
@@ -174,6 +214,16 @@ public class NotificationActivity extends BaseActivity {
         String routeKey = notification.getRouteKey();
         Long targetId = notification.getTargetId();
 
+        if (("CHAT_ROOM".equals(routeKey) || "CHAT".equalsIgnoreCase(notification.getType()))
+                && targetId != null) {
+            Intent intent = new Intent(this, ChatRoomActivity.class);
+            intent.putExtra(ChatRoomActivity.EXTRA_PARTNER_ID, targetId);
+            intent.putExtra(ChatRoomActivity.EXTRA_PARTNER_NAME, readRouteParam(notification.getRouteParams(), "partnerName"));
+            intent.putExtra(ChatRoomActivity.EXTRA_PARTNER_AVATAR, readRouteParam(notification.getRouteParams(), "partnerAvatarUrl"));
+            startActivity(intent);
+            return;
+        }
+
         if (("BUYER_ORDER_DETAIL".equals(routeKey)
                 || "ORDER_DETAIL".equals(routeKey)
                 || "SHOP_ORDER_DETAIL".equals(routeKey)
@@ -189,6 +239,19 @@ public class NotificationActivity extends BaseActivity {
         loadNotifications();
     }
 
+    private String readRouteParam(String rawJson, String key) {
+        if (rawJson == null || rawJson.trim().isEmpty()) {
+            return "";
+        }
+
+        try {
+            JSONObject object = new JSONObject(rawJson);
+            return object.optString(key, "");
+        } catch (Exception ignored) {
+            return "";
+        }
+    }
+
     private void openBuyerHome() {
         Intent intent = new Intent(this, BuyerMainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
@@ -197,3 +260,5 @@ public class NotificationActivity extends BaseActivity {
         overridePendingTransition(0, 0);
     }
 }
+
+

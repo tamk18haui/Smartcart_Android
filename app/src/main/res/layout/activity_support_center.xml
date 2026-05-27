@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="58dp"
+        android:background="@color/brand_primary"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="14dp"
+        android:paddingEnd="14dp">
+
+        <ImageView
+            android:id="@+id/imgBack"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:padding="9dp"
+            android:src="@drawable/ic_back"
+            app:tint="@color/text_white" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:text="Trung tâm hỗ trợ SmartCart"
+            android:textColor="@color/text_white"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <ImageView
+            android:layout_width="34dp"
+            android:layout_height="34dp"
+            android:padding="6dp"
+            android:src="@drawable/ic_message"
+            app:tint="@color/text_white" />
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="false">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_seller_card"
+                android:orientation="vertical"
+                android:padding="18dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Xin chào, SmartCart có thể giúp gì cho bạn?"
+                    android:textColor="@color/text_primary"
+                    android:textSize="21sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:lineSpacingExtra="4dp"
+                    android:text="Chọn vấn đề bên dưới để xem hướng dẫn nhanh hoặc liên hệ hỗ trợ. Các mục này chỉ điều hướng giao diện, không ảnh hưởng chức năng mua bán hiện tại."
+                    android:textColor="@color/text_secondary"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="18dp"
+                android:text="Hỗ trợ nhanh"
+                android:textColor="@color/text_primary"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:id="@+id/itemSupportChat"
+                style="@style/SupportCenterItem"
+                android:layout_marginTop="10dp">
+
+                <ImageView
+                    style="@style/SupportCenterIcon"
+                    android:src="@drawable/ic_message"
+                    app:tint="@color/brand_primary" />
+
+                <LinearLayout
+                    style="@style/SupportCenterTextBox">
+
+                    <TextView
+                        style="@style/SupportCenterTitle"
+                        android:text="Tin nhắn với shop" />
+
+                    <TextView
+                        style="@style/SupportCenterSubtitle"
+                        android:text="Mở danh sách trò chuyện để liên hệ shop hoặc người nhận." />
+                </LinearLayout>
+
+                <ImageView
+                    style="@style/SupportCenterArrow"
+                    android:src="@drawable/ic_chevron_right"
+                    app:tint="@color/text_secondary" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/itemSupportOrder"
+                style="@style/SupportCenterItem">
+
+                <ImageView
+                    style="@style/SupportCenterIcon"
+                    android:src="@drawable/ic_seller_orders"
+                    app:tint="@color/brand_primary" />
+
+                <LinearLayout
+                    style="@style/SupportCenterTextBox">
+
+                    <TextView
+                        style="@style/SupportCenterTitle"
+                        android:text="Vấn đề đơn hàng" />
+
+                    <TextView
+                        style="@style/SupportCenterSubtitle"
+                        android:text="Theo dõi xác nhận, giao hàng, hủy đơn và hoàn tiền." />
+                </LinearLayout>
+
+                <ImageView
+                    style="@style/SupportCenterArrow"
+                    android:src="@drawable/ic_chevron_right"
+                    app:tint="@color/text_secondary" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/itemSupportPayment"
+                style="@style/SupportCenterItem">
+
+                <ImageView
+                    style="@style/SupportCenterIcon"
+                    android:src="@drawable/ic_star"
+                    app:tint="@color/warning" />
+
+                <LinearLayout
+                    style="@style/SupportCenterTextBox">
+
+                    <TextView
+                        style="@style/SupportCenterTitle"
+                        android:text="Thanh toán và hoàn tiền" />
+
+                    <TextView
+                        style="@style/SupportCenterSubtitle"
+                        android:text="Hướng dẫn xử lý giao dịch, ví và tiền hoàn." />
+                </LinearLayout>
+
+                <ImageView
+                    style="@style/SupportCenterArrow"
+                    android:src="@drawable/ic_chevron_right"
+                    app:tint="@color/text_secondary" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/itemSupportSeller"
+                style="@style/SupportCenterItem">
+
+                <ImageView
+                    style="@style/SupportCenterIcon"
+                    android:src="@drawable/ic_seller_chat"
+                    app:tint="@color/success" />
+
+                <LinearLayout
+                    style="@style/SupportCenterTextBox">
+
+                    <TextView
+                        style="@style/SupportCenterTitle"
+                        android:text="Hỗ trợ người bán" />
+
+                    <TextView
+                        style="@style/SupportCenterSubtitle"
+                        android:text="Vấn đề sản phẩm, shop, đơn hàng và rút tiền." />
+                </LinearLayout>
+
+                <ImageView
+                    style="@style/SupportCenterArrow"
+                    android:src="@drawable/ic_chevron_right"
+                    app:tint="@color/text_secondary" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="Liên hệ SmartCart"
+                android:textColor="@color/text_primary"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:id="@+id/itemSupportEmail"
+                style="@style/SupportCenterItem"
+                android:layout_marginTop="10dp">
+
+                <ImageView
+                    style="@style/SupportCenterIcon"
+                    android:src="@drawable/ic_email"
+                    app:tint="@color/brand_primary" />
+
+                <LinearLayout
+                    style="@style/SupportCenterTextBox">
+
+                    <TextView
+                        style="@style/SupportCenterTitle"
+                        android:text="Email hỗ trợ" />
+
+                    <TextView
+                        style="@style/SupportCenterSubtitle"
+                        android:text="support@smartcart.vn" />
+                </LinearLayout>
+
+                <ImageView
+                    style="@style/SupportCenterArrow"
+                    android:src="@drawable/ic_chevron_right"
+                    app:tint="@color/text_secondary" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/itemSupportHotline"
+                style="@style/SupportCenterItem">
+
+                <ImageView
+                    style="@style/SupportCenterIcon"
+                    android:src="@drawable/ic_phone"
+                    app:tint="@color/success" />
+
+                <LinearLayout
+                    style="@style/SupportCenterTextBox">
+
+                    <TextView
+                        style="@style/SupportCenterTitle"
+                        android:text="Hotline" />
+
+                    <TextView
+                        style="@style/SupportCenterSubtitle"
+                        android:text="1900 1009" />
+                </LinearLayout>
+
+                <ImageView
+                    style="@style/SupportCenterArrow"
+                    android:src="@drawable/ic_chevron_right"
+                    app:tint="@color/text_secondary" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/btnBackHome"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="22dp"
+                android:layout_marginBottom="28dp"
+                android:background="@drawable/bg_seller_button_primary"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:layout_marginEnd="8dp"
+                    android:src="@drawable/ic_home"
+                    app:tint="@color/text_white" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Về SmartCart"
+                    android:textColor="@color/text_white"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

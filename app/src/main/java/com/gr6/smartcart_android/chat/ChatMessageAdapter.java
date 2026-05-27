@@ -3,6 +3,7 @@ package com.gr6.smartcart_android.chat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -11,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.gr6.smartcart_android.R;
 import com.gr6.smartcart_android.chat.response.ChatMessageResponse;
 import com.gr6.smartcart_android.chat.util.ChatTimeFormatter;
+import com.gr6.smartcart_android.common.utils.ImageLoader;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -98,18 +100,33 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
 
         private final TextView txtMessage;
         private final TextView txtTime;
+        private final ImageView imgMessageImage;
 
         public MessageViewHolder(@NonNull View itemView) {
             super(itemView);
 
             txtMessage = itemView.findViewById(R.id.txtMessage);
             txtTime = itemView.findViewById(R.id.txtTime);
+            imgMessageImage = itemView.findViewById(R.id.imgMessageImage);
         }
 
         void bind(ChatMessageResponse message) {
             if (message == null) return;
 
-            txtMessage.setText(message.getContent());
+            boolean hasImage = message.isImageMessage() && !message.getImageUrl().isEmpty();
+            boolean hasText = !message.getContent().trim().isEmpty()
+                    && !(hasImage && "[Ảnh]".equals(message.getContent().trim()));
+
+            if (imgMessageImage != null) {
+                imgMessageImage.setVisibility(hasImage ? View.VISIBLE : View.GONE);
+
+                if (hasImage) {
+                    ImageLoader.load(itemView.getContext(), message.getImageUrl(), imgMessageImage);
+                }
+            }
+
+            txtMessage.setVisibility(hasText ? View.VISIBLE : View.GONE);
+            txtMessage.setText(hasText ? message.getContent() : "");
             txtTime.setText(ChatTimeFormatter.shortTime(message.getCreatedAt()));
         }
     }

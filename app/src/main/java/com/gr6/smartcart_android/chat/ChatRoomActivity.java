@@ -1,13 +1,16 @@
 package com.gr6.smartcart_android.chat;
 
+import android.content.Context;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.content.Context;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -15,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.gr6.smartcart_android.R;
 import com.gr6.smartcart_android.chat.response.ChatMessageResponse;
 import com.gr6.smartcart_android.common.base.BaseActivity;
+import com.gr6.smartcart_android.common.cloudinary.CloudinaryRepository;
 import com.gr6.smartcart_android.common.storage.UserSession;
 import com.gr6.smartcart_android.common.utils.ImageLoader;
 import com.gr6.smartcart_android.common.utils.ThemeColor;
@@ -31,15 +35,19 @@ public class ChatRoomActivity extends BaseActivity {
     private TextView txtSocketStatus;
     private RecyclerView rcvMessages;
     private EditText edtMessage;
+    private ImageView btnPickImage;
     private ImageView btnSend;
     private View layoutEmpty;
 
     private ChatRoomViewModel viewModel;
     private ChatMessageAdapter adapter;
+    private CloudinaryRepository cloudinaryRepository;
+    private ActivityResultLauncher<String> pickImageLauncher;
 
     private Long partnerId;
     private String partnerName;
     private String partnerAvatar;
+    private boolean uploadingImage = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +58,8 @@ public class ChatRoomActivity extends BaseActivity {
         ThemeColor.applyWhiteNavigationBar(this);
 
         viewModel = new ViewModelProvider(this).get(ChatRoomViewModel.class);
+        cloudinaryRepository = new CloudinaryRepository();
+        setupImagePicker();
 
         readIntent();
         initViews();
@@ -58,6 +68,16 @@ public class ChatRoomActivity extends BaseActivity {
         observeData();
 
         viewModel.init(partnerId);
+    }
+
+    private void setupImagePicker() {
+        pickImageLauncher = registerForActivityResult(
+                new ActivityResultContracts.GetContent(),
+                uri -> {
+                    if (uri == null) return;
+                    uploadAndSendImage(uri);
+                }
+        );
     }
 
     private void readIntent() {
@@ -78,6 +98,7 @@ public class ChatRoomActivity extends BaseActivity {
         txtSocketStatus = findViewById(R.id.txtSocketStatus);
         rcvMessages = findViewById(R.id.rcvMessages);
         edtMessage = findViewById(R.id.edtMessage);
+        btnPickImage = findViewById(R.id.btnPickImage);
         btnSend = findViewById(R.id.btnSend);
         layoutEmpty = findViewById(R.id.layoutEmpty);
 
@@ -107,6 +128,11 @@ public class ChatRoomActivity extends BaseActivity {
 
     private void initEvents() {
         imgBack.setOnClickListener(v -> finish());
+
+        btnPickImage.setOnClickListener(v -> {
+            hideKeyboard();
+            pickImageLauncher.launch("image/*");
+        });
 
         btnSend.setOnClickListener(v -> sendMessage());
 
@@ -141,11 +167,13 @@ public class ChatRoomActivity extends BaseActivity {
             if (state == null) return;
 
             if (state.isLoading()) {
-                btnSend.setEnabled(false);
+                setSendControlsEnabled(false);
                 return;
             }
 
-            btnSend.setEnabled(true);
+            uploadingImage = false;
+            hideLoading();
+            setSendControlsEnabled(true);
 
             if (state.isSuccess()) {
                 edtMessage.setText("");
@@ -189,6 +217,49 @@ public class ChatRoomActivity extends BaseActivity {
 
         viewModel.sendMessage(content);
         hideKeyboard();
+    }
+
+    private void uploadAndSendImage(Uri imageUri) {
+        uploadingImage = true;
+        setSendControlsEnabled(false);
+        showLoading();
+
+        cloudinaryRepository.uploadImage(this, imageUri, new CloudinaryRepository.UploadCallback() {
+            @Override
+            public void onSuccess(String mediaUrl) {
+                runOnUiThread(() -> {
+                    if (mediaUrl == null || mediaUrl.trim().isEmpty()) {
+                        uploadingImage = false;
+                        hideLoading();
+                        setSendControlsEnabled(true);
+                        showToast("Cloudinary không trả link ảnh");
+                        return;
+                    }
+
+                    viewModel.sendImage(mediaUrl.trim());
+                });
+            }
+
+            @Override
+            public void onError(String message) {
+                runOnUiThread(() -> {
+                    uploadingImage = false;
+                    hideLoading();
+                    setSendControlsEnabled(true);
+                    showLongToast(message == null ? "Upload ảnh thất bại" : message);
+                });
+            }
+        });
+    }
+
+    private void setSendControlsEnabled(boolean enabled) {
+        btnSend.setEnabled(enabled);
+        btnSend.setAlpha(enabled ? 1f : 0.55f);
+
+        btnPickImage.setEnabled(enabled);
+        btnPickImage.setAlpha(enabled ? 1f : 0.55f);
+
+        edtMessage.setEnabled(enabled || uploadingImage);
     }
 
     private void updateEmptyState(boolean empty) {
